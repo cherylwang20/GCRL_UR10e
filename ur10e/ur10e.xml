@@ -121,6 +121,7 @@
                   <geom material="linkgray" mesh="wrist3" class="visual"/>
                   <geom class="eef_collision" pos="0 0.097 0" quat="1 1 0 0" size="0.046 0.02"/>
                   <site name="attachment_site" pos="0 0.1 0" quat="-1 1 0 0"/>
+                  <camera name="end_effector_cam" pos="0 0.12 0" quat="0.7071 0.7071 0 0" fovy="45"/>
                 </body>
               </body>
             </body>
