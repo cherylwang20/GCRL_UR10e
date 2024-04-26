@@ -8,7 +8,7 @@ import os
 import random
 from tqdm.auto import tqdm
 
-model_num = '2024_04_26_16_54_59'
+model_num = '2024_04_26_17_20_25'
 env_name = "UR10eReachFixed-v0"
 movie = True
 
@@ -21,15 +21,16 @@ frames = []
 view = 'front'
 for _ in tqdm(range(2)):
     ep_rewards = []
-    done = False
+    solved = False
     obs = env.reset()
     step = 0
-    for _ in tqdm(range(50)):
+    while not solved:
           obs = env.obsdict2obsvec(env.obs_dict, env.obs_keys)[1]
           #obs = env.get_obs_dict()        
           action, _ = model.predict(obs, deterministic=True)
           #env.sim.data.ctrl[:] = action
           obs, reward, done, info = env.step(action)
+          solved = info['solved']
           if movie:
                   #geom_1_indices = np.where(env.sim.model.geom_group == 1)
                   #env.sim.model.geom_rgba[geom_1_indices, 3] = 0
@@ -44,5 +45,5 @@ env.close()
 
 if movie:
     os.makedirs('./videos' +'/' + env_name, exist_ok=True)
-    skvideo.io.vwrite('./videos'  +'/' + env_name + '/' + model_num + f'{view}_video.mp4', np.asarray(frames), inputdict = {'-r':'10'} , outputdict={"-pix_fmt": "yuv420p"})
+    skvideo.io.vwrite('./videos'  +'/' + env_name + '/' + model_num + f'{view}_video.mp4', np.asarray(frames), inputdict = {'-r':'1'} , outputdict={"-pix_fmt": "yuv420p"})
 	

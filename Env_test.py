@@ -43,5 +43,6 @@ model = PPO('MlpPolicy', env, verbose=0, policy_kwargs =policy_kwargs)
 obs_callback = TensorboardCallback()
 callback = CallbackList([eval_callback])
 
-model.learn(total_timesteps= 200000, tb_log_name=env_name+"_" + time_now, callback=callback)
-model.save('ep_train_results')
+model.learn(total_timesteps= 500000, tb_log_name=env_name+"_" + time_now, callback=callback)
+
+
