@@ -8,7 +8,7 @@ import os
 import random
 from tqdm.auto import tqdm
 
-model_num = '2024_04_26_15_53_09'
+model_num = '2024_04_26_16_54_59'
 env_name = "UR10eReachFixed-v0"
 movie = True
 
@@ -19,13 +19,11 @@ env.reset()
 
 frames = []
 view = 'front'
-m_act = []
 for _ in tqdm(range(2)):
     ep_rewards = []
     done = False
     obs = env.reset()
     step = 0
-    muscle_act = []
     for _ in tqdm(range(50)):
           obs = env.obsdict2obsvec(env.obs_dict, env.obs_keys)[1]
           #obs = env.get_obs_dict()        
@@ -35,7 +33,7 @@ for _ in tqdm(range(2)):
           if movie:
                   #geom_1_indices = np.where(env.sim.model.geom_group == 1)
                   #env.sim.model.geom_rgba[geom_1_indices, 3] = 0
-                  frame = env.sim.renderer.render_offscreen(width=640, height=480,camera_id=f'right_cam')
+                  frame = env.sim.renderer.render_offscreen(width=1920, height=1080,camera_id=f'right_cam')
                   frame = np.rot90(np.rot90(frame))
             # if slow see https://github.com/facebookresearch/myosuite/blob/main/setup/README.md
                   frames.append(frame[::-1,:,:])
