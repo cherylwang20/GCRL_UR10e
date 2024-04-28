@@ -8,11 +8,11 @@ import os
 import random
 from tqdm.auto import tqdm
 
-model_num = '2024_04_27_19_30_02'
-env_name = "UR10eReachFixed-v0"
+model_num = '2024_04_27_22_52_12'
+env_name = "UR10ePickPlaceFixed-v0"
 movie = True
 
-model = PPO.load('./Reach_Target/policy_best_model/' + env_name +'/' + model_num + r'/best_model')
+model = PPO.load('./Pick&Place_Target/policy_best_model/' + env_name +'/' + model_num + r'/best_model')
 env = gym.make(f'mj_envs.robohive.envs:{env_name}')
 
 env.reset()
@@ -24,7 +24,7 @@ for _ in tqdm(range(2)):
     solved = False
     obs = env.reset()
     step = 0
-    while not solved and step < 300:
+    while not solved and step < 500:
           obs = env.obsdict2obsvec(env.obs_dict, env.obs_keys)[1]
           #obs = env.get_obs_dict()        
           action, _ = model.predict(obs, deterministic=True)
