@@ -8,7 +8,7 @@ import os
 import random
 from tqdm.auto import tqdm
 
-model_num = '2024_04_27_22_52_12'
+model_num = '2024_04_29_11_29_42'
 env_name = "UR10ePickPlaceFixed-v0"
 movie = True
 
@@ -24,7 +24,7 @@ for _ in tqdm(range(2)):
     solved = False
     obs = env.reset()
     step = 0
-    while not solved and step < 500:
+    while not solved and step < 1500:
           obs = env.obsdict2obsvec(env.obs_dict, env.obs_keys)[1]
           #obs = env.get_obs_dict()        
           action, _ = model.predict(obs, deterministic=True)

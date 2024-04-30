@@ -39,10 +39,10 @@ policy_kwargs = {
     'net_arch': {'pi': [256, 256], 'vf': [256, 256]}
     }
 
-model = PPO('MlpPolicy', env, verbose=0, policy_kwargs =policy_kwargs)
+model = PPO('MlpPolicy', env, verbose=0, ent_coef=0.1, policy_kwargs =policy_kwargs)
 obs_callback = TensorboardCallback()
 callback = CallbackList([eval_callback])
 
-model.learn(total_timesteps= 500000, tb_log_name=env_name+"_" + time_now, callback=callback)
+model.learn(total_timesteps= 5000000, tb_log_name=env_name+"_" + time_now, callback=callback)
 
 
