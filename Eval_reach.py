@@ -8,7 +8,7 @@ import os
 import random
 from tqdm.auto import tqdm
 
-model_num = '2024_04_30_14_24_34'
+model_num = '2024_05_03_14_42_58'
 env_name = "UR10eReachFixed-v0"
 movie = True
 
@@ -19,7 +19,7 @@ env.reset()
 
 frames = []
 view = 'front'
-for _ in tqdm(range(2)):
+for _ in tqdm(range(3)):
     ep_rewards = []
     solved = False
     obs = env.reset()
@@ -32,18 +32,14 @@ for _ in tqdm(range(2)):
           obs, reward, done, info = env.step(action)
           solved = info['solved']
           if movie:
-                  #geom_1_indices = np.where(env.sim.model.geom_group == 1)
-                  #env.sim.model.geom_rgba[geom_1_indices, 3] = 0
-                  frame = env.sim.renderer.render_offscreen(width=640, height=480,camera_id=f'right_cam')
-                  frame = np.rot90(np.rot90(frame))
-            # if slow see https://github.com/facebookresearch/myosuite/blob/main/setup/README.md
-                  frames.append(frame[::-1,:,:])
-                  #env.sim.mj_render(mode='window') # GUI
+            frame = env.sim.renderer.render_offscreen(width=640, height=480, camera_id=f'right_cam')
+            frame = np.rot90(np.rot90(frame))
+            frames.append(frame[::-1, :, :])
           step += 1
 
 env.close()
 
 if movie:
     os.makedirs('./videos' +'/' + env_name, exist_ok=True)
-    skvideo.io.vwrite('./videos'  +'/' + env_name + '/' + model_num + f'{view}_video.mp4', np.asarray(frames), inputdict = {'-r':'100'} , outputdict={"-pix_fmt": "yuv420p"})
+    skvideo.io.vwrite('./videos'  +'/' + env_name + '/' + model_num + f'{view}_video.mp4', np.asarray(frames), inputdict = {'-r':'50'} , outputdict={"-pix_fmt": "yuv420p"})
 	
