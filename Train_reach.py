@@ -27,19 +27,20 @@ class TensorboardCallback(BaseCallback):
 start_time = time.time()
 time_now = datetime.now().strftime("%Y_%m_%d_%H_%M_%S")
 
-env_name = "UR10eReachFixed-v0"
+env_name = "UR10eReachFixed-v1"
 
 log_path = './Reach_Target/policy_best_model/' + env_name + '/' + time_now + '/'
-#env = gym.make(f'mj_envs.robohive.envs.myo:{"myoHandPoseRandom-v0"}')
 env = gym.make(f'mj_envs.robohive.envs:{env_name}')
 eval_callback = EvalCallback(env, best_model_save_path=log_path, log_path=log_path, eval_freq=10000, deterministic=True, render=False)
 print('Begin training')
 policy_kwargs = {
     'activation_fn': torch.nn.modules.activation.ReLU,
-    'net_arch': {'pi': [256, 256], 'vf': [256, 256]}
+    'net_arch': {'pi': [128, 128], 'vf': [128, 128]}
     }
+model_num = '2024_05_15_14_32_50'
+#model = PPO('MlpPolicy', env, verbose=0, ent_coef= 0.01, policy_kwargs =policy_kwargs)
+model = PPO.load(r"C:/Users/chery/Documents/RL-Chemist/Reach_Target/policy_best_model/UR10eReachFixed-v1/" + model_num + '/best_model', env, verbose=0, policy_kwargs=policy_kwargs)
 
-model = PPO('MlpPolicy', env, verbose=0, ent_coef=0.1, policy_kwargs =policy_kwargs)
 obs_callback = TensorboardCallback()
 callback = CallbackList([eval_callback])
 

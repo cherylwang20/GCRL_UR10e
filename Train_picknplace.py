@@ -36,13 +36,15 @@ eval_callback = EvalCallback(env, best_model_save_path=log_path, log_path=log_pa
 print('Begin training')
 policy_kwargs = {
     'activation_fn': torch.nn.modules.activation.ReLU,
-    'net_arch': {'pi': [256, 256], 'vf': [256, 256]}
+    'net_arch': {'pi': [128, 128], 'vf': [128, 128]}
     }
 
-model = PPO('MlpPolicy', env, verbose=0, policy_kwargs =policy_kwargs)
+model_num = '2024_05_03_14_49_55'
+#model = PPO('MlpPolicy', env, verbose=0, policy_kwargs =policy_kwargs)
+model = PPO.load(r"C:/Users/chery/Documents/RL-Chemist/Pick&Place_Target/policy_best_model/UR10ePickPlaceFixed-v0/" + model_num + '/best_model', env, verbose=0, policy_kwargs=policy_kwargs)
 obs_callback = TensorboardCallback()
 callback = CallbackList([eval_callback])
 
-model.learn(total_timesteps= 500000, tb_log_name=env_name+"_" + time_now, callback=callback)
+model.learn(total_timesteps= 5000000, tb_log_name=env_name+"_" + time_now, callback=callback)
 
 

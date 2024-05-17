@@ -8,7 +8,7 @@ import os
 import random
 from tqdm.auto import tqdm
 
-model_num = '2024_05_03_14_49_55'
+model_num = '2024_05_03_15_23_56'
 env_name = "UR10ePickPlaceFixed-v0"
 movie = True
 

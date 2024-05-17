@@ -1,0 +1,6 @@
+Mon May  6 14:53:14 2024
+WARNING: mju_openResource: unknown file './ur10e/../../../simhive/scene_sim/topfloor_scene.xml'
+
+Mon May  6 14:53:47 2024
+WARNING: mju_openResource: unknown file '.mj_envs/robohive/envs/arms/ur10e/scene_gripper.xml'
+
