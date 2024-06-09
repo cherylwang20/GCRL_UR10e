@@ -1,0 +1,52 @@
+<mujoco model="beaker_thick">
+  <default>
+    <default class="visual">
+      <geom group="2" type="mesh" contype="0" conaffinity="0"/>
+    </default>
+    <default class="collision">
+      <geom group="3" type="mesh"/>
+    </default>
+  </default>
+  <asset>
+    <material name="Material.001" specular="0.5" shininess="0.36" rgba="0.800000 0.800000 0.800000 1.000000"/>
+    <material name="Material.003" specular="0.5" shininess="0.36" rgba="0.800000 0.800000 0.800000 1.000000"/>
+    <mesh file="beaker_thick_0.obj"/>
+    <mesh file="beaker_thick_1.obj"/>
+    <mesh file="beaker_thick_collision_0.obj"/>
+    <mesh file="beaker_thick_collision_1.obj"/>
+    <mesh file="beaker_thick_collision_2.obj"/>
+    <mesh file="beaker_thick_collision_3.obj"/>
+    <mesh file="beaker_thick_collision_4.obj"/>
+    <mesh file="beaker_thick_collision_5.obj"/>
+    <mesh file="beaker_thick_collision_6.obj"/>
+    <mesh file="beaker_thick_collision_7.obj"/>
+    <mesh file="beaker_thick_collision_8.obj"/>
+    <mesh file="beaker_thick_collision_9.obj"/>
+    <mesh file="beaker_thick_collision_10.obj"/>
+    <mesh file="beaker_thick_collision_11.obj"/>
+    <mesh file="beaker_thick_collision_12.obj"/>
+    <mesh file="beaker_thick_collision_13.obj"/>
+    <mesh file="beaker_thick_collision_14.obj"/>
+  </asset>
+  <worldbody>
+    <body name="beaker_thick">
+      <geom mesh="beaker_thick_0" material="Material.003" class="visual"/>
+      <geom mesh="beaker_thick_1" material="Material.001" class="visual"/>
+      <geom mesh="beaker_thick_collision_0" rgba="0.8089231935439344 0.6916704896118236 0.48909343264230576 1" class="collision"/>
+      <geom mesh="beaker_thick_collision_1" rgba="0.5420456061462268 0.06408525095253936 0.8997054479499778 1" class="collision"/>
+      <geom mesh="beaker_thick_collision_2" rgba="0.6477021751767689 0.7861022478761405 0.6056978378478907 1" class="collision"/>
+      <geom mesh="beaker_thick_collision_3" rgba="0.8505511451969144 0.6544825233529531 0.06703842998512355 1" class="collision"/>
+      <geom mesh="beaker_thick_collision_4" rgba="0.5703467524536416 0.48330721159499657 0.6695109607241276 1" class="collision"/>
+      <geom mesh="beaker_thick_collision_5" rgba="0.7857145634493164 0.43733725269854196 0.2889223370144104 1" class="collision"/>
+      <geom mesh="beaker_thick_collision_6" rgba="0.8894994837915412 0.797745006670721 0.09909446391803589 1" class="collision"/>
+      <geom mesh="beaker_thick_collision_7" rgba="0.8269245677225776 0.8261403060106178 0.4108554101294327 1" class="collision"/>
+      <geom mesh="beaker_thick_collision_8" rgba="0.5655801192459827 0.056354470601496565 0.7660360480838281 1" class="collision"/>
+      <geom mesh="beaker_thick_collision_9" rgba="0.45460958010512964 0.6364560384660889 0.968278686944556 1" class="collision"/>
+      <geom mesh="beaker_thick_collision_10" rgba="0.14197763290998244 0.17642883704583712 0.011252552398313576 1" class="collision"/>
+      <geom mesh="beaker_thick_collision_11" rgba="0.8464041071877287 0.47866351762070236 0.9390101206144971 1" class="collision"/>
+      <geom mesh="beaker_thick_collision_12" rgba="0.9667184118560372 0.497160573637779 0.6950846034367963 1" class="collision"/>
+      <geom mesh="beaker_thick_collision_13" rgba="0.3128579932137666 0.10168165049353595 0.039947091466638995 1" class="collision"/>
+      <geom mesh="beaker_thick_collision_14" rgba="0.984500702171131 0.41692661964048117 0.9153940718345277 1" class="collision"/>
+    </body>
+  </worldbody>
+</mujoco>

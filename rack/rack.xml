@@ -1,0 +1,32 @@
+<mujoco model="rack">
+  <default>
+    <default class="visual">
+      <geom group="2" type="mesh" contype="0" conaffinity="0"/>
+    </default>
+    <default class="collision">
+      <geom group="3" type="mesh"/>
+    </default>
+  </default>
+  <asset>
+    <mesh file="rack.obj"/>
+    <mesh file="rack_collision_0.obj"/>
+    <mesh file="rack_collision_1.obj"/>
+    <mesh file="rack_collision_2.obj"/>
+    <mesh file="rack_collision_3.obj"/>
+    <mesh file="rack_collision_4.obj"/>
+    <mesh file="rack_collision_5.obj"/>
+    <mesh file="rack_collision_6.obj"/>
+  </asset>
+  <worldbody>
+    <body name="rack">
+      <geom mesh="rack" class="visual"/>
+      <geom mesh="rack_collision_0" rgba="0.5942348748746239 0.9133402008931135 0.1079347351488198 1" class="collision"/>
+      <geom mesh="rack_collision_1" rgba="0.6464843110676932 0.8782758020240727 0.29255247529053674 1" class="collision"/>
+      <geom mesh="rack_collision_2" rgba="0.11889087029158008 0.7690649798602568 0.8104262033970712 1" class="collision"/>
+      <geom mesh="rack_collision_3" rgba="0.7711208480128682 0.6998160439756024 0.5247169228210097 1" class="collision"/>
+      <geom mesh="rack_collision_4" rgba="0.8701035945323015 0.48571113185099535 0.9086829475513054 1" class="collision"/>
+      <geom mesh="rack_collision_5" rgba="0.10100949448874308 0.22990317975901564 0.29193726549616905 1" class="collision"/>
+      <geom mesh="rack_collision_6" rgba="0.06199251722865973 0.6177107492770662 0.7009419742103689 1" class="collision"/>
+    </body>
+  </worldbody>
+</mujoco>

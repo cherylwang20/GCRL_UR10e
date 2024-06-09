@@ -1,0 +1,48 @@
+<mujoco model="base_rbf">
+  <default>
+    <default class="visual">
+      <geom group="2" type="mesh" contype="0" conaffinity="0"/>
+    </default>
+    <default class="collision">
+      <geom group="3" type="mesh"/>
+    </default>
+  </default>
+  <asset>
+    <mesh file="base_rbf.obj"/>
+    <mesh file="base_rbf_collision_0.obj"/>
+    <mesh file="base_rbf_collision_1.obj"/>
+    <mesh file="base_rbf_collision_2.obj"/>
+    <mesh file="base_rbf_collision_3.obj"/>
+    <mesh file="base_rbf_collision_4.obj"/>
+    <mesh file="base_rbf_collision_5.obj"/>
+    <mesh file="base_rbf_collision_6.obj"/>
+    <mesh file="base_rbf_collision_7.obj"/>
+    <mesh file="base_rbf_collision_8.obj"/>
+    <mesh file="base_rbf_collision_9.obj"/>
+    <mesh file="base_rbf_collision_10.obj"/>
+    <mesh file="base_rbf_collision_11.obj"/>
+    <mesh file="base_rbf_collision_12.obj"/>
+    <mesh file="base_rbf_collision_13.obj"/>
+    <mesh file="base_rbf_collision_14.obj"/>
+  </asset>
+  <worldbody>
+    <body name="base_rbf">
+      <geom mesh="base_rbf" class="visual"/>
+      <geom mesh="base_rbf_collision_0" rgba="0.24115817520653915 0.1687402362471312 0.6468572964981083 1" class="collision"/>
+      <geom mesh="base_rbf_collision_1" rgba="0.45885597951225887 0.7845803787680864 0.4155523410476143 1" class="collision"/>
+      <geom mesh="base_rbf_collision_2" rgba="0.9651798047202657 0.6592251538386993 0.6739963975014334 1" class="collision"/>
+      <geom mesh="base_rbf_collision_3" rgba="0.2315024162762207 0.9765081125363123 0.03763137265616112 1" class="collision"/>
+      <geom mesh="base_rbf_collision_4" rgba="0.4540219627261938 0.4073629050017079 0.6952255645752806 1" class="collision"/>
+      <geom mesh="base_rbf_collision_5" rgba="0.2409081093088632 0.07829861473424182 0.28250848308701915 1" class="collision"/>
+      <geom mesh="base_rbf_collision_6" rgba="0.8888937046113482 0.8637104362955579 0.7648752256565822 1" class="collision"/>
+      <geom mesh="base_rbf_collision_7" rgba="0.35267570490776157 0.8532674894430606 0.5436827877949225 1" class="collision"/>
+      <geom mesh="base_rbf_collision_8" rgba="0.9627244430959125 0.7516864878563337 0.5053465863186191 1" class="collision"/>
+      <geom mesh="base_rbf_collision_9" rgba="0.890392136200353 0.13932170154116164 0.380959376451135 1" class="collision"/>
+      <geom mesh="base_rbf_collision_10" rgba="0.1193069222918074 0.15979083650490133 0.9996264946741902 1" class="collision"/>
+      <geom mesh="base_rbf_collision_11" rgba="0.12582566257394556 0.7370891143521316 0.24308496399141732 1" class="collision"/>
+      <geom mesh="base_rbf_collision_12" rgba="0.8451746435386327 0.19629702827650086 0.5088125049845166 1" class="collision"/>
+      <geom mesh="base_rbf_collision_13" rgba="0.22532637878739703 0.6209223004692725 0.9133982718341188 1" class="collision"/>
+      <geom mesh="base_rbf_collision_14" rgba="0.4215125127378594 0.46412280244380943 0.2862697888863004 1" class="collision"/>
+    </body>
+  </worldbody>
+</mujoco>
