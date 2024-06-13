@@ -1,0 +1,66 @@
+<mujoco model="tnr">
+  <default>
+    <default class="visual">
+      <geom group="2" type="mesh" contype="0" conaffinity="0"/>
+    </default>
+    <default class="collision">
+      <geom group="3" type="mesh"/>
+    </default>
+  </default>
+  <asset>
+    <material name="2" specular="0.5" shininess="0.36" rgba="0.800000 0.800000 0.800000 1.000000"/>
+    <material name="Material" specular="0.5" shininess="0.25" rgba="0.800000 0.800000 0.800000 1.000000"/>
+    <mesh file="tnr_0.obj"/>
+    <mesh file="tnr_1.obj"/>
+    <mesh file="tnr_collision_0.obj"/>
+    <mesh file="tnr_collision_1.obj"/>
+    <mesh file="tnr_collision_2.obj"/>
+    <mesh file="tnr_collision_3.obj"/>
+    <mesh file="tnr_collision_4.obj"/>
+    <mesh file="tnr_collision_5.obj"/>
+    <mesh file="tnr_collision_6.obj"/>
+    <mesh file="tnr_collision_7.obj"/>
+    <mesh file="tnr_collision_8.obj"/>
+    <mesh file="tnr_collision_9.obj"/>
+    <mesh file="tnr_collision_10.obj"/>
+    <mesh file="tnr_collision_11.obj"/>
+    <mesh file="tnr_collision_12.obj"/>
+    <mesh file="tnr_collision_13.obj"/>
+    <mesh file="tnr_collision_14.obj"/>
+    <mesh file="tnr_collision_15.obj"/>
+    <mesh file="tnr_collision_16.obj"/>
+    <mesh file="tnr_collision_17.obj"/>
+    <mesh file="tnr_collision_18.obj"/>
+    <mesh file="tnr_collision_19.obj"/>
+    <mesh file="tnr_collision_20.obj"/>
+    <mesh file="tnr_collision_21.obj"/>
+  </asset>
+  <worldbody>
+    <body name="tnr">
+      <geom mesh="tnr_0" material="2" class="visual"/>
+      <geom mesh="tnr_1" material="Material" class="visual"/>
+      <geom mesh="tnr_collision_0" rgba="0.6161389370909456 0.3210971689062807 0.08090263346346793 1" class="collision"/>
+      <geom mesh="tnr_collision_1" rgba="0.4937340116013187 0.6405372402517951 0.24911823284898715 1" class="collision"/>
+      <geom mesh="tnr_collision_2" rgba="0.28490758552085715 0.9863671394805186 0.3310885412198671 1" class="collision"/>
+      <geom mesh="tnr_collision_3" rgba="0.07468348603606989 0.13335618446978215 0.884037257547161 1" class="collision"/>
+      <geom mesh="tnr_collision_4" rgba="0.22782378734905462 0.7554713031518029 0.6959473845768183 1" class="collision"/>
+      <geom mesh="tnr_collision_5" rgba="0.48408894181565565 0.44973603722248356 0.9636465801591376 1" class="collision"/>
+      <geom mesh="tnr_collision_6" rgba="0.5682313752323631 0.42731262147403337 0.19116802777284614 1" class="collision"/>
+      <geom mesh="tnr_collision_7" rgba="0.7580492337588404 0.9973920230234545 0.6888180304727956 1" class="collision"/>
+      <geom mesh="tnr_collision_8" rgba="0.4479084753107865 0.06839062006258301 0.7090321387975203 1" class="collision"/>
+      <geom mesh="tnr_collision_9" rgba="0.9712271964966597 0.31585481087848066 0.3617850094034045 1" class="collision"/>
+      <geom mesh="tnr_collision_10" rgba="0.1736657334961479 0.2586182038055086 0.4358237151457529 1" class="collision"/>
+      <geom mesh="tnr_collision_11" rgba="0.05651298132525984 0.24400715720995947 0.8323555299771903 1" class="collision"/>
+      <geom mesh="tnr_collision_12" rgba="0.7318120848157322 0.9973467181457266 0.6762484611325753 1" class="collision"/>
+      <geom mesh="tnr_collision_13" rgba="0.9344111789657131 0.09396228954171859 0.4633501488167898 1" class="collision"/>
+      <geom mesh="tnr_collision_14" rgba="0.02796913780811594 0.7599385063117912 0.4004008931796944 1" class="collision"/>
+      <geom mesh="tnr_collision_15" rgba="0.40778399965853696 0.15065058612773286 0.858032319938857 1" class="collision"/>
+      <geom mesh="tnr_collision_16" rgba="0.5074799595628346 0.7368567894183528 0.11830249678335547 1" class="collision"/>
+      <geom mesh="tnr_collision_17" rgba="0.42146258728704267 0.13414238234332942 0.8146027557533507 1" class="collision"/>
+      <geom mesh="tnr_collision_18" rgba="0.34088243051791367 0.7071987990341823 0.19631042735839743 1" class="collision"/>
+      <geom mesh="tnr_collision_19" rgba="0.9428977645497031 0.5689207697315971 0.48195364021549925 1" class="collision"/>
+      <geom mesh="tnr_collision_20" rgba="0.1552939551863114 0.3819516798060053 0.10945965090769283 1" class="collision"/>
+      <geom mesh="tnr_collision_21" rgba="0.027093508280564005 0.9877072521889732 0.9261842823421099 1" class="collision"/>
+    </body>
+  </worldbody>
+</mujoco>
