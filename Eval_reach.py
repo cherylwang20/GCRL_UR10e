@@ -14,17 +14,20 @@ print(torch.cuda.current_device())
 print(torch.cuda.device(0))
 print(torch.cuda.get_device_name(0))
 
-model_num = '2024_05_15_16_45_28'
-env_name = "UR10eReachFixed-v1"
+model_num = '2024_06_25_00_46_36' #'2024_06_22_19_48_33'
+env_name = "UR10eReachFixed-v2"
 movie = True
-frame_width = 400
-frame_height = 400
+frame_width = 200
+frame_height = 200
 cap = cv.VideoCapture(0)
 
-model = PPO.load('./Reach_Target/policy_best_model/' + env_name +'/' + model_num + r'/best_model')
+model = PPO.load('./Reach_Target_CNN/policy_best_model/' + env_name +'/' + model_num + r'/best_model')
 env = gym.make(f'mj_envs.robohive.envs:{env_name}')
 
+detect_color = 'red'
+
 env.reset()
+env.set_color(detect_color)
 
 frames = []
 frames_mask = []
@@ -36,23 +39,24 @@ for _ in tqdm(range(2)):
     obs = env.reset()
     step = 0
     ret, frame = cap.read()
-    while not solved and step < 200:
-          obs = env.obsdict2obsvec(env.obs_dict, env.obs_keys)[1]
+    while not solved and step < 150:
+          #obs = env.obsdict2obsvec(env.obs_dict, env.obs_keys)[1]
           #obs = env.get_obs_dict()        
           action, _ = model.predict(obs, deterministic=True)
           #env.sim.data.ctrl[:] = action
           obs, reward, done, info = env.step(action)
           solved = info['solved']
           if movie:
-              frame = env.sim.renderer.render_offscreen(width=400, height=400, camera_id=f'end_effector_cam')
-              blurred = cv.GaussianBlur(frame, (11, 11), 0)
+              frame = env.sim.renderer.render_offscreen(width=200, height=200, camera_id=f'front_cam')
+              rgb = cv.cvtColor(frame, cv.COLOR_BGR2RGB)
+              blurred = cv.GaussianBlur(rgb, (11, 11), 0)
               hsv = cv.cvtColor(blurred, cv.COLOR_BGR2HSV)
               # construct a mask for the color "green", then perform
               # a series of dilations and erosions to remove any small
               # blobs left in the mask
-              greenLower = (29, 86, 56)
-              greenUpper = (64, 255, 255)
-              mask = cv.inRange(hsv, greenLower, greenUpper)
+              redLower = np.array([0, 70, 50], dtype=np.uint8)
+              redUpper = np.array([7, 233, 255], dtype=np.uint8)
+              mask = cv.inRange(hsv, redLower, redUpper)
               mask = cv.erode(mask, None, iterations=2)
               mask = cv.dilate(mask, None, iterations=2)
               
@@ -62,8 +66,8 @@ for _ in tqdm(range(2)):
 
               cv.rectangle(frame, (x1, 0), (x2, y2), (0, 0, 255), thickness=2)
               cv.rectangle(mask, (x1, 0), (x2, y2), 255, thickness=1)
-              
-            
+              cv.imshow("rbg", rgb)
+              cv.waitKey(1)
               frame = np.rot90(np.rot90(frame))
               frames.append(frame[::-1, :, :])
               frames_mask.append(mask)
