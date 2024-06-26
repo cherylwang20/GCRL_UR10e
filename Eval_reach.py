@@ -14,7 +14,7 @@ print(torch.cuda.current_device())
 print(torch.cuda.device(0))
 print(torch.cuda.get_device_name(0))
 
-model_num = '2024_06_25_00_46_36' #'2024_06_22_19_48_33'
+model_num = '2024_06_26_00_35_08' #'2024_06_22_19_48_33'
 env_name = "UR10eReachFixed-v2"
 movie = True
 frame_width = 200
@@ -47,7 +47,7 @@ for _ in tqdm(range(2)):
           obs, reward, done, info = env.step(action)
           solved = info['solved']
           if movie:
-              frame = env.sim.renderer.render_offscreen(width=200, height=200, camera_id=f'front_cam')
+              frame = env.sim.renderer.render_offscreen(width=200, height=200, camera_id=f'end_effector_cam')
               rgb = cv.cvtColor(frame, cv.COLOR_BGR2RGB)
               blurred = cv.GaussianBlur(rgb, (11, 11), 0)
               hsv = cv.cvtColor(blurred, cv.COLOR_BGR2HSV)
