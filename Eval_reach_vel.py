@@ -11,14 +11,14 @@ from tqdm.auto import tqdm
 import torch
 
 
-model_num = '2024_06_28_10_53_45' #'2024_06_22_19_48_33'
-env_name = "UR10eReachFixed-v2"
+model_num = '2024_06_28_18_21_03' #'2024_06_22_19_48_33'
+env_name = "UR10eReachFixed-v3"
 movie = True
 frame_width = 200
 frame_height = 200
 #cap = cv.VideoCapture(0)
 
-model = PPO.load('./Reach_Target_CNN/policy_best_model/' + env_name +'/' + model_num + r'/best_model')
+model = PPO.load('./Reach_Target_vel/policy_best_model/' + env_name +'/' + model_num + r'/best_model')
 env = gym.make(f'mj_envs.robohive.envs:{env_name}')
 
 

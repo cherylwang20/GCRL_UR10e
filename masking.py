@@ -1,48 +1,39 @@
 import cv2
 import numpy as np
+import matplotlib.pyplot as plt
 
 # Read the image
-image = cv2.imread('image_rbf.png')
-
-# Convert the image to HSV color space
-#blurred = cv2.GaussianBlur(image, (11, 11), 0)
-
-#gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
-contrast_img = cv2.convertScaleAbs(image, alpha=1.3, beta=40)
-
-cv2.imshow('contrast_img', contrast_img)
-
+image = cv2.imread('image_2.png')
+cv2.imshow('raw', image)
+gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+# Apply histogram equalization to enhance contrast
+blurred = cv2.GaussianBlur(gray, (5, 5), 0)
+# Apply adaptive thresholding to minimize shadow effects
+contrast_img = cv2.convertScaleAbs(image, alpha=1.5, beta=20)
+# Use Canny edge detection on the thresholded image
+cv2.imshow('contrast', contrast_img)
 edges = cv2.Canny(contrast_img, 50, 150)
 
+# Dilate the edges to close gaps
+dilated = cv2.dilate(edges, np.ones((3, 3), np.uint8), iterations=2)
 
-contours, _ = cv2.findContours(edges, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+# Find contours from the dilated image
+contours, _ = cv2.findContours(dilated, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
 
-# Draw contours on the original image
-#cv2.drawContours(image, contours, -1, (0, 255, 0), 2)
+# Assuming the beaker is the largest object in the image
+largest_contour = max(contours, key=cv2.contourArea)
 
-# Display the result
-cv2.imshow('Edges', edges)
-cv2.imshow('Result', image)
+# Create a mask for the beaker
+mask = np.zeros_like(gray)
+cv2.drawContours(mask, [largest_contour], -1, (255), thickness=cv2.FILLED)
+
+# Optional: Apply a mask to the original image to highlight the beaker
+result = cv2.bitwise_and(image, image, mask=mask)
+
+# Save or display the results
+cv2.imwrite('beaker_mask.png', mask)
+cv2.imwrite('beaker_result.png', result)
+cv2.imshow('Beaker Mask', mask)
+#cv2.imshow('Segmented Beaker', result)
 cv2.waitKey(0)
 cv2.destroyAllWindows()
-
-'''
-hsv = cv2.cvtColor(blurred, cv2.COLOR_BGR2HSV)
-
-# Get the range of colors from the user
-lower_bound = np.array([80, 50, 20], dtype=np.uint8)
-upper_bound = np.array([100, 255, 255], dtype=np.uint8)
-
-# Create the color mask
-mask = cv2.inRange(hsv, lower_bound, upper_bound)
-
-# Apply the color mask to the image
-mask = cv2.erode(mask, None, iterations=2)
-mask = cv2.dilate(mask, None, iterations=2)
-
-# Show the original and segmented images
-cv2.imshow("Original Image", hsv)
-cv2.imshow("Segmented Image", mask)
-cv2.waitKey(0)
-cv2.destroyAllWindows()
-'''
