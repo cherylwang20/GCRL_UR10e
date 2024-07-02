@@ -11,7 +11,7 @@ from tqdm.auto import tqdm
 import torch
 
 
-model_num = '2024_06_28_18_21_03' #'2024_06_22_19_48_33'
+model_num = '2024_07_01_17_00_53' #'2024_06_22_19_48_33'
 env_name = "UR10eReachFixed-v3"
 movie = True
 frame_width = 200
@@ -19,10 +19,13 @@ frame_height = 200
 #cap = cv.VideoCapture(0)
 
 model = PPO.load('./Reach_Target_vel/policy_best_model/' + env_name +'/' + model_num + r'/best_model')
-env = gym.make(f'mj_envs.robohive.envs:{env_name}')
+env = gym.make(f'mj_envs.robohive.envs:{"UR10eReachFixed-v3"}')
+
+print("Action Space Lower Bounds:", env.action_space.low)
+print("Action Space Upper Bounds:", env.action_space.high)
 
 
-detect_color = 'red'
+detect_color = 'blue'
 
 env.reset()
 env.set_color(detect_color)
@@ -31,7 +34,7 @@ frames = []
 frames_mask = []
 view = 'front'
 all_rewards = []
-for _ in tqdm(range(2)):
+for _ in tqdm(range(3)):
     ep_rewards = 0
     solved = False
     obs = env.reset()
@@ -45,7 +48,7 @@ for _ in tqdm(range(2)):
           obs, reward, done, info = env.step(action)
           solved = info['solved']
           if movie:
-              frame_n = env.sim.renderer.render_offscreen(width=frame_width, height=frame_height, camera_id=f'right_cam')
+              frame_n = env.sim.renderer.render_offscreen(width=frame_width, height=frame_height, camera_id=f'end_effector_cam')
               rgb = cv.cvtColor(frame_n, cv.COLOR_BGR2RGB)
               blurred = cv.GaussianBlur(rgb, (11, 11), 0)
               hsv = cv.cvtColor(blurred, cv.COLOR_BGR2HSV)
@@ -68,8 +71,8 @@ for _ in tqdm(range(2)):
               mask = cv.dilate(mask, None, iterations=2)
               
               #define the grasping rectangle
-              x1, y1 = int(53/200 * frame_width), 0
-              x2, y2 = int(156/200 * frame_width), int(68/200 * frame_height)
+              x1, y1 = int(63/200 * frame_width), 0
+              x2, y2 = int(136/200 * frame_width), int(68/200 * frame_height)
 
               cv.rectangle(frame_n, (x1, 0), (x2, y2), (0, 0, 255), thickness=2)
               cv.rectangle(mask, (x1, 0), (x2, y2), 255, thickness=1)
