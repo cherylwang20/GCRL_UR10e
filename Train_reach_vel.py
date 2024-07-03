@@ -38,12 +38,13 @@ if __name__ == '__main__':
     start_time = time.time()
     time_now = datetime.now().strftime("%Y_%m_%d_%H_%M_%S")
 
-    num_cpu = 4
+    num_cpu = 2
     env_name = "UR10eReachFixed-v3"
     envs = SubprocVecEnv([make_env(env_name, i) for i in range(num_cpu)])
 
     detect_color = 'red'
-    envs.set_attr('set_color', detect_color)
+    #envs.set_attr('set_color', detect_color)
+    envs.color = detect_color
 
     log_path = './Reach_Target_vel/policy_best_model/' + env_name + '/' + time_now + '/'
     eval_callback = EvalCallback(envs, best_model_save_path=log_path, log_path=log_path, eval_freq=10000, deterministic=True, render=False)
@@ -54,8 +55,8 @@ if __name__ == '__main__':
 
     # Create a model using the vectorized environment
     model = PPO("MultiInputPolicy", envs, ent_coef=0.01, verbose=0)
-    #model_num = "2024_06_28_09_15_25"
-    #model = PPO.load(r"C:/Users/chery/Documents/RL-Chemist/Reach_Target_CNN/policy_best_model/" + env_name + '/' + model_num + '/best_model', envs, verbose=0)
+    #model_num = "2024_07_02_21_36_07"
+    #model = PPO.load(r"C:/Users/chery/Documents/RL-Chemist/Reach_Target_vel/policy_best_model/" + env_name + '/' + model_num + '/best_model', envs, verbose=0)
 
 
     #obs_callback = TensorboardCallback()

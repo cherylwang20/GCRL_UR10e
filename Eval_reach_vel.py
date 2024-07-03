@@ -11,7 +11,7 @@ from tqdm.auto import tqdm
 import torch
 
 
-model_num = '2024_07_01_17_00_53' #'2024_06_22_19_48_33'
+model_num = '2024_07_03_10_13_01' #'2024_06_22_19_48_33'
 env_name = "UR10eReachFixed-v3"
 movie = True
 frame_width = 200
@@ -25,7 +25,7 @@ print("Action Space Lower Bounds:", env.action_space.low)
 print("Action Space Upper Bounds:", env.action_space.high)
 
 
-detect_color = 'blue'
+detect_color = 'red'
 
 env.reset()
 env.set_color(detect_color)
@@ -44,6 +44,7 @@ for _ in tqdm(range(3)):
           #obs = env.obsdict2obsvec(env.obs_dict, env.obs_keys)[1]
           #obs = env.get_obs_dict()        
           action, _ = model.predict(obs, deterministic=True)
+          #print(action)
           #env.sim.data.ctrl[:] = action
           obs, reward, done, info = env.step(action)
           solved = info['solved']
@@ -74,8 +75,8 @@ for _ in tqdm(range(3)):
               x1, y1 = int(63/200 * frame_width), 0
               x2, y2 = int(136/200 * frame_width), int(68/200 * frame_height)
 
-              cv.rectangle(frame_n, (x1, 0), (x2, y2), (0, 0, 255), thickness=2)
-              cv.rectangle(mask, (x1, 0), (x2, y2), 255, thickness=1)
+              #cv.rectangle(frame_n, (x1, 0), (x2, y2), (0, 0, 255), thickness=2)
+              #cv.rectangle(mask, (x1, 0), (x2, y2), 255, thickness=1)
               cv.imshow("rbg", rgb)
               cv.waitKey(1)
               frame_n = np.rot90(np.rot90(frame_n))
