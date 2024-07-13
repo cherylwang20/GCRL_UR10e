@@ -1,6 +1,6 @@
 import gym
 from gym import spaces
-import torch as th
+import torch 
 import torch.nn as nn
 from stable_baselines3 import PPO, SAC
 from stable_baselines3.common.torch_layers import BaseFeaturesExtractor
@@ -11,6 +11,7 @@ from stable_baselines3.common.callbacks import EvalCallback, CallbackList, BaseC
 from typing import Callable, Dict, List, Optional, Tuple, Type, Union
 from datetime import datetime
 import time
+
 import numpy as np
 
 class TensorboardCallback(BaseCallback):
@@ -27,6 +28,39 @@ class TensorboardCallback(BaseCallback):
         self.logger.record("average_obs", average_obs)
         return True
 
+
+class CustomDictFeaturesExtractor(BaseFeaturesExtractor):
+    def __init__(self, observation_space, features_dim=1024):  # Adjust features_dim if needed
+        super(CustomDictFeaturesExtractor, self).__init__(observation_space, features_dim)
+        self.cnn = nn.Sequential(
+            nn.Conv2d(4, 32, kernel_size=8, stride=4, padding=2),  # Adjust padding to fit your needs
+            nn.ReLU(),
+            nn.Conv2d(32, 64, kernel_size=4, stride=2, padding=1),
+            nn.ReLU(),
+            nn.Conv2d(64, 64, kernel_size=3, stride=1, padding=1),
+            nn.ReLU(),
+            nn.Flatten()  # Flatten the output for feature concatenation
+        )
+
+        # Vector processing network
+        self.mlp = nn.Linear(observation_space.spaces['vector'].shape[0], 16)
+        
+
+        # Calculate the total concatenated feature dimension
+        self._features_dim = observation_space.spaces['image'].shape[0]**2 + 16  # Adjust based on actual output dimensions of cnn and mlp
+
+    def forward(self, observations):
+        images = observations['image'].permute(0, 3, 1, 2)
+        image_features = self.cnn(images)
+        vector_features = self.mlp(observations['vector'])
+        return torch.cat([image_features, vector_features], dim=1)
+
+class CustomMultiInputPolicy(ActorCriticPolicy):
+    def __init__(self, *args, **kwargs):
+        super(CustomMultiInputPolicy, self).__init__(*args, **kwargs,
+                                                     features_extractor_class=CustomDictFeaturesExtractor,
+                                                     features_extractor_kwargs={},
+                                                     net_arch=[{'vf': [512, 512], 'pi': [512, 512]}])  # Adjust architecture if needed
 def make_env(env_name, idx, seed=0):
     def _init():
         env = gym.make(f'mj_envs.robohive.envs:{env_name}')
@@ -38,7 +72,7 @@ if __name__ == '__main__':
     start_time = time.time()
     time_now = datetime.now().strftime("%Y_%m_%d_%H_%M_%S")
 
-    num_cpu = 2
+    num_cpu = 1
     env_name = "UR10eReachFixed-v3"
     envs = SubprocVecEnv([make_env(env_name, i) for i in range(num_cpu)])
 
@@ -54,8 +88,9 @@ if __name__ == '__main__':
     print(envs.get_attr('obs_dict')[0].keys())
 
     # Create a model using the vectorized environment
-    model = PPO("MultiInputPolicy", envs, ent_coef=0.01, verbose=0)
-    #model_num = "2024_07_02_21_36_07"
+    #model = SAC("MultiInputPolicy", envs, buffer_size=1000, verbose=0)
+    model = PPO(CustomMultiInputPolicy, envs, ent_coef=0.1, verbose=0)
+    #model_num = "2024_07_12_13_53_06"
     #model = PPO.load(r"C:/Users/chery/Documents/RL-Chemist/Reach_Target_vel/policy_best_model/" + env_name + '/' + model_num + '/best_model', envs, verbose=0)
 
 

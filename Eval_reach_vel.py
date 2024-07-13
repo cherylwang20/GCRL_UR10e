@@ -11,7 +11,7 @@ from tqdm.auto import tqdm
 import torch
 
 
-model_num = '2024_07_03_10_13_01' #'2024_06_22_19_48_33'
+model_num = '2024_07_13_09_39_49' #'2024_06_22_19_48_33'
 env_name = "UR10eReachFixed-v3"
 movie = True
 frame_width = 200

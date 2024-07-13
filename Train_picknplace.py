@@ -22,29 +22,24 @@ class TensorboardCallback(BaseCallback):
 	
 	    return True
 	
+model_num = '2024_07_12_13_53_06' #'2024_06_22_19_48_33'
+env_name = "UR10eReachFixed-v3"
+movie = True
+frame_width = 200
+frame_height = 200
+#cap = cv.VideoCapture(0)
+
+model = PPO.load('./Reach_Target_vel/policy_best_model/' + env_name +'/' + model_num + r'/best_model')
 
 
-start_time = time.time()
-time_now = datetime.now().strftime("%Y_%m_%d_%H_%M_%S")
 
-env_name = "UR10ePickPlaceFixed-v0"
+# Access the policy network directly (for inspection or modification)
+policy_net = model.policy
 
-log_path = './Pick&Place_Target/policy_best_model/' + env_name + '/' + time_now + '/'
-#env = gym.make(f'mj_envs.robohive.envs.myo:{"myoHandPoseRandom-v0"}')
-env = gym.make(f'mj_envs.robohive.envs:{env_name}')
-eval_callback = EvalCallback(env, best_model_save_path=log_path, log_path=log_path, eval_freq=10000, deterministic=True, render=False)
-print('Begin training')
-policy_kwargs = {
-    'activation_fn': torch.nn.modules.activation.ReLU,
-    'net_arch': {'pi': [128, 128], 'vf': [128, 128]}
-    }
+print(policy_net)
 
-model_num = '2024_05_03_14_49_55'
-#model = PPO('MlpPolicy', env, verbose=0, policy_kwargs =policy_kwargs)
-model = PPO.load(r"C:/Users/chery/Documents/RL-Chemist/Pick&Place_Target/policy_best_model/UR10ePickPlaceFixed-v0/" + model_num + '/best_model', env, verbose=0, policy_kwargs=policy_kwargs)
-obs_callback = TensorboardCallback()
-callback = CallbackList([eval_callback])
-
-model.learn(total_timesteps= 5000000, tb_log_name=env_name+"_" + time_now, callback=callback)
-
+# Example: Print out weights of the first layer (modify as needed)
+#for name, param in policy_net.named_parameters():
+      # Adjust layer name based on your model architecture
+    #print(f"Layer: {name} | Size: {param.size()} | Values: \n{param.data}")
 
