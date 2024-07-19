@@ -72,29 +72,39 @@ if __name__ == '__main__':
     start_time = time.time()
     time_now = datetime.now().strftime("%Y_%m_%d_%H_%M_%S")
 
+    if torch.cuda.is_available():
+        device = torch.device("cuda")
+        print("Using GPU:", torch.cuda.get_device_name(0))
+    else:
+        device = torch.device("cpu")
+        print("Using CPU")
+
     num_cpu = 1
     env_name = "UR10eReachFixed-v3"
-    envs = SubprocVecEnv([make_env(env_name, i) for i in range(num_cpu)])
-
+    #envs = SubprocVecEnv([make_env(env_name, i) for i in range(num_cpu)])
+    envs = gym.make(f'mj_envs.robohive.envs:{env_name}')
+    
     detect_color = 'red'
-    #envs.set_attr('set_color', detect_color)
     envs.color = detect_color
 
     log_path = './Reach_Target_vel/policy_best_model/' + env_name + '/' + time_now + '/'
     eval_callback = EvalCallback(envs, best_model_save_path=log_path, log_path=log_path, eval_freq=10000, deterministic=True, render=False)
-
+    
     print('Begin training')
+
+    
     # Adjust here to print keys from one of the environments
-    print(envs.get_attr('obs_dict')[0].keys())
+    print(envs.get_obs_dict)
 
     # Create a model using the vectorized environment
     #model = SAC("MultiInputPolicy", envs, buffer_size=1000, verbose=0)
-    model = PPO(CustomMultiInputPolicy, envs, ent_coef=0.1, verbose=0)
+    model = PPO(CustomMultiInputPolicy, envs, ent_coef=0.1, verbose=1)
     #model_num = "2024_07_12_13_53_06"
     #model = PPO.load(r"C:/Users/chery/Documents/RL-Chemist/Reach_Target_vel/policy_best_model/" + env_name + '/' + model_num + '/best_model', envs, verbose=0)
 
-
     #obs_callback = TensorboardCallback()
     callback = CallbackList([eval_callback])#, obs_callback])
+    print('learning begins')
+    
 
-    model.learn(total_timesteps=5000000, tb_log_name=env_name + "_" + time_now, callback=callback)
+    model.learn(total_timesteps=5000000) #, tb_log_name=env_name + "_" + time_now, callback=callback)

@@ -16,13 +16,15 @@ def create_vid(images):
 def main():
     ## Setup
     images = []
-    height = 1080
-    width = 1920
+    height = 480
+    width = 680
 
     model_path = './mj_envs/robohive/envs/arms/ur10e/scene_gripper.xml' 
     model = mujoco.MjModel.from_xml_path(model_path)
     data = mujoco.MjData(model)
     renderer = mujoco.Renderer(model, height=height, width=width)
+
+    print('rendering')
 
     ## Move to grabbing position
     kf = model.keyframe('home_2')
@@ -36,6 +38,7 @@ def main():
     ctrl = kf.qpos[:7]
     ctrl[6] = 1
     for i in range(200):
+        print(i,'rendering')
         data.ctrl = ctrl
         mujoco.mj_step(model, data)
         renderer.update_scene(data, camera='front_cam')
@@ -47,6 +50,7 @@ def main():
     ctrl[3] = 0
     ctrl[6] = 1
     for i in range(200):
+        print(i,'rendering')
         data.ctrl = ctrl
         mujoco.mj_step(model, data, nstep=2)
         renderer.update_scene(data, camera='front_cam')
