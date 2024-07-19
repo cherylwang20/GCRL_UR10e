@@ -4,6 +4,7 @@ import torch
 import torch.nn as nn
 from stable_baselines3 import PPO, SAC
 from stable_baselines3.common.torch_layers import BaseFeaturesExtractor
+from stable_baselines3.common.env_util import make_vec_env
 from stable_baselines3.common.policies import ActorCriticPolicy
 from stable_baselines3.common.vec_env import SubprocVecEnv, DummyVecEnv
 from stable_baselines3.common.callbacks import EvalCallback, CallbackList, BaseCallback
@@ -81,10 +82,10 @@ if __name__ == '__main__':
 
     num_cpu = 1
     env_name = "UR10eReachFixed-v3"
-    #envs = SubprocVecEnv([make_env(env_name, i) for i in range(num_cpu)])
     envs = gym.make(f'mj_envs.robohive.envs:{env_name}')
-    
-    detect_color = 'red'
+
+    detect_color = 'green'
+    #envs.set_attr('set_color', detect_color)
     envs.color = detect_color
 
     log_path = './Reach_Target_vel/policy_best_model/' + env_name + '/' + time_now + '/'
@@ -98,9 +99,10 @@ if __name__ == '__main__':
 
     # Create a model using the vectorized environment
     #model = SAC("MultiInputPolicy", envs, buffer_size=1000, verbose=0)
-    model = PPO(CustomMultiInputPolicy, envs, ent_coef=0.1, verbose=1)
-    #model_num = "2024_07_12_13_53_06"
+    model = PPO(CustomMultiInputPolicy, envs, ent_coef=0.01, verbose=0)
+    #model_num = "2024_07_17_14_37_05"
     #model = PPO.load(r"C:/Users/chery/Documents/RL-Chemist/Reach_Target_vel/policy_best_model/" + env_name + '/' + model_num + '/best_model', envs, verbose=0)
+
 
     #obs_callback = TensorboardCallback()
     callback = CallbackList([eval_callback])#, obs_callback])
