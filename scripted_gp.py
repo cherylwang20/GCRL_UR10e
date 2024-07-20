@@ -1,5 +1,5 @@
 import numpy as np
-import mujoco 
+import mujoco
 import cv2
 import os
 

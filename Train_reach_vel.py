@@ -69,7 +69,7 @@ def make_env(env_name, idx, seed=0):
         return env
     return _init
 
-if __name__ == '__main__':
+def main():
     start_time = time.time()
     time_now = datetime.now().strftime("%Y_%m_%d_%H_%M_%S")
 
@@ -100,8 +100,8 @@ if __name__ == '__main__':
     # Create a model using the vectorized environment
     #model = SAC("MultiInputPolicy", envs, buffer_size=1000, verbose=0)
     model = PPO(CustomMultiInputPolicy, envs, ent_coef=0.01, verbose=0)
-    #model_num = "2024_07_17_14_37_05"
-    #model = PPO.load(r"C:/Users/chery/Documents/RL-Chemist/Reach_Target_vel/policy_best_model/" + env_name + '/' + model_num + '/best_model', envs, verbose=0)
+    #model_num = "2024_07_18_16_15_52"
+    #model = PPO.load(r"./Reach_Target_vel/policy_best_model/" + env_name + '/' + model_num + '/best_model', envs, verbose=0)
 
 
     #obs_callback = TensorboardCallback()
@@ -110,3 +110,7 @@ if __name__ == '__main__':
     
 
     model.learn(total_timesteps=5000000) #, tb_log_name=env_name + "_" + time_now, callback=callback)
+
+if __name__ == "__main__":
+    # TRAIN
+    main()
