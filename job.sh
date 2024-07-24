@@ -1,31 +1,25 @@
-#!/bin/bash
-
-# Specify the partition of the cluster to run on (Typically TrixieMain)
-#SBATCH --partition=TrixieMain
-# Add your project account code using -A or --account
-#SBATCH --account AI4D-CORE-148
-# Specify the time allocated to the job. Max 12 hours on TrixieMain queue.
-#SBATCH --time=12:00:00
-# Request GPUs for the job. In this case 4 GPUs
+#!/bin/bash 
+#SBATCH --account=def-durandau
+#SBATCH --cpus-per-task=4
+#SBATCH --time=0-0:15
+#SBATCH --mem=32G
 #SBATCH --gres=gpu:1
-#SBATCH --job-name=retraining_for_pickup
-#SBATCH --ntasks=1
-#SBATCH --cpus-per-task=32
-#SBATCH --mem=64G        # Adjust memory request as needed
-#SBATCH --mail-type=ALL   # Send email on begin, end, and fail
-#SBATCH --mail-user=huiyi.wang@nrc-cnrc.gc.ca
-# Print out the hostname that the jobs is running on
-hostname
+#SBATCH --mail-user=huiyi.wang@mail.mcgill.ca
+#SBATCH --mail-type=ALL
 
-# unset PIP_CONFIG_FILE; unset PYTHONPATH; 
-# Activate the conda pytorch environment created in step 1
-conda activate mujoco_env
+export PYTHONPATH="$PYTHONPATH:/home/cheryl16/projects/def-durandau/RL-Chemist"
+
+cd /home/cheryl16/projects/def-durandau/RL-Chemist
+
+module load StdEnv/2023
+module load gcc opencv cuda/12.2 python/3.10 mpi4py mujoco/3.1.6
+
+source /home/cheryl16/py310/bin/activate
+
 export MUJOCO_GL="egl"
 export PYOPENGL_PLATFORM="egl"
+export OMP_NUM_THREADS=1
+export MKL_NUM_THREADS=1
 
-# Launch our test pytorch python files
-srun python Train_reach_vel.py
 
-#srun --ntasks=1 python scripted_gp.py #
-#python Train_reach_vel.py
-# xvfb-run --auto-servernum --server-args='-screen 0 1024x768x24' python Train_reach_CNN.pysource
+python /home/cheryl16/projects/def-durandau/RL-Chemist/Train_reach_vel.py
