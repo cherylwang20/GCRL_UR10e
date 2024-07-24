@@ -99,9 +99,9 @@ def main():
 
     # Create a model using the vectorized environment
     #model = SAC("MultiInputPolicy", envs, buffer_size=1000, verbose=0)
-    model = PPO(CustomMultiInputPolicy, envs, ent_coef=0.01, verbose=0)
-    #model_num = "2024_07_18_16_15_52"
-    #model = PPO.load(r"./Reach_Target_vel/policy_best_model/" + env_name + '/' + model_num + '/best_model', envs, verbose=0)
+    #model = PPO(CustomMultiInputPolicy, envs, ent_coef=0.01, verbose=0)
+    model_num = "2024_07_21_11_40_41"
+    model = PPO.load(r"C:/Users/chery/Documents/RL-Chemist/Reach_Target_vel/policy_best_model/" + env_name + '/' + model_num + '/best_model', envs, verbose=0)
 
 
     #obs_callback = TensorboardCallback()

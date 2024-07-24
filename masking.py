@@ -6,7 +6,7 @@ IMAGE_WIDTH = 200
 IMAGE_HEIGHT = 200
 
 # Read the image
-image = cv.imread('image.png')
+image = cv.imread('rgb_1.png')
 color = "red"
 #rgb = cv.cvtColor(image, cv.COLOR_BGR2RGB)
 blurred = cv.GaussianBlur(image, (11, 11), 0)
@@ -54,3 +54,4 @@ cv.imshow("mask", mask)
 cv.waitKey(1)
 cv.waitKey(delay=5000)
 # cv.destroyAllWindows()
+cv.imwrite('mask_1.png', mask)
