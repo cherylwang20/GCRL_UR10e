@@ -13,7 +13,7 @@ import mujoco
 
 #obj2mjcf --obj-dir . --obj-filter beaker --save-mjcf --compile-model --decompose --overwrite --coacd-args.max-convex-hull 15
 
-model_num = '2024_07_21_11_40_41' #'2024_06_22_19_48_33'
+model_num = '2024_07_23_21_58_35' #'2024_06_22_19_48_33'
 env_name = "UR10eReachFixed-v3"
 movie = True
 frame_width = 800
@@ -34,16 +34,17 @@ frames = []
 frames_mask = []
 view = 'front'
 all_rewards = []
-for _ in tqdm(range(1)):
+for _ in tqdm(range(3)):
     ep_rewards = 0
-    solved = False
+    solved, done = False, False
     obs = env.reset()
     step = 0
     #ret, frame = cap.read()
-    while not solved and step < 200:
+    while not done and step < 250:
           #obs = env.obsdict2obsvec(env.obs_dict, env.obs_keys)[1]
           #obs = env.get_obs_dict()        
           action, _ = model.predict(obs, deterministic=True)
+          #print(action)
           obs, reward, done, info = env.step(action)
           solved = info['solved']
           if movie:

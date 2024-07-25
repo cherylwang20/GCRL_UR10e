@@ -12,6 +12,7 @@ from stable_baselines3.common.callbacks import EvalCallback, CallbackList, BaseC
 from typing import Callable, Dict, List, Optional, Tuple, Type, Union
 from datetime import datetime
 import time
+import neptune
 
 import numpy as np
 
@@ -29,6 +30,21 @@ class TensorboardCallback(BaseCallback):
         self.logger.record("average_obs", average_obs)
         return True
 
+class CustomNeptuneCallback(BaseCallback):
+    def __init__(self, run):
+        super(CustomNeptuneCallback, self).__init__(verbose=1)
+        self.run = run
+        # You might want to add more parameters here if needed
+
+    def _on_step(self) -> bool:
+        # Check if an episode has ended
+        if 'episode' in self.locals["infos"][0]:
+            episode_info = self.locals["infos"][0]['episode']
+            # Log episodic information to Neptune
+            self.run["metrics/episode_reward"].append(episode_info['r'])
+            self.run["metrics/episode_length"].append(episode_info['l'])
+
+        return True
 
 class CustomDictFeaturesExtractor(BaseFeaturesExtractor):
     def __init__(self, observation_space, features_dim=1024):  # Adjust features_dim if needed
@@ -62,12 +78,15 @@ class CustomMultiInputPolicy(ActorCriticPolicy):
                                                      features_extractor_class=CustomDictFeaturesExtractor,
                                                      features_extractor_kwargs={},
                                                      net_arch=[{'vf': [512, 512], 'pi': [512, 512]}])  # Adjust architecture if needed
+
 def make_env(env_name, idx, seed=0):
     def _init():
         env = gym.make(f'mj_envs.robohive.envs:{env_name}')
         env.seed(seed + idx)
         return env
     return _init
+
+
 
 def main():
     start_time = time.time()
@@ -80,6 +99,11 @@ def main():
         device = torch.device("cpu")
         print("Using CPU")
 
+    run = neptune.init_run(
+    project="cherylwang20/RL-Chemist-PPO",
+    api_token="eyJhcGlfYWRkcmVzcyI6Imh0dHBzOi8vYXBwLm5lcHR1bmUuYWkiLCJhcGlfdXJsIjoiaHR0cHM6Ly9hcHAubmVwdHVuZS5haSIsImFwaV9rZXkiOiIyMGZmM2VhZC04ZDBjLTQxZGQtYjlkOS1hMzEyMGVkOTA3NzMifQ==",
+    )
+
     num_cpu = 1
     env_name = "UR10eReachFixed-v3"
     envs = gym.make(f'mj_envs.robohive.envs:{env_name}')
@@ -89,7 +113,7 @@ def main():
     envs.color = detect_color
 
     log_path = './Reach_Target_vel/policy_best_model/' + env_name + '/' + time_now + '/'
-    eval_callback = EvalCallback(envs, best_model_save_path=log_path, log_path=log_path, eval_freq=10000, deterministic=True, render=False)
+    eval_callback = EvalCallback(envs, best_model_save_path=log_path, log_path=log_path, eval_freq=10000, deterministic=False, render=False)
     
     print('Begin training')
 
@@ -97,19 +121,32 @@ def main():
     # Adjust here to print keys from one of the environments
     print(envs.get_obs_dict)
 
+    training_steps = 5000000
+    loaded_model = '2024_07_23_21_58_35'
+
+    parameter = {
+    "dense_units": 512,
+    "activation": "relu",
+    "max_episode_steps": envs._max_episode_steps,
+	"training_steps": training_steps,
+	"loaded_model": loaded_model,
+	}
+
+    parameters = {**parameter, **envs.rwd_keys_wt}
+    run["model/parameters"] = parameters
+
     # Create a model using the vectorized environment
     #model = SAC("MultiInputPolicy", envs, buffer_size=1000, verbose=0)
     #model = PPO(CustomMultiInputPolicy, envs, ent_coef=0.01, verbose=0)
-    model_num = "2024_07_21_11_40_41"
-    model = PPO.load(r"C:/Users/chery/Documents/RL-Chemist/Reach_Target_vel/policy_best_model/" + env_name + '/' + model_num + '/best_model', envs, verbose=0)
+    model = PPO.load(r"C:/Users/chery/Documents/RL-Chemist/Reach_Target_vel/policy_best_model/" + env_name + '/' + loaded_model + '/best_model', envs, verbose=0, tensorboard_log="./temp_env_tensorboard/")
 
-
-    #obs_callback = TensorboardCallback()
-    callback = CallbackList([eval_callback])#, obs_callback])
-    print('learning begins')
+    obs_callback = TensorboardCallback()
+    nep_callback = CustomNeptuneCallback(run=run)
+    callback = CallbackList([eval_callback, nep_callback])#, obs_callback])
     
 
-    model.learn(total_timesteps=5000000) #, tb_log_name=env_name + "_" + time_now, callback=callback)
+    model.learn(total_timesteps=training_steps, callback=callback)# , tb_log_name=env_name + "_" + time_now)
+    run.stop()
 
 if __name__ == "__main__":
     # TRAIN
