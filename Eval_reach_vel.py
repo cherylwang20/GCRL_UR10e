@@ -13,11 +13,11 @@ import mujoco
 
 #obj2mjcf --obj-dir . --obj-filter beaker --save-mjcf --compile-model --decompose --overwrite --coacd-args.max-convex-hull 15
 
-model_num = '2024_07_23_21_58_35' #'2024_06_22_19_48_33'
+model_num = '2024_07_31_21_49_29' #'2024_06_22_19_48_33'
 env_name = "UR10eReachFixed-v3"
 movie = True
-frame_width = 800
-frame_height = 800
+frame_width = 224
+frame_height = 224
 #cap = cv.VideoCapture(0)
 
 model = PPO.load('./Reach_Target_vel/policy_best_model/' + env_name +'/' + model_num + r'/best_model')
@@ -34,18 +34,19 @@ frames = []
 frames_mask = []
 view = 'front'
 all_rewards = []
-for _ in tqdm(range(3)):
+for _ in tqdm(range(2)):
     ep_rewards = 0
     solved, done = False, False
     obs = env.reset()
     step = 0
     #ret, frame = cap.read()
-    while not done and step < 250:
+    while not done and step < 300:
           #obs = env.obsdict2obsvec(env.obs_dict, env.obs_keys)[1]
           #obs = env.get_obs_dict()        
           action, _ = model.predict(obs, deterministic=True)
           #print(action)
           obs, reward, done, info = env.step(action)
+          #print(obs)
           solved = info['solved']
           if movie:
               frame_n = env.sim.renderer.render_offscreen(width=frame_width, height=frame_height, camera_id=f'end_effector_cam')
@@ -71,13 +72,13 @@ for _ in tqdm(range(3)):
               mask = cv.dilate(mask, None, iterations=2)
               
               #define the grasping rectangle
-              x1, y1 = int(63/200 * frame_width), 0
-              x2, y2 = int(136/200 * frame_width), int(68/200 * frame_height)
+              x1, y1 = int(63/200 * frame_width), frame_height - int(68/200 * frame_height)
+              x2, y2 = int(136/200 * frame_width), frame_height 
 
-              #cv.rectangle(frame_n, (x1, 0), (x2, y2), (0, 0, 255), thickness=2)
-              #cv.rectangle(mask, (x1, 0), (x2, y2), 255, thickness=1)
-              cv.imshow("rbg", rgb)
-              cv.waitKey(1)
+              cv.rectangle(frame_n, (x1, y1), (x2, y2), (0, 0, 255), thickness=2)
+              cv.rectangle(mask, (x1, y1), (x2, y2), 255, thickness=1)
+              #cv.imshow("rbg", rgb)
+              #cv.waitKey(1)
               frame_n = np.rot90(np.rot90(frame_n))
               frames.append(frame_n[::-1, :, :])
               frames_mask.append(mask)

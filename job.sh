@@ -1,9 +1,10 @@
 #!/bin/bash 
-#SBATCH --account=def-durandau
-#SBATCH --cpus-per-task=4
-#SBATCH --time=0-0:15
+#SBATCH --account=def-cbelling
+#SBATCH --job-name=wandb_testing
+#SBATCH --cpus-per-task=8
+#SBATCH --time=0-48:00
 #SBATCH --mem=32G
-#SBATCH --gres=gpu:1
+#SBATCH --gres=gpu:2
 #SBATCH --mail-user=huiyi.wang@mail.mcgill.ca
 #SBATCH --mail-type=ALL
 
@@ -21,5 +22,7 @@ export PYOPENGL_PLATFORM="egl"
 export OMP_NUM_THREADS=1
 export MKL_NUM_THREADS=1
 
+wandb offline
 
-python /home/cheryl16/projects/def-durandau/RL-Chemist/Train_reach_vel.py
+#python  /home/cheryl16/projects/def-durandau/RL-Chemist/Eval_reach_vel.py
+parallel -j 15 python /home/cheryl16/projects/def-durandau/RL-Chemist/Train_reach_vel.py --num_envs 1 --seed ::: {1..20}

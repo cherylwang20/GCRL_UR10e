@@ -3,19 +3,27 @@ from gym import spaces
 import torch 
 import torch.nn as nn
 from stable_baselines3 import PPO, SAC
+from stable_baselines3.common.monitor import Monitor
 from stable_baselines3.common.torch_layers import BaseFeaturesExtractor
 from stable_baselines3.common.env_util import make_vec_env
 from stable_baselines3.common.policies import ActorCriticPolicy
 from stable_baselines3.common.vec_env import SubprocVecEnv, DummyVecEnv
+from stable_baselines3.common.vec_env import DummyVecEnv, VecVideoRecorder
 from stable_baselines3.common.callbacks import EvalCallback, CallbackList, BaseCallback
 #import mujoco_py
 from typing import Callable, Dict, List, Optional, Tuple, Type, Union
 from datetime import datetime
 import time
-import neptune
 from wandb.integration.sb3 import WandbCallback
 
 import numpy as np
+import argparse
+parser = argparse.ArgumentParser(description="Main script to train an agent")
+
+parser.add_argument("--seed", type=int, default=0, help="Seed for random number generator")
+parser.add_argument("--num_envs", type=int, default=1, help="Number of parallel environments")
+
+args = parser.parse_args()
 
 class TensorboardCallback(BaseCallback):
     """
@@ -91,12 +99,38 @@ def main():
 
     training_steps = 1500000
     env_name = "UR10eReachFixed-v3"
-
-
-    loaded_model = '2024_07_29_19_22_32'
-
     start_time = time.time()
     time_now = datetime.now().strftime("%Y_%m_%d_%H_%M_%S")
+
+    IS_WnB_enabled = False
+
+    loaded_model = '2024_07_29_19_22_32'
+    try:
+        import wandb
+        from wandb.integration.sb3 import WandbCallback
+        IS_WnB_enabled = True
+        config = {
+            "policy_type": 'PPO',
+            'name': time_now,
+            "total_timesteps": training_steps,
+            "env_name": env_name,
+            "dense_units": 512,
+            "activation": "relu",
+            "max_episode_steps": 300,
+            "seed", args.seed, 
+            "num_envs", args.num_envs
+            "loaded_model": loaded_model,
+        }
+        #config = {**config, **envs.rwd_keys_wt}
+        run = wandb.init(project="RL-Chemist",
+                        settings=wandb.Settings(start_method="fork"),
+                        config=config,
+                        sync_tensorboard=True,  # auto-upload sb3's tensorboard metrics
+                        monitor_gym=True,  # auto-upload the videos of agents playing the game
+                        save_code=True,  # optional
+                        )
+    except ImportError as e:
+        pass 
 
     if torch.cuda.is_available():
         device = torch.device("cuda")
@@ -105,9 +139,12 @@ def main():
         device = torch.device("cpu")
         print("Using CPU")
 
-    num_cpu = 1
-    envs = gym.make(f'mj_envs.robohive.envs:{env_name}')
+    num_cpu = args.num_envs
 
+    env = SubprocVecEnv([make_env(env_name, i, seed=args.seed) for i in range(num_cpu)])
+    env.render_mode = 'rgb_array'
+    envs = VecVideoRecorder(env, "videos",
+        record_video_trigger=lambda x: x % 2000 == 0, video_length=200)
 
     detect_color = 'green'
     #envs.set_attr('set_color', detect_color)
@@ -119,21 +156,22 @@ def main():
     print('Begin training')
     print(time_now)
 
-    
-    # Adjust here to print keys from one of the environments
-    print(envs.get_obs_dict)
 
     # Create a model using the vectorized environment
     #model = SAC("MultiInputPolicy", envs, buffer_size=1000, verbose=0)
-    #model = PPO(CustomMultiInputPolicy, envs, ent_coef=0.01, verbose=0, tensorboard_log=f"runs/{time_now}")
-    model = PPO.load(r"./Reach_Target_vel/policy_best_model/" + env_name + '/' + loaded_model + '/best_model', envs, verbose=1, tensorboard_log=f"runs/{time_now}")
+    model = PPO(CustomMultiInputPolicy, envs, ent_coef=0.01, verbose=0, tensorboard_log=f"runs/{time_now}")
+    #model = PPO.load(r"./Reach_Target_vel/policy_best_model/" + env_name + '/' + loaded_model + '/best_model', envs, verbose=1, tensorboard_log=f"runs/{time_now}")
 
     obs_callback = TensorboardCallback()
-    callback = CallbackList([eval_callback])#, obs_callback])
+    callback = CallbackList([eval_callback, WandbCallback(gradient_save_freq=100,
+                model_save_freq=1000,
+                model_save_path=f"models/{time_now}")])#, obs_callback])
     
 
     model.learn(total_timesteps=training_steps, callback=callback)# , tb_log_name=env_name + "_" + time_now)
 
+    if IS_WnB_enabled:
+        run.finish()
 
 if __name__ == "__main__":
     # TRAIN
