@@ -13,7 +13,7 @@ import mujoco
 
 #obj2mjcf --obj-dir . --obj-filter beaker --save-mjcf --compile-model --decompose --overwrite --coacd-args.max-convex-hull 15
 
-model_num = '2024_07_31_21_49_29' #'2024_06_22_19_48_33'
+model_num = '2024_08_14_18_21_54' #'2024_06_22_19_48_33'
 env_name = "UR10eReachFixed-v3"
 movie = True
 frame_width = 224
@@ -21,7 +21,7 @@ frame_height = 224
 #cap = cv.VideoCapture(0)
 
 model = PPO.load('./Reach_Target_vel/policy_best_model/' + env_name +'/' + model_num + r'/best_model')
-env = gym.make(f'mj_envs.robohive.envs:{"UR10eReachFixed-v3"}')
+env = gym.make(f'mj_envs.robohive.envs:{"UR10eReachFixed-v2"}')
 
 print("Action Space Lower Bounds:", env.action_space.low)
 print("Action Space Upper Bounds:", env.action_space.high)
@@ -40,7 +40,7 @@ for _ in tqdm(range(2)):
     obs = env.reset()
     step = 0
     #ret, frame = cap.read()
-    while not done and step < 300:
+    while not done and step < 500:
           #obs = env.obsdict2obsvec(env.obs_dict, env.obs_keys)[1]
           #obs = env.get_obs_dict()        
           action, _ = model.predict(obs, deterministic=True)
@@ -56,17 +56,22 @@ for _ in tqdm(range(2)):
               # construct a mask for the color "green", then perform
               # a series of dilations and erosions to remove any small
               # blobs left in the mask
-              if env.color == 'red':
-                Lower = (0, 70, 50)
-                Upper = (7, 233, 255)
-              elif env.color == 'green':
-                Lower = (29, 86, 56)
-                Upper = (64, 255, 255)
-              elif env.color == 'blue':
-                Lower = (80, 50, 20)
-                Upper = (100, 255, 255)
-              else:
-                raise Warning('please define a valid color (red, gree, blue)')
+              if env.touch_success < 1:
+                if env.color == 'red':
+                    Lower = (0, 70, 50)
+                    Upper = (7, 233, 255)
+                elif env.color == 'green':
+                    Lower = (29, 86, 56)
+                    Upper = (64, 255, 255)
+                elif env.color == 'blue':
+                    Lower = (80, 50, 20)
+                    Upper = (100, 255, 255)
+                else:
+                    raise Warning('please define a valid color (red, gree, blue)')
+              else:        
+                  #print(self.touch_success)
+                  Lower = (0, 0, 0)
+                  Upper = (0, 0, 0)
               mask = cv.inRange(hsv, Lower, Upper)
               mask = cv.erode(mask, None, iterations=2)
               mask = cv.dilate(mask, None, iterations=2)
@@ -84,6 +89,7 @@ for _ in tqdm(range(2)):
               frames_mask.append(mask)
           step += 1
           ep_rewards += reward
+    print(step)
     all_rewards.append(ep_rewards)
 
 print(f"Average reward: {np.mean(all_rewards)}")

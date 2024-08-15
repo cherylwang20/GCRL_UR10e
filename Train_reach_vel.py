@@ -89,14 +89,41 @@ def make_env(env_name, idx, seed=0):
 
 def main():
 
-    training_steps = 1500000
+    training_steps = 5000000
     env_name = "UR10eReachFixed-v3"
 
-
-    loaded_model = '2024_07_29_19_22_32'
+    IS_WnB_enabled = False
+    loaded_model = '2024_08_08_11_08_01'#'2024_07_29_19_22_32'
 
     start_time = time.time()
     time_now = datetime.now().strftime("%Y_%m_%d_%H_%M_%S")
+    try:
+        import wandb
+        from wandb.integration.sb3 import WandbCallback
+        IS_WnB_enabled = True
+        config = {
+            "policy_type": 'PPO',
+            'name': time_now,
+            "total_timesteps": training_steps,
+            "env_name": env_name,
+            "dense_units": 512,
+            "activation": "relu",
+            "max_episode_steps": 300,
+            "seed": 0, 
+            "num_envs": 2,
+            "loaded_model": loaded_model,
+        }
+        #config = {**config, **envs.rwd_keys_wt}
+        run = wandb.init(project="RL-Chemist_pick",
+                        group="experiment_1",
+                        settings=wandb.Settings(start_method="fork"),
+                        config=config,
+                        sync_tensorboard=True,  # auto-upload sb3's tensorboard metrics
+                        monitor_gym=True,  # auto-upload the videos of agents playing the game
+                        save_code=True,  # optional
+                        )
+    except ImportError as e:
+        pass 
 
     if torch.cuda.is_available():
         device = torch.device("cuda")
@@ -106,7 +133,7 @@ def main():
         print("Using CPU")
 
     num_cpu = 1
-    envs = gym.make(f'mj_envs.robohive.envs:{env_name}')
+    envs = gym.make(f'mj_envs.robohive.envs:{"UR10eReachFixed-v2"}')
 
 
     detect_color = 'green'
@@ -129,8 +156,10 @@ def main():
     model = PPO.load(r"./Reach_Target_vel/policy_best_model/" + env_name + '/' + loaded_model + '/best_model', envs, verbose=1, tensorboard_log=f"runs/{time_now}")
 
     obs_callback = TensorboardCallback()
-    callback = CallbackList([eval_callback])#, obs_callback])
-    
+    callback = CallbackList([eval_callback, WandbCallback(gradient_save_freq=100,
+                model_save_freq=1000,
+                model_save_path=f"models/{time_now}")])#, obs_callback])
+      
 
     model.learn(total_timesteps=training_steps, callback=callback)# , tb_log_name=env_name + "_" + time_now)
 

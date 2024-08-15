@@ -22,6 +22,8 @@ parser = argparse.ArgumentParser(description="Main script to train an agent")
 
 parser.add_argument("--seed", type=int, default=0, help="Seed for random number generator")
 parser.add_argument("--num_envs", type=int, default=1, help="Number of parallel environments")
+parser.add_argument("--env_name", type=str, default=1, help="environment name")
+parser.add_argument("--group", type=str, default=1, help="environment name")
 
 args = parser.parse_args()
 
@@ -97,14 +99,16 @@ def make_env(env_name, idx, seed=0):
 
 def main():
 
-    training_steps = 1500000
-    env_name = "UR10eReachFixed-v3"
+    training_steps = 5000000
+    env_name = args.env_name
     start_time = time.time()
     time_now = datetime.now().strftime("%Y_%m_%d_%H_%M_%S")
 
+    time_now = time_now + str(args.seed)
+
     IS_WnB_enabled = False
 
-    loaded_model = '2024_07_29_19_22_32'
+    loaded_model = 'N/A'
     try:
         import wandb
         from wandb.integration.sb3 import WandbCallback
@@ -117,12 +121,13 @@ def main():
             "dense_units": 512,
             "activation": "relu",
             "max_episode_steps": 300,
-            "seed", args.seed, 
-            "num_envs", args.num_envs
+            "seed": args.seed, 
+            "num_envs": args.num_envs,
             "loaded_model": loaded_model,
         }
         #config = {**config, **envs.rwd_keys_wt}
         run = wandb.init(project="RL-Chemist",
+                        group=args.group,
                         settings=wandb.Settings(start_method="fork"),
                         config=config,
                         sync_tensorboard=True,  # auto-upload sb3's tensorboard metrics
@@ -143,8 +148,8 @@ def main():
 
     env = SubprocVecEnv([make_env(env_name, i, seed=args.seed) for i in range(num_cpu)])
     env.render_mode = 'rgb_array'
-    envs = VecVideoRecorder(env, "videos",
-        record_video_trigger=lambda x: x % 2000 == 0, video_length=200)
+    envs = VecVideoRecorder(env, "videos/" + env_name + '/training_log' ,
+        record_video_trigger=lambda x: x % 30000 == 0, video_length=300)
 
     detect_color = 'green'
     #envs.set_attr('set_color', detect_color)
