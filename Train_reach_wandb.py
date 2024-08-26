@@ -90,6 +90,25 @@ class CustomMultiInputPolicy(ActorCriticPolicy):
                                                      features_extractor_kwargs={},
                                                      net_arch=[{'vf': [512, 512], 'pi': [512, 512]}])  # Adjust architecture if needed
 
+def linear_schedule(initial_value: float) -> Callable[[float], float]:
+    """
+    Linear learning rate schedule.
+
+    :param initial_value: Initial learning rate.
+    :return: schedule that computes
+      current learning rate depending on remaining progress
+    """
+    def func(progress_remaining: float) -> float:
+        """
+        Progress will decrease from 1 (beginning) to 0.
+
+        :param progress_remaining:
+        :return: current learning rate
+        """
+        return progress_remaining * initial_value
+
+    return func
+
 def make_env(env_name, idx, seed=0):
     def _init():
         env = gym.make(f'mj_envs.robohive.envs:{env_name}')
@@ -99,7 +118,7 @@ def make_env(env_name, idx, seed=0):
 
 def main():
 
-    training_steps = 5000000
+    training_steps = 1500000
     env_name = args.env_name
     start_time = time.time()
     time_now = datetime.now().strftime("%Y_%m_%d_%H_%M_%S")
@@ -126,7 +145,7 @@ def main():
             "loaded_model": loaded_model,
         }
         #config = {**config, **envs.rwd_keys_wt}
-        run = wandb.init(project="RL-Chemist",
+        run = wandb.init(project="RL-Chemist_Aug",
                         group=args.group,
                         settings=wandb.Settings(start_method="fork"),
                         config=config,
@@ -164,12 +183,12 @@ def main():
 
     # Create a model using the vectorized environment
     #model = SAC("MultiInputPolicy", envs, buffer_size=1000, verbose=0)
-    model = PPO(CustomMultiInputPolicy, envs, ent_coef=0.01, verbose=0, tensorboard_log=f"runs/{time_now}")
+    model = PPO(CustomMultiInputPolicy, envs, ent_coef=0.02, learning_rate=linear_schedule(0.003), verbose=0, tensorboard_log=f"runs/{time_now}")
     #model = PPO.load(r"./Reach_Target_vel/policy_best_model/" + env_name + '/' + loaded_model + '/best_model', envs, verbose=1, tensorboard_log=f"runs/{time_now}")
 
     obs_callback = TensorboardCallback()
     callback = CallbackList([eval_callback, WandbCallback(gradient_save_freq=100,
-                model_save_freq=1000,
+                model_save_freq=10000,
                 model_save_path=f"models/{time_now}")])#, obs_callback])
     
 

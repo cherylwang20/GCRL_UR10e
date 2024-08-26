@@ -1,9 +1,9 @@
 #!/bin/bash 
 #SBATCH --account=def-cbelling
-#SBATCH --job-name=baseline_rbf_train
+#SBATCH --job-name=baseline_a_2
 #SBATCH --cpus-per-task=12
-#SBATCH --time=0-72:00
-#SBATCH --mem=60G
+#SBATCH --time=0-24:00
+#SBATCH --mem=80G
 #SBATCH --gres=gpu:1
 #SBATCH --mail-user=huiyi.wang@mail.mcgill.ca
 #SBATCH --mail-type=ALL
@@ -24,5 +24,5 @@ export MKL_NUM_THREADS=1
 
 wandb offline
 
-#python  /home/cheryl16/projects/def-durandau/RL-Chemist/Eval_reach_vel.py
-parallel -j 5 python /home/cheryl16/projects/def-durandau/RL-Chemist/Train_reach_wandb.py --env_name 'UR10eReachFixed-v4' --group 'baseline_experiment_4_rbf' --num_envs 2 --seed ::: {1..10}
+#python  /home/cheryl16/projects/def-durandau/RL-Chemist/Eval_reach_vel.py UR10eReachObject-v0 UR10eReachFixed-v4
+parallel -j 5 python /home/cheryl16/projects/def-durandau/RL-Chemist/Train_reach_wandb.py --env_name 'UR10eReachObject-v1' --group 'experiment_a_2' --num_envs 3 --seed ::: {1..10}
