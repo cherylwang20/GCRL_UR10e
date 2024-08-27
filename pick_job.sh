@@ -2,7 +2,7 @@
 #SBATCH --account=def-cbelling
 #SBATCH --job-name=new_pick_target
 #SBATCH --cpus-per-task=5
-#SBATCH --time=0-48:00
+#SBATCH --time=0-24:00
 #SBATCH --mem=20G
 #SBATCH --gres=gpu:1
 #SBATCH --mail-user=huiyi.wang@mail.mcgill.ca

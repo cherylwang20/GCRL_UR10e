@@ -24,6 +24,8 @@ parser.add_argument("--seed", type=int, default=0, help="Seed for random number 
 parser.add_argument("--num_envs", type=int, default=1, help="Number of parallel environments")
 parser.add_argument("--env_name", type=str, default=1, help="environment name")
 parser.add_argument("--group", type=str, default=1, help="environment name")
+parser.add_argument("--learning_rate", type=float, default=0.0003, help="Learning rate for the optimizer")
+parser.add_argument("--clip_range", type=float, default=0.2, help="Clip range for the policy gradient update")
 
 args = parser.parse_args()
 
@@ -118,10 +120,13 @@ def make_env(env_name, idx, seed=0):
 
 def main():
 
-    training_steps = 1500000
+    training_steps = 2500000
     env_name = args.env_name
     start_time = time.time()
     time_now = datetime.now().strftime("%Y_%m_%d_%H_%M_%S")
+    ENTROPY = 0.01
+    LR = linear_schedule(args.learning_rate)
+    CR = linear_schedule(args.clip_range)
 
     time_now = time_now + str(args.seed)
 
@@ -139,8 +144,11 @@ def main():
             "env_name": env_name,
             "dense_units": 512,
             "activation": "relu",
-            "max_episode_steps": 300,
-            "seed": args.seed, 
+            "max_episode_steps": 200,
+            "seed": args.seed,
+            "entropy": ENTROPY,
+            "lr": LR,
+            "CR": CR,
             "num_envs": args.num_envs,
             "loaded_model": loaded_model,
         }
@@ -183,7 +191,7 @@ def main():
 
     # Create a model using the vectorized environment
     #model = SAC("MultiInputPolicy", envs, buffer_size=1000, verbose=0)
-    model = PPO(CustomMultiInputPolicy, envs, ent_coef=0.02, learning_rate=linear_schedule(0.003), verbose=0, tensorboard_log=f"runs/{time_now}")
+    model = PPO(CustomMultiInputPolicy, envs, ent_coef=ENTROPY, learning_rate=LR, clip_range=CR, verbose=0, tensorboard_log=f"runs/{time_now}")
     #model = PPO.load(r"./Reach_Target_vel/policy_best_model/" + env_name + '/' + loaded_model + '/best_model', envs, verbose=1, tensorboard_log=f"runs/{time_now}")
 
     obs_callback = TensorboardCallback()
