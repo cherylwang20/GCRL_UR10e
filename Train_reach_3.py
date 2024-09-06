@@ -23,7 +23,7 @@ parser = argparse.ArgumentParser(description="Main script to train an agent")
 parser.add_argument("--seed", type=int, default=0, help="Seed for random number generator")
 parser.add_argument("--num_envs", type=int, default=1, help="Number of parallel environments")
 parser.add_argument("--env_name", type=str, default=1, help="environment name")
-parser.add_argument("--group", type=str, default=1, help="environment name")
+parser.add_argument("--group", type=str, default='testing', help="environment name")
 parser.add_argument("--learning_rate", type=float, default=0.0003, help="Learning rate for the optimizer")
 parser.add_argument("--clip_range", type=float, default=0.2, help="Clip range for the policy gradient update")
 
@@ -63,7 +63,7 @@ class CustomDictFeaturesExtractor(BaseFeaturesExtractor):
     def __init__(self, observation_space, features_dim=1024):  # Adjust features_dim if needed
         super(CustomDictFeaturesExtractor, self).__init__(observation_space, features_dim)
         self.cnn = nn.Sequential(
-            nn.Conv2d(4, 32, kernel_size=8, stride=4, padding=2),  # Adjust padding to fit your needs
+            nn.Conv2d(6, 32, kernel_size=8, stride=4, padding=2),  # Adjust padding to fit your needs
             nn.ReLU(),
             nn.Conv2d(32, 64, kernel_size=4, stride=2, padding=1),
             nn.ReLU(),
@@ -75,13 +75,14 @@ class CustomDictFeaturesExtractor(BaseFeaturesExtractor):
         # Vector processing network
         self.mlp = nn.Linear(observation_space.spaces['vector'].shape[0], 16)
         
+        print(observation_space.spaces.keys())
 
         # Calculate the total concatenated feature dimension
         self._features_dim = observation_space.spaces['image'].shape[0]**2 + 16  # Adjust based on actual output dimensions of cnn and mlp
 
     def forward(self, observations):
-        images = observations['image'].permute(0, 3, 1, 2)
-        image_features = self.cnn(images)
+        image = observations['image'].permute(0, 3, 1, 2)
+        image_features = self.cnn(image)
         vector_features = self.mlp(observations['vector'])
         return torch.cat([image_features, vector_features], dim=1)
 
@@ -90,7 +91,7 @@ class CustomMultiInputPolicy(ActorCriticPolicy):
         super(CustomMultiInputPolicy, self).__init__(*args, **kwargs,
                                                      features_extractor_class=CustomDictFeaturesExtractor,
                                                      features_extractor_kwargs={},
-                                                     net_arch=[{'vf': [512, 512], 'pi': [512, 512]}])  # Adjust architecture if needed
+                                                     net_arch=[{'vf': [1024, 1024], 'pi': [1024, 1024]}])  # Adjust architecture if needed
 
 def linear_schedule(initial_value: float) -> Callable[[float], float]:
     """
@@ -153,7 +154,7 @@ def main():
             "loaded_model": loaded_model,
         }
         #config = {**config, **envs.rwd_keys_wt}
-        run = wandb.init(project="RL-Chemist_Aug",
+        run = wandb.init(project="RL-Chemist_Reach",
                         group=args.group,
                         settings=wandb.Settings(start_method="fork"),
                         config=config,

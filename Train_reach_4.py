@@ -23,7 +23,7 @@ parser = argparse.ArgumentParser(description="Main script to train an agent")
 parser.add_argument("--seed", type=int, default=0, help="Seed for random number generator")
 parser.add_argument("--num_envs", type=int, default=1, help="Number of parallel environments")
 parser.add_argument("--env_name", type=str, default=1, help="environment name")
-parser.add_argument("--group", type=str, default=1, help="environment name")
+parser.add_argument("--group", type=str, default='testing', help="environment name")
 parser.add_argument("--learning_rate", type=float, default=0.0003, help="Learning rate for the optimizer")
 parser.add_argument("--clip_range", type=float, default=0.2, help="Clip range for the policy gradient update")
 
@@ -75,13 +75,14 @@ class CustomDictFeaturesExtractor(BaseFeaturesExtractor):
         # Vector processing network
         self.mlp = nn.Linear(observation_space.spaces['vector'].shape[0], 16)
         
+        print(observation_space.spaces.keys())
 
         # Calculate the total concatenated feature dimension
         self._features_dim = observation_space.spaces['image'].shape[0]**2 + 16  # Adjust based on actual output dimensions of cnn and mlp
 
     def forward(self, observations):
-        images = observations['image'].permute(0, 3, 1, 2)
-        image_features = self.cnn(images)
+        image = observations['image'].permute(0, 3, 1, 2)
+        image_features = self.cnn(image)
         vector_features = self.mlp(observations['vector'])
         return torch.cat([image_features, vector_features], dim=1)
 
@@ -130,13 +131,12 @@ def main():
 
     time_now = time_now + str(args.seed)
 
-    IS_WnB_enabled = False
+    IS_WnB_enabled = True
 
     loaded_model = 'N/A'
     try:
         import wandb
         from wandb.integration.sb3 import WandbCallback
-        IS_WnB_enabled = True
         config = {
             "policy_type": 'PPO',
             'name': time_now,
@@ -153,7 +153,7 @@ def main():
             "loaded_model": loaded_model,
         }
         #config = {**config, **envs.rwd_keys_wt}
-        run = wandb.init(project="RL-Chemist_Aug",
+        run = wandb.init(project="RL-Chemist_Reach",
                         group=args.group,
                         settings=wandb.Settings(start_method="fork"),
                         config=config,
@@ -196,7 +196,7 @@ def main():
 
     obs_callback = TensorboardCallback()
     callback = CallbackList([eval_callback, WandbCallback(gradient_save_freq=100,
-                model_save_freq=10000,
+                model_save_freq=1000,
                 model_save_path=f"models/{time_now}")])#, obs_callback])
     
 

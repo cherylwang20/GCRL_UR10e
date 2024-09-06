@@ -2,3 +2,8 @@
 	path = mj_envs
 	url = https://github.com/cherylwang20/mj_envs.git
 	branch = rl-chemist
+
+[submodule "GroundingDINO"]
+	path = GroundingDINO
+	url = https://github.com/cherylwang20/GroundingDINO.git
+	branch = main
