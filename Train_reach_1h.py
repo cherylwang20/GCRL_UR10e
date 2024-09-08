@@ -63,7 +63,7 @@ class CustomDictFeaturesExtractor(BaseFeaturesExtractor):
     def __init__(self, observation_space, features_dim=1024):  # Adjust features_dim if needed
         super(CustomDictFeaturesExtractor, self).__init__(observation_space, features_dim)
         self.cnn = nn.Sequential(
-            nn.Conv2d(6, 32, kernel_size=8, stride=4, padding=2),  # Adjust padding to fit your needs
+            nn.Conv2d(3, 32, kernel_size=8, stride=4, padding=2),  # Adjust padding to fit your needs
             nn.ReLU(),
             nn.Conv2d(32, 64, kernel_size=4, stride=2, padding=1),
             nn.ReLU(),
@@ -73,12 +73,12 @@ class CustomDictFeaturesExtractor(BaseFeaturesExtractor):
         )
 
         # Vector processing network
-        self.mlp = nn.Linear(observation_space.spaces['vector'].shape[0], 16)
+        self.mlp = nn.Linear(observation_space.spaces['vector'].shape[0], 23)
         
         print(observation_space.spaces.keys())
 
         # Calculate the total concatenated feature dimension
-        self._features_dim = observation_space.spaces['image'].shape[0]**2 + 16  # Adjust based on actual output dimensions of cnn and mlp
+        self._features_dim = observation_space.spaces['image'].shape[0]**2 + 23  # Adjust based on actual output dimensions of cnn and mlp
 
     def forward(self, observations):
         image = observations['image'].permute(0, 3, 1, 2)
@@ -91,7 +91,7 @@ class CustomMultiInputPolicy(ActorCriticPolicy):
         super(CustomMultiInputPolicy, self).__init__(*args, **kwargs,
                                                      features_extractor_class=CustomDictFeaturesExtractor,
                                                      features_extractor_kwargs={},
-                                                     net_arch=[{'vf': [1024, 1024], 'pi': [1024, 1024]}])  # Adjust architecture if needed
+                                                     net_arch=[{'vf': [512, 512], 'pi': [512, 512]}])  # Adjust architecture if needed
 
 def linear_schedule(initial_value: float) -> Callable[[float], float]:
     """
@@ -112,9 +112,9 @@ def linear_schedule(initial_value: float) -> Callable[[float], float]:
 
     return func
 
-def make_env(env_name, idx, seed=0, eval_mode=False):
+def make_env(env_name, idx, seed=0):
     def _init():
-        env = gym.make(f'mj_envs.robohive.envs:{env_name}', eval_mode=eval_mode)
+        env = gym.make(f'mj_envs.robohive.envs:{env_name}')
         env.seed(seed + idx)
         return env
     return _init
@@ -182,17 +182,6 @@ def main():
     detect_color = 'green'
     #envs.set_attr('set_color', detect_color)
     envs.color = detect_color
-    
-    
-    ## EVAL
-    eval_env = SubprocVecEnv([make_env(env_name, i, seed=args.seed, eval_mode=True) for i in range(num_cpu)])
-    eval_env.render_mode = 'rgb_array'
-    eval_envs = VecVideoRecorder(eval_env, "videos/" + env_name + '/training_log' ,
-        record_video_trigger=lambda x: x % 30000 == 0, video_length=300)
-
-    detect_color = 'green'
-    #envs.set_attr('set_color', detect_color)
-    eval_envs.color = detect_color
 
     log_path = './Reach_Target_vel/policy_best_model/' + env_name + '/' + time_now + '/'
     eval_callback = EvalCallback(envs, best_model_save_path=log_path, log_path=log_path, eval_freq=10000, deterministic=True, render=False)
