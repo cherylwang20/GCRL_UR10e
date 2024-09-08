@@ -194,7 +194,7 @@ def main():
     eval_envs.color = detect_color
 
     log_path = './Reach_Target_vel/policy_best_model/' + env_name + '/' + time_now + '/'
-    eval_callback = EvalCallback(eval_envs, best_model_save_path=log_path, log_path=log_path, eval_freq=10000, deterministic=True, render=False)
+    eval_callback = EvalCallback(eval_envs, best_model_save_path=log_path, log_path=log_path, eval_freq=10000, n_eval_episodes=20, deterministic=True, render=False)
     
     print('Begin training')
     print(time_now)
