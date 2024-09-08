@@ -112,9 +112,9 @@ def linear_schedule(initial_value: float) -> Callable[[float], float]:
 
     return func
 
-def make_env(env_name, idx, seed=0):
+def make_env(env_name, idx, seed=0, eval_mode=False):
     def _init():
-        env = gym.make(f'mj_envs.robohive.envs:{env_name}')
+        env = gym.make(f'mj_envs.robohive.envs:{env_name}', eval_mode=eval_mode)
         env.seed(seed + idx)
         return env
     return _init
@@ -172,7 +172,8 @@ def main():
         device = torch.device("cpu")
         print("Using CPU")
 
-    num_cpu = args.num_envs
+    # num_cpu = args.num_envs
+    num_cpu = 3
 
     env = SubprocVecEnv([make_env(env_name, i, seed=args.seed) for i in range(num_cpu)])
     env.render_mode = 'rgb_array'
@@ -182,9 +183,20 @@ def main():
     detect_color = 'green'
     #envs.set_attr('set_color', detect_color)
     envs.color = detect_color
+    
+    
+    ## EVAL
+    eval_env = SubprocVecEnv([make_env(env_name, i, seed=args.seed, eval_mode=True) for i in range(num_cpu)])
+    eval_env.render_mode = 'rgb_array'
+    eval_envs = VecVideoRecorder(eval_env, "videos/" + env_name + '/training_log' ,
+        record_video_trigger=lambda x: x % 30000 == 0, video_length=300)
+
+    detect_color = 'green'
+    #envs.set_attr('set_color', detect_color)
+    eval_envs.color = detect_color
 
     log_path = './Reach_Target_vel/policy_best_model/' + env_name + '/' + time_now + '/'
-    eval_callback = EvalCallback(envs, best_model_save_path=log_path, log_path=log_path, eval_freq=10000, deterministic=True, render=False)
+    eval_callback = EvalCallback(eval_envs, best_model_save_path=log_path, log_path=log_path, eval_freq=10000, deterministic=True, render=False)
     
     print('Begin training')
     print(time_now)

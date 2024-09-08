@@ -2,7 +2,7 @@
 #SBATCH --account=def-cbelling
 #SBATCH --job-name=mask_4_1
 #SBATCH --cpus-per-task=12
-#SBATCH --time=0-48:00
+#SBATCH --time=0-60:00
 #SBATCH --array=1-5
 #SBATCH --mem=108G
 #SBATCH --gres=gpu:1
