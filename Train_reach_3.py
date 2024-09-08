@@ -173,9 +173,10 @@ def main():
         print("Using CPU")
 
     # num_cpu = args.num_envs
-    num_cpu = 3
+    num_envs = 4
+    num_eval_envs = 1
 
-    env = SubprocVecEnv([make_env(env_name, i, seed=args.seed) for i in range(num_cpu)])
+    env = SubprocVecEnv([make_env(env_name, i, seed=args.seed) for i in range(num_envs)])
     env.render_mode = 'rgb_array'
     envs = VecVideoRecorder(env, "videos/" + env_name + '/training_log' ,
         record_video_trigger=lambda x: x % 30000 == 0, video_length=300)
@@ -186,7 +187,7 @@ def main():
     
     
     ## EVAL
-    eval_env = SubprocVecEnv([make_env(env_name, i, seed=args.seed, eval_mode=True) for i in range(num_cpu)])
+    eval_env = SubprocVecEnv([make_env(env_name, i, seed=args.seed, eval_mode=True) for i in range(num_eval_envs)])
     eval_env.render_mode = 'rgb_array'
     eval_envs = VecVideoRecorder(eval_env, "videos/" + env_name + '/training_log' ,
         record_video_trigger=lambda x: x % 30000 == 0, video_length=300)
