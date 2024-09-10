@@ -7,7 +7,7 @@ from stable_baselines3.common.monitor import Monitor
 from stable_baselines3.common.torch_layers import BaseFeaturesExtractor
 from stable_baselines3.common.env_util import make_vec_env
 from stable_baselines3.common.policies import ActorCriticPolicy
-from stable_baselines3.common.vec_env import SubprocVecEnv, DummyVecEnv
+from stable_baselines3.common.vec_env import SubprocVecEnv, DummyVecEnv, VecMonitor
 from stable_baselines3.common.vec_env import DummyVecEnv, VecVideoRecorder
 from stable_baselines3.common.callbacks import EvalCallback, CallbackList, BaseCallback
 #import mujoco_py
@@ -112,9 +112,9 @@ def linear_schedule(initial_value: float) -> Callable[[float], float]:
 
     return func
 
-def make_env(env_name, idx, seed=0):
+def make_env(env_name, idx, seed=0, eval_mode=False):
     def _init():
-        env = gym.make(f'mj_envs.robohive.envs:{env_name}')
+        env = gym.make(f'mj_envs.robohive.envs:{env_name}', eval_mode=eval_mode)
         env.seed(seed + idx)
         return env
     return _init
@@ -178,7 +178,7 @@ def main():
     env.render_mode = 'rgb_array'
     envs = VecVideoRecorder(env, "videos/" + env_name + '/training_log' ,
         record_video_trigger=lambda x: x % 30000 == 0.3333, video_length=300)
-
+    envs = VecMonitor(envs)
 
     ## EVAL
     eval_env = SubprocVecEnv([make_env(env_name, i, seed=args.seed, eval_mode=True) for i in range(1)])
@@ -187,7 +187,7 @@ def main():
         record_video_trigger=lambda x: x % 30000 == 0, video_length=300)
 
     log_path = './Reach_Target_vel/policy_best_model/' + env_name + '/' + time_now + '/'
-    eval_callback = EvalCallback(eval_envs, best_model_save_path=log_path, log_path=log_path, eval_freq=10000, n_eval_episodes=20, deterministic=True, render=False)
+    eval_callback = EvalCallback(eval_envs, best_model_save_path=log_path, log_path=log_path, eval_freq=2000, n_eval_episodes=20, deterministic=True, render=False)
     
     print('Begin training')
     print(time_now)
