@@ -9,6 +9,7 @@ from stable_baselines3.common.env_util import make_vec_env
 from stable_baselines3.common.policies import ActorCriticPolicy
 from stable_baselines3.common.vec_env import SubprocVecEnv, DummyVecEnv
 from stable_baselines3.common.vec_env import DummyVecEnv, VecVideoRecorder
+from stable_baselines3.common.vec_env.vec_monitor import VecMonitor
 from stable_baselines3.common.callbacks import EvalCallback, CallbackList, BaseCallback
 #import mujoco_py
 from typing import Callable, Dict, List, Optional, Tuple, Type, Union
@@ -180,6 +181,7 @@ def main():
     env.render_mode = 'rgb_array'
     envs = VecVideoRecorder(env, "videos/" + env_name + '/training_log' ,
         record_video_trigger=lambda x: x % 30000 == 0, video_length=300)
+    envs = VecMonitor(envs)
 
     detect_color = 'green'
     #envs.set_attr('set_color', detect_color)
@@ -191,6 +193,7 @@ def main():
     eval_env.render_mode = 'rgb_array'
     eval_envs = VecVideoRecorder(eval_env, "videos/" + env_name + '/training_log' ,
         record_video_trigger=lambda x: x % 30000 == 0, video_length=300)
+    envs = VecMonitor(envs)
 
     detect_color = 'green'
     #envs.set_attr('set_color', detect_color)

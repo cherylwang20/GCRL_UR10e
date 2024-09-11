@@ -1,0 +1,5 @@
+*.out
+*model.zip
+events.out.*
+*videos/*
+*.npz

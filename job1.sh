@@ -1,6 +1,6 @@
 #!/bin/bash 
 #SBATCH --account=rrg-ashique
-#SBATCH --job-name=mask_4_1
+#SBATCH --job-name=mask_3_1
 #SBATCH --cpus-per-task=12
 #SBATCH --time=0-60:00
 #SBATCH --array=1-5
@@ -31,7 +31,7 @@ wandb offline
 #parallel -j 5 python Train_reach_4.py --env_name 'UR10eReach4C-v0' --group 'experiment_reach4_1' --num_envs 4 --learning_rate ::: 0.0002 0.0001 ::: --clip_range ::: 0.1 0.01 ::: --seed ::: {1..10} 
 #parallel -j 5 python Train_reach_4.py --env_name 'UR10eReach4C-v0' --group 'experiment_reach4_1' --num_envs 4 --learning_rate 0.0001 --clip_range 0.01 -seed $SLURM_ARRAY_TASK_ID
 
-python Train_reach_4.py --env_name 'UR10eMask4C-v0' --group 'experiment_Mask4_1' --num_envs 4 --learning_rate 0.0001 --clip_range 0.01 --seed $SLURM_ARRAY_TASK_ID
+python Train_reach_3.py --env_name 'UR10eMask3C-v0' --group 'experiment_Mask3_1' --num_envs 4 --learning_rate 0.0001 --clip_range 0.01 --seed $SLURM_ARRAY_TASK_ID
 
 # parallel -j 5 python Train_reach_4.py --env_name 'UR10eMask4C-v0' --group 'experiment_Mask4_1' --num_envs 4 --learning_rate 0.0001 --clip_range 0.01 --seed $SLURM_ARRAY_TASK_ID
 
