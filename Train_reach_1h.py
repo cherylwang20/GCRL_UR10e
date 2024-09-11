@@ -63,7 +63,7 @@ class CustomDictFeaturesExtractor(BaseFeaturesExtractor):
     def __init__(self, observation_space, features_dim=1024):  # Adjust features_dim if needed
         super(CustomDictFeaturesExtractor, self).__init__(observation_space, features_dim)
         self.cnn = nn.Sequential(
-            nn.Conv2d(6, 32, kernel_size=8, stride=4, padding=2),  # Adjust padding to fit your needs
+            nn.Conv2d(3, 32, kernel_size=8, stride=4, padding=2),  # Adjust padding to fit your needs
             nn.ReLU(),
             nn.Conv2d(32, 64, kernel_size=4, stride=2, padding=1),
             nn.ReLU(),
@@ -73,12 +73,12 @@ class CustomDictFeaturesExtractor(BaseFeaturesExtractor):
         )
 
         # Vector processing network
-        self.mlp = nn.Linear(observation_space.spaces['vector'].shape[0], 16)
+        self.mlp = nn.Linear(observation_space.spaces['vector'].shape[0], 23)
         
         print(observation_space.spaces.keys())
 
         # Calculate the total concatenated feature dimension
-        self._features_dim = observation_space.spaces['image'].shape[0]**2 + 16  # Adjust based on actual output dimensions of cnn and mlp
+        self._features_dim = observation_space.spaces['image'].shape[0]**2 + 23  # Adjust based on actual output dimensions of cnn and mlp
 
     def forward(self, observations):
         image = observations['image'].permute(0, 3, 1, 2)
@@ -91,7 +91,7 @@ class CustomMultiInputPolicy(ActorCriticPolicy):
         super(CustomMultiInputPolicy, self).__init__(*args, **kwargs,
                                                      features_extractor_class=CustomDictFeaturesExtractor,
                                                      features_extractor_kwargs={},
-                                                     net_arch=[{'vf': [1024, 1024], 'pi': [1024, 1024]}])  # Adjust architecture if needed
+                                                     net_arch=[{'vf': [512, 512], 'pi': [512, 512]}])  # Adjust architecture if needed
 
 def linear_schedule(initial_value: float) -> Callable[[float], float]:
     """
@@ -121,7 +121,7 @@ def make_env(env_name, idx, seed=0, eval_mode=False):
 
 def main():
 
-    training_steps = 3500000
+    training_steps = 2500000
     env_name = args.env_name
     start_time = time.time()
     time_now = datetime.now().strftime("%Y_%m_%d_%H_%M_%S")
@@ -172,34 +172,22 @@ def main():
         device = torch.device("cpu")
         print("Using CPU")
 
-    # num_cpu = args.num_envs
-    num_envs = 4
-    num_eval_envs = 1
+    num_cpu = args.num_envs
 
-    env = SubprocVecEnv([make_env(env_name, i, seed=args.seed) for i in range(num_envs)])
+    env = SubprocVecEnv([make_env(env_name, i, seed=args.seed) for i in range(num_cpu)])
     env.render_mode = 'rgb_array'
     envs = VecVideoRecorder(env, "videos/" + env_name + '/training_log' ,
-        record_video_trigger=lambda x: x % 30000 == 0, video_length=300)
+        record_video_trigger=lambda x: x % 30000 == 0.3333, video_length=300)
     envs = VecMonitor(envs)
 
-    detect_color = 'green'
-    #envs.set_attr('set_color', detect_color)
-    envs.color = detect_color
-    
-    
     ## EVAL
-    eval_env = SubprocVecEnv([make_env(env_name, i, seed=args.seed, eval_mode=True) for i in range(num_eval_envs)])
+    eval_env = SubprocVecEnv([make_env(env_name, i, seed=args.seed, eval_mode=True) for i in range(1)])
     eval_env.render_mode = 'rgb_array'
     eval_envs = VecVideoRecorder(eval_env, "videos/" + env_name + '/training_log' ,
         record_video_trigger=lambda x: x % 30000 == 0, video_length=300)
-    envs = VecMonitor(envs)
-
-    detect_color = 'green'
-    #envs.set_attr('set_color', detect_color)
-    eval_envs.color = detect_color
 
     log_path = './Reach_Target_vel/policy_best_model/' + env_name + '/' + time_now + '/'
-    eval_callback = EvalCallback(eval_envs, best_model_save_path=log_path, log_path=log_path, eval_freq=2000, deterministic=True, render=False)
+    eval_callback = EvalCallback(eval_envs, best_model_save_path=log_path, log_path=log_path, eval_freq=2000, n_eval_episodes=20, deterministic=True, render=False)
     
     print('Begin training')
     print(time_now)

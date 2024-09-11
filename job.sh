@@ -2,8 +2,8 @@
 #SBATCH --account=rrg-ashique
 #SBATCH --job-name=mask_4_1
 #SBATCH --cpus-per-task=12
-#SBATCH --time=0-60:00
-#SBATCH --array=1-5
+#SBATCH --time=0-72:00
+#SBATCH --array=1
 #SBATCH --mem=108G
 #SBATCH --gres=gpu:1 
 #SBATCH --mail-type=ALL
@@ -27,7 +27,13 @@ wandb offline
 #parallel -j 5 python /home/cheryl16/projects/def-durandau/RL-Chemist/Train_reach_wandb.py --env_name 'UR10eReachObject-v0' --group 'experiment_s_3' --num_envs 3 --seed ::: {1..3}
 #parallel -j 5 python /home/cheryl16/projects/def-durandau/RL-Chemist/Train_reach_wandb.py --env_name 'UR10eReachObject-v0' --group 'experiment_s_4' --num_envs 4 --learning_rate ::: 0.0002 0.0001 ::: --clip_range ::: 0.1 0.01 ::: --seed ::: {1..5} 
 #parallel -j 5 python /home/cheryl16/projects/def-durandau/RL-Chemist/Train_reach_wandb.py --env_name 'UR10eReachFive-v1' --group 'experiment_5_mask_1' --num_envs 4 --learning_rate ::: 0.0002 0.0001 ::: --clip_range ::: 0.1 0.01 ::: --seed ::: {1..5} 
-#parallel -j 5 python Train_reach_3.py --env_name 'UR10eReach3C-v0' --group 'experiment_reach3_2' --num_envs 4 --learning_rate ::: 0.0003 0.0001 ::: --clip_range ::: 0.1 0.01 ::: --seed ::: {1..10} 
+#parallel -j 5 python Train_reach_3.py --env_name 'UR10eReach3C-v0' --group 'experiment_reach3_5' --num_envs 4 --learning_rate 0.0001 --clip_range 0.1 --seed ::: {1..10} 
+
+#parallel -j 5 python Train_reach_3.py --env_name 'UR10eSparse3C-v0' --group 'experiment_sparse3_1' --num_envs 4 --learning_rate 0.0002 --clip_range 0.1 --seed ::: {1..10} 
+#python Train_reach_4.py --env_name 'UR10eSparse4C-v0' --group 'experiment_sparse_4' --num_envs 4 --learning_rate 0.0001 --clip_range 0.01 --seed $SLURM_ARRAY_TASK_ID
+
+parallel -j 5 python Train_reach_1h.py --env_name 'UR10eReach1H-v0' --group 'experiment_reach1_2' --num_envs 4 --learning_rate 0.0001 --clip_range 0.05 --seed ::: {1..10} 
+
 #parallel -j 5 python Train_reach_4.py --env_name 'UR10eReach4C-v0' --group 'experiment_reach4_1' --num_envs 4 --learning_rate ::: 0.0002 0.0001 ::: --clip_range ::: 0.1 0.01 ::: --seed ::: {1..10} 
 #parallel -j 5 python Train_reach_4.py --env_name 'UR10eReach4C-v0' --group 'experiment_reach4_1' --num_envs 4 --learning_rate 0.0001 --clip_range 0.01 -seed $SLURM_ARRAY_TASK_ID
 
