@@ -9,6 +9,7 @@ from stable_baselines3.common.env_util import make_vec_env
 from stable_baselines3.common.policies import ActorCriticPolicy
 from stable_baselines3.common.vec_env import SubprocVecEnv, DummyVecEnv, VecMonitor
 from stable_baselines3.common.vec_env import DummyVecEnv, VecVideoRecorder
+from stable_baselines3.common.vec_env.vec_monitor import VecMonitor
 from stable_baselines3.common.callbacks import EvalCallback, CallbackList, BaseCallback
 #import mujoco_py
 from typing import Callable, Dict, List, Optional, Tuple, Type, Union
@@ -171,7 +172,9 @@ def main():
         device = torch.device("cpu")
         print("Using CPU")
 
-    num_cpu = args.num_envs
+    # num_cpu = args.num_envs
+    num_envs = 4
+    num_eval_envs = 1
 
     env = DummyVecEnv([make_env(env_name, i, seed=args.seed) for i in range(num_cpu)])
     env.render_mode = 'rgb_array'

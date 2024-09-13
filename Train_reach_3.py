@@ -172,20 +172,31 @@ def main():
         device = torch.device("cpu")
         print("Using CPU")
 
-    num_cpu = args.num_envs
+    # num_cpu = args.num_envs
+    num_envs = 4
+    num_eval_envs = 1
 
-    env = SubprocVecEnv([make_env(env_name, i, seed=args.seed) for i in range(num_cpu)])
+    env = SubprocVecEnv([make_env(env_name, i, seed=args.seed) for i in range(num_envs)])
     env.render_mode = 'rgb_array'
     envs = VecVideoRecorder(env, "videos/" + env_name + '/training_log' ,
         record_video_trigger=lambda x: x % 30000 == 0, video_length=300)
+    envs = VecMonitor(envs)
 
+    detect_color = 'green'
+    #envs.set_attr('set_color', detect_color)
+    envs.color = detect_color
+    
     
     ## EVAL
-    eval_env = SubprocVecEnv([make_env(env_name, i, seed=args.seed, eval_mode=True) for i in range(1)])
+    eval_env = SubprocVecEnv([make_env(env_name, i, seed=args.seed, eval_mode=True) for i in range(num_eval_envs)])
     eval_env.render_mode = 'rgb_array'
     eval_envs = VecVideoRecorder(eval_env, "videos/" + env_name + '/training_log' ,
         record_video_trigger=lambda x: x % 30000 == 0, video_length=300)
     envs = VecMonitor(envs)
+
+    detect_color = 'green'
+    #envs.set_attr('set_color', detect_color)
+    eval_envs.color = detect_color
 
     log_path = './Reach_Target_vel/policy_best_model/' + env_name + '/' + time_now + '/'
     eval_callback = EvalCallback(eval_envs, best_model_save_path=log_path, log_path=log_path, eval_freq=2000, deterministic=True, render=False)
