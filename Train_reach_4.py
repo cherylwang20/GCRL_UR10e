@@ -173,14 +173,14 @@ def main():
 
     num_cpu = args.num_envs
 
-    env = SubprocVecEnv([make_env(env_name, i, seed=args.seed) for i in range(num_cpu)])
+    env = DummyVecEnv([make_env(env_name, i, seed=args.seed) for i in range(num_cpu)])
     env.render_mode = 'rgb_array'
     envs = VecVideoRecorder(env, "videos/" + env_name + '/training_log' ,
-        record_video_trigger=lambda x: x % 30000 == 0.3333, video_length=300)
+        record_video_trigger=lambda x: x % 30000 == 0, video_length=300)
     envs = VecMonitor(envs)
 
     ## EVAL
-    eval_env = SubprocVecEnv([make_env(env_name, i, seed=args.seed, eval_mode=True) for i in range(1)])
+    eval_env = DummyVecEnv([make_env(env_name, i, seed=args.seed, eval_mode=True) for i in range(1)])
     eval_env.render_mode = 'rgb_array'
     eval_envs = VecVideoRecorder(eval_env, "videos/" + env_name + '/training_log' ,
         record_video_trigger=lambda x: x % 30000 == 0, video_length=300)

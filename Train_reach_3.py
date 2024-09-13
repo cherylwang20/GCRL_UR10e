@@ -145,7 +145,7 @@ def main():
             "env_name": env_name,
             "dense_units": 512,
             "activation": "relu",
-            "max_episode_steps": 200,
+            "max_episode_steps": 150,
             "seed": args.seed,
             "entropy": ENTROPY,
             "lr": args.learning_rate,
