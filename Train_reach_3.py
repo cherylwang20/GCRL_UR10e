@@ -172,11 +172,11 @@ def main():
         device = torch.device("cpu")
         print("Using CPU")
 
-    # num_cpu = args.num_envs
-    num_envs = 4
+    num_cpu = args.num_envs
+    #num_envs = 4
     num_eval_envs = 1
 
-    env = SubprocVecEnv([make_env(env_name, i, seed=args.seed) for i in range(num_envs)])
+    env = SubprocVecEnv([make_env(env_name, i, seed=args.seed) for i in range(num_cpu)])
     env.render_mode = 'rgb_array'
     envs = VecVideoRecorder(env, "videos/" + env_name + '/training_log' ,
         record_video_trigger=lambda x: x % 30000 == 0, video_length=300)

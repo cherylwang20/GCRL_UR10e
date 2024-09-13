@@ -172,9 +172,7 @@ def main():
         device = torch.device("cpu")
         print("Using CPU")
 
-    # num_cpu = args.num_envs
-    num_envs = 4
-    num_eval_envs = 1
+    num_cpu = args.num_envs
 
     env = DummyVecEnv([make_env(env_name, i, seed=args.seed) for i in range(num_cpu)])
     env.render_mode = 'rgb_array'
