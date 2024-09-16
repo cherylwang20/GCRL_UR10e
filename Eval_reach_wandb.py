@@ -13,8 +13,8 @@ import mujoco
 
 #obj2mjcf --obj-dir . --obj-filter beaker --save-mjcf --compile-model --decompose --overwrite --coacd-args.max-convex-hull 15
 
-model_num = '2024_09_10_11_12_045' #'2024_08_10_19_05_524' #'2024_06_22_19_48_33'
-env_name = "UR10eEvalReach4C-v0"
+model_num = '2024_09_13_15_26_302' #'2024_08_10_19_05_524' #'2024_06_22_19_48_33'
+env_name = "UR10eMask3C-v1"
 env = gym.make(f'mj_envs.robohive.envs:{env_name}')
 
 movie = True
@@ -22,7 +22,7 @@ frame_width = 224
 frame_height = 224
 #cap = cv.VideoCapture(0)
 
-model = PPO.load('./Reach_Target_vel/policy_best_model/' + "UR10eReach4C-v0" +'/' + model_num + r'/best_model')
+model = PPO.load('./Reach_Target_vel/policy_best_model/' + "UR10eMask3C-v1" +'/' + model_num + r'/best_model')
 #model = PPO.load('./models/'+ model_num + r'/model')
 
 
@@ -71,6 +71,6 @@ print(f"Success rate: {success/trial}")
 
 
 if movie:
-    os.makedirs('./videos' +'/' + env_name, exist_ok=True)
-    skvideo.io.vwrite('./videos'  +'/' + env_name + '/' + model_num + f'{view}_video.mp4', np.asarray(frames), inputdict = {'-r':'50'} , outputdict={"-pix_fmt": "yuv420p"})
-    skvideo.io.vwrite('./videos'  +'/' + env_name + '/' + model_num + f'{view}_mask_video.mp4', np.asarray(frames_mask), inputdict = {'-r':'50'} , outputdict={"-pix_fmt": "yuv420p"})
+    os.makedirs('./videos1' +'/' + env_name, exist_ok=True)
+    skvideo.io.vwrite('./videos1'  +'/' + env_name + '/' + model_num + f'{view}_video.mp4', np.asarray(frames), inputdict = {'-r':'50'} , outputdict={"-pix_fmt": "yuv420p"})
+    skvideo.io.vwrite('./videos1'  +'/' + env_name + '/' + model_num + f'{view}_mask_video.mp4', np.asarray(frames_mask), inputdict = {'-r':'50'} , outputdict={"-pix_fmt": "yuv420p"})
