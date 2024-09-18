@@ -3,3 +3,4 @@
 events.out.*
 *videos/*
 *.npz
+*.sh
