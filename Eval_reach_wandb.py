@@ -13,8 +13,8 @@ import mujoco
 
 #obj2mjcf --obj-dir . --obj-filter beaker --save-mjcf --compile-model --decompose --overwrite --coacd-args.max-convex-hull 15
 
-model_num = '2024_09_10_11_12_045' #'2024_08_10_19_05_524' #'2024_06_22_19_48_33'
-env_name = "UR10eEvalReach4C-v0"
+model_num = '2024_09_13_12_56_365' #'2024_08_10_19_05_524' #'2024_06_22_19_48_33'
+env_name = "UR10eReach4C-v1"
 env = gym.make(f'mj_envs.robohive.envs:{env_name}')
 
 movie = True
@@ -22,7 +22,7 @@ frame_width = 224
 frame_height = 224
 #cap = cv.VideoCapture(0)
 
-model = PPO.load('./Reach_Target_vel/policy_best_model/' + "UR10eReach4C-v0" +'/' + model_num + r'/best_model')
+model = PPO.load('./Reach_Target_vel/policy_best_model/' + "UR10eReach4C-v1" +'/' + model_num + r'/best_model')
 #model = PPO.load('./models/'+ model_num + r'/model')
 
 
@@ -46,7 +46,7 @@ for i in tqdm(range(trial)):
     obs = env.reset()
     step = 0
     #ret, frame = cap.read()
-    while not done and step < 150:
+    while not done and step < 200:
           #obs = env.obsdict2obsvec(env.obs_dict, env.obs_keys)[1]
           #obs = env.get_obs_dict()        
           action, _ = model.predict(obs, deterministic=False)
@@ -61,8 +61,8 @@ for i in tqdm(range(trial)):
               frames_mask.append(mask)
           step += 1
           ep_rewards += reward
-          if solved:
-            success += 1
+    if solved:
+        success += 1
     all_rewards.append(ep_rewards)
 
 print(f"Average reward: {np.mean(all_rewards)}")
