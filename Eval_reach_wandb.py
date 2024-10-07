@@ -12,21 +12,34 @@ import torch
 import mujoco
 import warnings
 
+import argparse
+parser = argparse.ArgumentParser(description="Main script to train an agent")
+
+parser.add_argument("--env_name", type=str, default='NA', help="environment name")
+parser.add_argument("--policy_env", type=str, default='NA', help="environment name")
+parser.add_argument("--model_num", type=str, default='testing', help="environment name")
+parser.add_argument("--movie", type=str, default='False', help="environment name")
+args = parser.parse_args()
+
 # Ignore specific warning
 warnings.filterwarnings("ignore", message=".*tostring.*is deprecated.*")
 
 #obj2mjcf --obj-dir . --obj-filter beaker --save-mjcf --compile-model --decompose --overwrite --coacd-args.max-convex-hull 15
 
-model_num = '2024_09_20_10_35_557' #'2024_08_10_19_05_524' #'2024_06_22_19_48_33'
-env_name = "UR10eEvalReach7C-v0"
+model_num = args.model_num  
+env_name = args.env_name 
+print(env_name)
+policy_env = args.policy_env
 env = gym.make(f'mj_envs.robohive.envs:{env_name}')
+seed_value = 47006  # Seed value for reproducibility
+env.seed(seed_value)
 
 movie = False
 frame_width = 224
 frame_height = 224
 #cap = cv.VideoCapture(0)
 
-model = PPO.load('./Reach_Target_vel/policy_best_model/' + "UR10eReach7C-v1" +'/' + model_num + r'/best_model')
+model = PPO.load('./Reach_Target_vel/policy_best_model/' + policy_env +'/' + model_num + r'/best_model')
 #model = PPO.load('./models/'+ model_num + r'/model')
 
 
@@ -59,10 +72,10 @@ for i in tqdm(range(trial)):
           solved = info['solved']
           if i < trial:
               frame_n = env.rgb_out
-              mask = env.mask_out
+              #mask = env.mask_out
               frame_n = np.rot90(np.rot90(frame_n))
               frames.append(frame_n[::-1, :, :])
-              frames_mask.append(mask)
+              #frames_mask.append(mask)
           step += 1
           ep_rewards += reward
     if solved:
@@ -77,4 +90,4 @@ print(f"Success rate: {success/trial}")
 if movie:
     os.makedirs('./videos' +'/' + env_name, exist_ok=True)
     skvideo.io.vwrite('./videos'  +'/' + env_name + '/' + model_num + f'{view}_video.mp4', np.asarray(frames), inputdict = {'-r':'50'} , outputdict={"-pix_fmt": "yuv420p"})
-    skvideo.io.vwrite('./videos'  +'/' + env_name + '/' + model_num + f'{view}_mask_video.mp4', np.asarray(frames_mask), inputdict = {'-r':'50'} , outputdict={"-pix_fmt": "yuv420p"})
+    #skvideo.io.vwrite('./videos'  +'/' + env_name + '/' + model_num + f'{view}_mask_video.mp4', np.asarray(frames_mask), inputdict = {'-r':'50'} , outputdict={"-pix_fmt": "yuv420p"})

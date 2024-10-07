@@ -178,9 +178,9 @@ def main():
 
     env = SubprocVecEnv([make_env(env_name, i, seed=args.seed) for i in range(num_cpu)])
     env.render_mode = 'rgb_array'
-    envs = VecVideoRecorder(env, "videos/" + env_name + '/training_log' ,
-        record_video_trigger=lambda x: x % 30000 == 0, video_length=300)
-    envs = VecMonitor(envs)
+    #envs = VecVideoRecorder(env, "videos/" + env_name + '/training_log' ,
+        #record_video_trigger=lambda x: x % 30000 == 0, video_length=300)
+    envs = VecMonitor(env)
 
     detect_color = 'green'
     #envs.set_attr('set_color', detect_color)

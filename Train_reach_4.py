@@ -122,7 +122,7 @@ def make_env(env_name, idx, seed=0, eval_mode=False):
 
 def main():
 
-    training_steps = 2500000
+    training_steps = 3500000
     env_name = args.env_name
     start_time = time.time()
     time_now = datetime.now().strftime("%Y_%m_%d_%H_%M_%S")
@@ -134,7 +134,7 @@ def main():
 
     IS_WnB_enabled = True
 
-    loaded_model = 'N/A'
+    loaded_model = '2024_09_25_13_42_113'
     try:
         import wandb
         from wandb.integration.sb3 import WandbCallback
@@ -185,7 +185,7 @@ def main():
     eval_env.render_mode = 'rgb_array'
     eval_envs = VecVideoRecorder(eval_env, "videos/" + env_name + '/training_log' ,
         record_video_trigger=lambda x: x % 30000 == 0, video_length=300)
-
+    
     log_path = './Reach_Target_vel/policy_best_model/' + env_name + '/' + time_now + '/'
     eval_callback = EvalCallback(eval_envs, best_model_save_path=log_path, log_path=log_path, eval_freq=2000, n_eval_episodes=20, deterministic=True, render=False)
     
@@ -195,8 +195,8 @@ def main():
 
     # Create a model using the vectorized environment
     #model = SAC("MultiInputPolicy", envs, buffer_size=1000, verbose=0)
-    model = PPO(CustomMultiInputPolicy, envs, ent_coef=ENTROPY, learning_rate=LR, clip_range=CR, verbose=0, tensorboard_log=f"runs/{time_now}")
-    #model = PPO.load(r"./Reach_Target_vel/policy_best_model/" + env_name + '/' + loaded_model + '/best_model', envs, verbose=1, tensorboard_log=f"runs/{time_now}")
+    #model = PPO(CustomMultiInputPolicy, envs, ent_coef=ENTROPY, learning_rate=LR, clip_range=CR, verbose=0, tensorboard_log=f"runs/{time_now}")
+    model = PPO.load(r"./Reach_Target_vel/policy_best_model/" + env_name + '/' + loaded_model + '/best_model', envs, verbose=1, tensorboard_log=f"runs/{time_now}")
 
     obs_callback = TensorboardCallback()
     callback = CallbackList([eval_callback, WandbCallback(gradient_save_freq=100,
