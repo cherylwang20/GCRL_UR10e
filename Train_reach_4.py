@@ -1,16 +1,24 @@
 import gym
+import os
 from gym import spaces
+from PIL import Image
+import torchvision.transforms as transforms
 import torch 
+import random
+import kornia.augmentation as KAug
+import kornia.enhance as KEnhance
 import torch.nn as nn
 from stable_baselines3 import PPO, SAC
 from stable_baselines3.common.monitor import Monitor
 from stable_baselines3.common.torch_layers import BaseFeaturesExtractor
 from stable_baselines3.common.env_util import make_vec_env
 from stable_baselines3.common.policies import ActorCriticPolicy
-from stable_baselines3.common.vec_env import SubprocVecEnv, DummyVecEnv, VecMonitor
+from stable_baselines3.common.vec_env import SubprocVecEnv, DummyVecEnv, VecMonitor, VecFrameStack
 from stable_baselines3.common.vec_env import DummyVecEnv, VecVideoRecorder
 from stable_baselines3.common.vec_env.vec_monitor import VecMonitor
 from stable_baselines3.common.callbacks import EvalCallback, CallbackList, BaseCallback
+from stable_baselines3.common.vec_env.base_vec_env import VecEnv, VecEnvWrapper
+from stable_baselines3.common.vec_env.stacked_observations import StackedObservations
 #import mujoco_py
 from typing import Callable, Dict, List, Optional, Tuple, Type, Union
 from datetime import datetime
@@ -30,6 +38,83 @@ parser.add_argument("--clip_range", type=float, default=0.2, help="Clip range fo
 
 args = parser.parse_args()
 
+class KorniaAugmentationCallback(BaseCallback):
+    def __init__(self, augment_images, alpha, beta, gamma, verbose=0):
+        super().__init__(verbose)
+        self.alpha = alpha
+        self.beta = beta
+        self.gamma = gamma
+        self.augment_images = augment_images
+        self.transform = torch.nn.Sequential(
+            KAug.RandomContrast(contrast=(0.7, 1.2), clip_output=True, p=1.0),
+            KAug.RandomBrightness((0.7, 1.2)),
+            KAug.RandomSaturation((0.7, 1.2)), 
+            KAug.RandomGaussianBlur(kernel_size=(5, 5), sigma=(0.7, 1.2), p=0.5)
+        )
+
+    def _on_rollout_start(self):
+        # Assume observations['image'] has the shape [batch_size, height, width, channels]
+        images = self.model.rollout_buffer.observations['image']
+
+        images = images.reshape(images.shape[0] * images.shape[1], 120, 212, 12)
+
+        # Reshape to separate frames and channels
+        # New shape: [batch_size, height, width, num_frames, channels_per_frame]
+        images = np.split(images, 3, axis = 3)
+
+        final_tensors = []
+
+        for image in images:
+            image = torch.from_numpy(image)
+            image = image.permute(0, 3, 1, 2)
+            rgb_channel = image[:, :3, :, :]
+            mask_channel = image[:, 3:4, :, :]
+            
+            half_index = rgb_channel.shape[0] // 2  # Assuming split along the height
+            first_half = rgb_channel[:half_index, :, :, :]
+            second_half = rgb_channel[half_index:, :, :, :]
+
+            rgb_transform = self.transform(first_half)
+
+            enhanced_transform = torch.empty_like(second_half)
+            for i in range(second_half.size(0)):
+                alpha = random.uniform(0.5, 1)
+                beta, gamma = 1 - alpha, 0.1
+                random_image = random.choice(self.augment_images)
+                enhanced_transform[i] = KEnhance.add_weighted(second_half[i], alpha, random_image, beta, gamma)
+            
+            processed_rgb = torch.cat((rgb_transform, enhanced_transform), dim=0)
+
+            augmented_tensor = torch.cat((processed_rgb, mask_channel), dim=1)
+
+            final_tensors.append(augmented_tensor)
+        
+        concatenated = torch.cat(final_tensors, dim=1)
+        final_output = concatenated.unsqueeze(1) 
+        final_output = final_output.permute(0, 1, 3, 4, 2)
+
+        #print("Final output shape:", final_output.numpy().shape)
+
+        # Update the observations in the rollout buffer
+        self.model.rollout_buffer.observations['image'] = final_output.numpy()
+
+        return True
+    
+    def _on_step(self):
+        return True
+
+def load_images(folder_path):
+    image_files = [os.path.join(folder_path, file) for file in os.listdir(folder_path) if file.endswith(('.png', '.jpg', '.jpeg'))]
+    images = []
+    for file in image_files:
+        image = Image.open(file).convert('RGB')
+        transform = transforms.Compose([
+            transforms.Resize((120, 212)),
+            transforms.ToTensor()
+        ])
+        images.append(transform(image))
+    return images
+
 class TensorboardCallback(BaseCallback):
     """
     Custom callback for plotting additional values in tensorboard.
@@ -44,27 +129,11 @@ class TensorboardCallback(BaseCallback):
         self.logger.record("average_obs", average_obs)
         return True
 
-class CustomNeptuneCallback(BaseCallback):
-    def __init__(self, run):
-        super(CustomNeptuneCallback, self).__init__(verbose=1)
-        self.run = run
-        # You might want to add more parameters here if needed
-
-    def _on_step(self) -> bool:
-        # Check if an episode has ended
-        if 'episode' in self.locals["infos"][0]:
-            episode_info = self.locals["infos"][0]['episode']
-            # Log episodic information to Neptune
-            self.run["metrics/episode_reward"].append(episode_info['r'])
-            self.run["metrics/episode_length"].append(episode_info['l'])
-
-        return True
-
 class CustomDictFeaturesExtractor(BaseFeaturesExtractor):
     def __init__(self, observation_space, features_dim=1024):  # Adjust features_dim if needed
         super(CustomDictFeaturesExtractor, self).__init__(observation_space, features_dim)
         self.cnn = nn.Sequential(
-            nn.Conv2d(4, 32, kernel_size=8, stride=4, padding=2),  # Adjust padding to fit your needs
+            nn.Conv2d(12, 32, kernel_size=8, stride=4, padding=2),  # Adjust padding to fit your needs
             nn.ReLU(),
             nn.Conv2d(32, 64, kernel_size=4, stride=2, padding=1),
             nn.ReLU(),
@@ -74,18 +143,19 @@ class CustomDictFeaturesExtractor(BaseFeaturesExtractor):
         )
 
         # Vector processing network
-        self.mlp = nn.Linear(observation_space.spaces['vector'].shape[0], 16)
+        self.mlp = nn.Linear(observation_space.spaces['vector'].shape[0], 14)
         
         print(observation_space.spaces.keys())
 
         # Calculate the total concatenated feature dimension
-        self._features_dim = observation_space.spaces['image'].shape[0]**2 + 16  # Adjust based on actual output dimensions of cnn and mlp
+        self._features_dim = 24974  # Adjust based on actual output dimensions of cnn and mlp
 
     def forward(self, observations):
         image = observations['image'].permute(0, 3, 1, 2)
         image_features = self.cnn(image)
         vector_features = self.mlp(observations['vector'])
-        return torch.cat([image_features, vector_features], dim=1)
+        concatenated_features = torch.cat([image_features, vector_features], dim=1)
+        return concatenated_features
 
 class CustomMultiInputPolicy(ActorCriticPolicy):
     def __init__(self, *args, **kwargs):
@@ -122,6 +192,14 @@ def make_env(env_name, idx, seed=0, eval_mode=False):
 
 def main():
 
+    augment_images = load_images('background/212x120')
+    augment_callback = KorniaAugmentationCallback(
+                    augment_images=augment_images,
+                    alpha=0.5, 
+                    beta=0.5,
+                    gamma=0.0
+                    )
+
     training_steps = 3500000
     env_name = args.env_name
     start_time = time.time()
@@ -145,7 +223,7 @@ def main():
             "env_name": env_name,
             "dense_units": 512,
             "activation": "relu",
-            "max_episode_steps": 200,
+            "max_episode_steps": 250,
             "seed": args.seed,
             "entropy": ENTROPY,
             "lr": args.learning_rate,
@@ -177,14 +255,14 @@ def main():
     env = DummyVecEnv([make_env(env_name, i, seed=args.seed) for i in range(num_cpu)])
     env.render_mode = 'rgb_array'
     envs = VecVideoRecorder(env, "videos/" + env_name + '/training_log' ,
-        record_video_trigger=lambda x: x % 30000 == 0, video_length=300)
-    envs = VecMonitor(envs)
+        record_video_trigger=lambda x: x % 30000 == 0, video_length=250)
+    envs = VecMonitor(env)
+    envs = VecFrameStack(envs, n_stack = 3)
 
     ## EVAL
     eval_env = DummyVecEnv([make_env(env_name, i, seed=args.seed, eval_mode=True) for i in range(1)])
     eval_env.render_mode = 'rgb_array'
-    eval_envs = VecVideoRecorder(eval_env, "videos/" + env_name + '/training_log' ,
-        record_video_trigger=lambda x: x % 30000 == 0, video_length=300)
+    eval_envs = VecFrameStack(eval_env, n_stack = 3)
     
     log_path = './Reach_Target_vel/policy_best_model/' + env_name + '/' + time_now + '/'
     eval_callback = EvalCallback(eval_envs, best_model_save_path=log_path, log_path=log_path, eval_freq=2000, n_eval_episodes=20, deterministic=True, render=False)
@@ -195,13 +273,10 @@ def main():
 
     # Create a model using the vectorized environment
     #model = SAC("MultiInputPolicy", envs, buffer_size=1000, verbose=0)
-    #model = PPO(CustomMultiInputPolicy, envs, ent_coef=ENTROPY, learning_rate=LR, clip_range=CR, verbose=0, tensorboard_log=f"runs/{time_now}")
-    model = PPO.load(r"./Reach_Target_vel/policy_best_model/" + env_name + '/' + loaded_model + '/best_model', envs, verbose=1, tensorboard_log=f"runs/{time_now}")
+    model = PPO(CustomMultiInputPolicy, envs, ent_coef=ENTROPY, learning_rate=LR, clip_range=CR, n_steps = 1024, batch_size = 64, verbose=0, tensorboard_log=f"runs/{time_now}")
+    #model = PPO.load(r"./Reach_Target_vel/policy_best_model/" + env_name + '/' + loaded_model + '/best_model', envs, verbose=1, tensorboard_log=f"runs/{time_now}")
 
-    obs_callback = TensorboardCallback()
-    callback = CallbackList([eval_callback, WandbCallback(gradient_save_freq=100,
-                model_save_freq=1000,
-                model_save_path=f"models/{time_now}")])#, obs_callback])
+    callback = CallbackList([augment_callback, eval_callback, WandbCallback(gradient_save_freq=100)])
     
 
     model.learn(total_timesteps=training_steps, callback=callback)# , tb_log_name=env_name + "_" + time_now)

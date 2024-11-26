@@ -111,12 +111,12 @@ for i in tqdm(range(trial)):
     #obs = np.stack([obs, obs, obs])
     step = 0
     #ret, frame = cap.read()
-    while not solved and step < 400:
+    while not solved and step < 200:
           #obs = env.obsdict2obsvec(env.obs_dict, env.obs_keys)[1]
           #obs = np.stack([obs, obs, obs])
           #obs = env.get_obs_dict()        
           action, _ = model.predict(obs, deterministic=False)
-          #print(action)
+          print(action)
           obs, reward, done, info = env.step(action)
           solved = info['solved']
           if i < trial:
