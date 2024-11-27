@@ -92,23 +92,21 @@ class KorniaAugmentationCallback(BaseCallback):
                 # Display original first half
                 self.show_images(rgb_transform, title='After')
 
-            enhanced_transform = torch.empty_like(rgb_channel)
+            enhanced_transform = torch.empty_like(rgb_transform)
             idx = np.random.choice(len(self.augment_images), size=rgb_channel.size(0), replace=True)
             alpha = np.random.uniform(0.7, 1, size=rgb_channel.size(0))
             beta, gamma = 1 - alpha, np.zeros(rgb_channel.size(0))
 
             self.augment_images = np.array(self.augment_images)
 
-            enhanced_transform = KEnhance.add_weighted(rgb_channel, alpha[:, None, None, None], torch.from_numpy(self.augment_images[idx]), beta[:, None, None, None], gamma[:, None, None, None])
+            enhanced_transform = KEnhance.add_weighted(rgb_transform, alpha[:, None, None, None], torch.from_numpy(self.augment_images[idx]), beta[:, None, None, None], gamma[:, None, None, None])
 
             
             if self.display:
                 # Display original first half
                 self.show_images(enhanced_transform, title='Mixed')
-            
-            processed_rgb = torch.cat((rgb_transform, enhanced_transform), dim=0)
 
-            augmented_tensor = torch.cat((processed_rgb, mask_channel), dim=1)
+            augmented_tensor = torch.cat((enhanced_transform, mask_channel), dim=1)
 
             final_tensors.append(augmented_tensor)
         
