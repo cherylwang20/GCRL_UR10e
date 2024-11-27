@@ -2,6 +2,7 @@ import gym
 import os
 from gym import spaces
 from PIL import Image
+import cv2
 import torchvision.transforms as transforms
 import torch 
 import random
@@ -45,14 +46,25 @@ class KorniaAugmentationCallback(BaseCallback):
         self.beta = beta
         self.gamma = gamma
         self.augment_images = augment_images
+        self.display = True
         self.transform = torch.nn.Sequential(
             KAug.RandomContrast(contrast=(0.7, 1.2), clip_output=True, p=1.0),
             KAug.RandomBrightness((0.7, 1.2)),
             KAug.RandomSaturation((0.7, 1.2)), 
             KAug.RandomGaussianBlur(kernel_size=(5, 5), sigma=(0.7, 1.2), p=0.5)
         )
+    
+    def show_images(self, images, title='Image'):
+        #print(images)
+        images = images * 255
+        images = images.permute(0, 2, 3, 1).numpy().astype(np.uint8)
+        for index, img in enumerate(images):
+            cv2.imwrite(f'test' + title + f'_{index}.png', img)
+            if cv2.waitKey(0) & 0xFF == ord('q'):
+                break
+        cv2.destroyAllWindows()
 
-    def _on_rollout_start(self):
+    def _on_rollout_end(self):
         # Assume observations['image'] has the shape [batch_size, height, width, channels]
         images = self.model.rollout_buffer.observations['image']
 
@@ -70,18 +82,29 @@ class KorniaAugmentationCallback(BaseCallback):
             rgb_channel = image[:, :3, :, :]
             mask_channel = image[:, 3:4, :, :]
             
-            half_index = rgb_channel.shape[0] // 2  # Assuming split along the height
-            first_half = rgb_channel[:half_index, :, :, :]
-            second_half = rgb_channel[half_index:, :, :, :]
+            if self.display:
+                # Display original first half
+                self.show_images(rgb_channel, title='Original First Half')
 
-            rgb_transform = self.transform(first_half)
+            rgb_transform = self.transform(rgb_channel)
 
-            enhanced_transform = torch.empty_like(second_half)
-            for i in range(second_half.size(0)):
-                alpha = random.uniform(0.5, 1)
-                beta, gamma = 1 - alpha, 0.1
-                random_image = random.choice(self.augment_images)
-                enhanced_transform[i] = KEnhance.add_weighted(second_half[i], alpha, random_image, beta, gamma)
+            if self.display:
+                # Display original first half
+                self.show_images(rgb_transform, title='After')
+
+            enhanced_transform = torch.empty_like(rgb_channel)
+            idx = np.random.choice(len(self.augment_images), size=rgb_channel.size(0), replace=True)
+            alpha = np.random.uniform(0.7, 1, size=rgb_channel.size(0))
+            beta, gamma = 1 - alpha, np.zeros(rgb_channel.size(0))
+
+            self.augment_images = np.array(self.augment_images)
+
+            enhanced_transform = KEnhance.add_weighted(rgb_channel, alpha[:, None, None, None], torch.from_numpy(self.augment_images[idx]), beta[:, None, None, None], gamma[:, None, None, None])
+
+            
+            if self.display:
+                # Display original first half
+                self.show_images(enhanced_transform, title='Mixed')
             
             processed_rgb = torch.cat((rgb_transform, enhanced_transform), dim=0)
 
@@ -108,11 +131,14 @@ def load_images(folder_path):
     images = []
     for file in image_files:
         image = Image.open(file).convert('RGB')
+
         transform = transforms.Compose([
             transforms.Resize((120, 212)),
             transforms.ToTensor()
         ])
-        images.append(transform(image))
+        image = transform(image)
+        image = image[[2, 1, 0], :, :]
+        images.append(image)
     return images
 
 class TensorboardCallback(BaseCallback):
@@ -273,7 +299,7 @@ def main():
 
     # Create a model using the vectorized environment
     #model = SAC("MultiInputPolicy", envs, buffer_size=1000, verbose=0)
-    model = PPO(CustomMultiInputPolicy, envs, ent_coef=ENTROPY, learning_rate=LR, clip_range=CR, n_steps = 1024, batch_size = 64, verbose=0, tensorboard_log=f"runs/{time_now}")
+    model = PPO(CustomMultiInputPolicy, envs, ent_coef=ENTROPY, learning_rate=LR, clip_range=CR, n_steps = 64, batch_size = 64, verbose=0, tensorboard_log=f"runs/{time_now}")
     #model = PPO.load(r"./Reach_Target_vel/policy_best_model/" + env_name + '/' + loaded_model + '/best_model', envs, verbose=1, tensorboard_log=f"runs/{time_now}")
 
     callback = CallbackList([augment_callback, eval_callback, WandbCallback(gradient_save_freq=100)])
