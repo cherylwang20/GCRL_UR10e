@@ -52,7 +52,7 @@ class KorniaAugmentationCallback(BaseCallback):
             KAug.RandomGaussianBlur(kernel_size=(5, 5), sigma=(0.7, 1.2), p=0.5)
         )
 
-    def _on_rollout_start(self):
+    def _on_rollout_end(self):
         # Assume observations['image'] has the shape [batch_size, height, width, channels]
         images = self.model.rollout_buffer.observations['image']
 
