@@ -99,7 +99,7 @@ time_now = datetime.now().strftime("%Y_%m_%d_%H_%M_%S")
 IS_WnB_enabled = True
 env_name = 'UR10eReachFixed-v13'
 
-training_steps = 2000000
+training_steps = 5000000
 ENTROPY = 0.01
 LR = linear_schedule(0.0003)
 CR = linear_schedule(0.1)

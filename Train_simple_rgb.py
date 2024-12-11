@@ -100,12 +100,12 @@ time_now = datetime.now().strftime("%Y_%m_%d_%H_%M_%S")
 IS_WnB_enabled = True
 env_name = 'UR10eReachFixed-v12'
 
-training_steps = 2000000
+training_steps = 5000000
 ENTROPY = 0.01
 LR = linear_schedule(0.0003)
 CR = linear_schedule(0.1)
 
-loaded_model = 'N/A'
+loaded_model = '2024_12_11_10_10_44'
 try:
     import wandb
     from wandb.integration.sb3 import WandbCallback
@@ -154,7 +154,7 @@ print(time_now)
 # Create a model using the vectorized environment
 #model = SAC("MultiInputPolicy", envs, buffer_size=1000, verbose=0)
 model = PPO(CustomMultiInputPolicy, envs, ent_coef=ENTROPY, learning_rate=LR, clip_range=CR, n_steps = 2048, batch_size = 64, verbose=0, tensorboard_log=f"runs/{time_now}")
-#model = PPO.load(r"./Reach_Target_vel/policy_best_model/" + 'UR10eReachFixed-v0' + '/' + loaded_model + '/best_model', envs, verbose=0, tensorboard_log=f"runs/{time_now}")
+#model = PPO.load(r"./Reach_Target_vel/policy_best_model/" + env_name + '/' + loaded_model + '/best_model', envs, verbose=0, tensorboard_log=f"runs/{time_now}")
 
 callback = CallbackList([eval_callback])
 
