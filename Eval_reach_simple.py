@@ -97,6 +97,7 @@ detect_color = 'green'
 
 env.reset()
 
+
 trial = 2
 success = 0
 
@@ -115,15 +116,13 @@ for i in tqdm(range(trial)):
           #obs = env.obsdict2obsvec(env.obs_dict, env.obs_keys)[1]
           #obs = np.stack([obs, obs, obs])
           #obs = env.get_obs_dict()        
-          action, _ = model.predict(obs, deterministic=False)
+          action, _ = model.predict(obs, deterministic=True)
           obs, reward, done, info = env.step(action)
           solved = info['solved']
           if i < trial:
               frame_n = env.rgb_out
-              mask = env.mask_out
-              frame_n = np.rot90(np.rot90(frame_n))
-              frames.append(frame_n[::-1, :, :])
-              frames_mask.append(mask)
+              #print(frame_n)
+              frames.append(frame_n)
           step += 1
           ep_rewards += reward
     if solved:
@@ -138,4 +137,3 @@ print(f"Success rate: {success/trial}")
 if movie:
     os.makedirs('./videos' +'/' + env_name, exist_ok=True)
     skvideo.io.vwrite('./videos'  +'/' + env_name + '/' + model_num + f'{view}_video.mp4', np.asarray(frames), inputdict = {'-r':'50'} , outputdict={"-pix_fmt": "yuv420p"})
-    skvideo.io.vwrite('./videos'  +'/' + env_name + '/' + model_num + f'{view}_mask_video.mp4', np.asarray(frames_mask), inputdict = {'-r':'50'} , outputdict={"-pix_fmt": "yuv420p"})
