@@ -18,6 +18,7 @@ class FrameStackingWrapper(gym.Wrapper):
     def __init__(self, env, n_frames):
         super(FrameStackingWrapper, self).__init__(env)
         self.n_frames = n_frames
+        print(env.observation_space.shape)
         self.frames = np.zeros((n_frames,) + env.observation_space.shape)
 
         # Update observation space to accommodate the stacked frames

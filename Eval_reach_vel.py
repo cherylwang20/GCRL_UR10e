@@ -13,7 +13,7 @@ import mujoco
 
 #obj2mjcf --obj-dir . --obj-filter beaker --save-mjcf --compile-model --decompose --overwrite --coacd-args.max-convex-hull 15
 
-model_num = '2024_08_19_18_16_32' #'2024_06_22_19_48_33'
+model_num = '2024_08_23_12_40_40' #'2024_06_22_19_48_33'
 env_name = "UR10eReachFixed-v3"
 movie = True
 frame_width = 224
@@ -21,12 +21,11 @@ frame_height = 224
 #cap = cv.VideoCapture(0)
 
 model = PPO.load('./Reach_Target_vel/policy_best_model/' + env_name +'/' + model_num + r'/best_model')
-env = gym.make(f'mj_envs.robohive.envs:{"UR10eReachFixed-v2"}')
+env = gym.make(f'mj_envs.robohive.envs:{"UR10eEvalReach3C-v0"}')
 
 print("Action Space Lower Bounds:", env.action_space.low)
 print("Action Space Upper Bounds:", env.action_space.high)
 
-detect_color = 'green'
 
 env.reset()
 
@@ -49,7 +48,7 @@ for _ in tqdm(range(2)):
           #print(obs)
           solved = info['solved']
           if movie:
-              frame_n = env.sim.renderer.render_offscreen(width=frame_width, height=frame_height, camera_id=f'ft_cam')
+              frame_n = env.sim.renderer.render_offscreen(width=frame_width, height=frame_height, camera_id=f'end_effector_cam')
               rgb = cv.cvtColor(frame_n, cv.COLOR_BGR2RGB)
               blurred = cv.GaussianBlur(rgb, (11, 11), 0)
               hsv = cv.cvtColor(blurred, cv.COLOR_BGR2HSV)

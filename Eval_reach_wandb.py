@@ -34,6 +34,15 @@ env = gym.make(f'mj_envs.robohive.envs:{env_name}')
 seed_value = 47006  # Seed value for reproducibility
 env.seed(seed_value)
 
+
+site_id = env.sim.model.site_name2id('right_silicone_pad')
+site_position = env.sim.data.site_xpos[site_id]
+
+site_id_2 = env.sim.model.site_name2id('left_silicone_pad')
+site_position_2 = env.sim.data.site_xpos[site_id_2]
+
+print(np.linalg.norm(site_position - site_position_2))
+
 movie = False
 frame_width = 224
 frame_height = 224
