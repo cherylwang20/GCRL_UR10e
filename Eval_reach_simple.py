@@ -98,29 +98,34 @@ detect_color = 'green'
 env.reset()
 
 
-trial = 2
+trial = 1
 success = 0
 
 frames = []
 frames_mask = []
 view = 'front'
 all_rewards = []
+joint_angle = []
+action_array = []
 for i in tqdm(range(trial)):
     ep_rewards = 0
     solved, done = False, False
     obs = env.reset()
     #obs = np.stack([obs, obs, obs])
     step = 0
+    joint_angle.append(env.sim.data.qpos[:7].copy())
     #ret, frame = cap.read()
     while not solved and step < 200:
           #obs = env.obsdict2obsvec(env.obs_dict, env.obs_keys)[1]
           #obs = np.stack([obs, obs, obs])
           #obs = env.get_obs_dict()        
           action, _ = model.predict(obs, deterministic=False)
+          action_array.append(action)
           obs, reward, done, info = env.step(action)
+          joint_angle.append(env.sim.data.qpos[:7].copy())
           solved = info['solved']
           if i < trial:
-              frame_n = env.rgb_out
+              frame_n = env.rgb_out #env.sim.renderer.render_offscreen(width = 640, height = 480, camera_id = 'front_cam')
               #print(frame_n)
               frames.append(frame_n)
           step += 1
@@ -133,6 +138,8 @@ print(f"Average reward: {np.mean(all_rewards)}")
 env.close()
 print(f"Success rate: {success/trial}")
 
+np.savetxt('action_rgb.csv', action_array, fmt='%f', delimiter=',')
+np.savetxt('joint_rgb.csv', joint_angle, fmt='%f', delimiter=',')
 
 if movie:
     os.makedirs('./videos' +'/' + env_name, exist_ok=True)
