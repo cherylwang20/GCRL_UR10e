@@ -101,7 +101,7 @@ env_name = 'UR10eReachFixed-v13'
 
 training_steps = 5000000
 ENTROPY = 0.01
-LR = linear_schedule(0.0003)
+LR = linear_schedule(0.0002)
 CR = linear_schedule(0.1)
 
 loaded_model = 'N/A'

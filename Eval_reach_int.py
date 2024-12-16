@@ -97,7 +97,7 @@ detect_color = 'green'
 
 env.reset()
 
-trial = 2
+trial = 5
 success = 0
 
 frames = []

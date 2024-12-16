@@ -40,18 +40,17 @@ parser.add_argument("--clip_range", type=float, default=0.2, help="Clip range fo
 args = parser.parse_args()
 
 class KorniaAugmentationCallback(BaseCallback):
-    def __init__(self, augment_images, alpha, beta, gamma, verbose=0):
+    def __init__(self, augment_images, low, high, verbose=0):
         super().__init__(verbose)
-        self.alpha = alpha
-        self.beta = beta
-        self.gamma = gamma
+        self.low = low
+        self.high = high
         self.augment_images = augment_images
-        self.display = True
+        self.display = False
         self.transform = torch.nn.Sequential(
-            KAug.RandomContrast(contrast=(0.7, 1.2), clip_output=True, p=1.0),
-            KAug.RandomBrightness((0.7, 1.2)),
-            KAug.RandomSaturation((0.7, 1.2)), 
-            KAug.RandomGaussianBlur(kernel_size=(5, 5), sigma=(0.7, 1.2), p=0.5)
+            KAug.RandomContrast(contrast=(low, high), clip_output=True, p=0.8),
+            KAug.RandomBrightness((low, high)),
+            KAug.RandomSaturation((low, high)), 
+            KAug.RandomGaussianBlur(kernel_size=(5, 5), sigma=(low, high), p=0.5)
         )
     
     def show_images(self, images, title='Image'):
@@ -94,19 +93,15 @@ class KorniaAugmentationCallback(BaseCallback):
 
             enhanced_transform = torch.empty_like(rgb_transform)
             idx = np.random.choice(len(self.augment_images), size=rgb_channel.size(0), replace=True)
-            alpha = np.random.uniform(0.7, 1, size=rgb_channel.size(0))
+            alpha = np.random.uniform(self.low, 1, size=rgb_channel.size(0))
             beta, gamma = 1 - alpha, np.zeros(rgb_channel.size(0))
 
             self.augment_images = np.array(self.augment_images)
 
-            enhanced_transform = KEnhance.add_weighted(rgb_transform, alpha[:, None, None, None], torch.from_numpy(self.augment_images[idx]), beta[:, None, None, None], gamma[:, None, None, None])
+            #enhanced_transform = KEnhance.add_weighted(rgb_transform, alpha[:, None, None, None], torch.from_numpy(self.augment_images[idx]), beta[:, None, None, None], gamma[:, None, None, None])
 
-            
-            if self.display:
-                # Display original first half
-                self.show_images(enhanced_transform, title='Mixed')
-
-            augmented_tensor = torch.cat((enhanced_transform, mask_channel), dim=1)
+            #augmented_tensor = torch.cat((enhanced_transform, mask_channel), dim=1)
+            augmented_tensor = torch.cat((rgb_transform, mask_channel), dim=1)
 
             final_tensors.append(augmented_tensor)
         
@@ -216,13 +211,6 @@ def make_env(env_name, idx, seed=0, eval_mode=False):
 
 def main():
 
-    augment_images = load_images('background/212x120')
-    augment_callback = KorniaAugmentationCallback(
-                    augment_images=augment_images,
-                    alpha=0.5, 
-                    beta=0.5,
-                    gamma=0.0
-                    )
 
     training_steps = 3500000
     env_name = args.env_name
@@ -267,6 +255,13 @@ def main():
     except ImportError as e:
         pass 
 
+    augment_images = load_images('background/212x120')
+    augment_callback = KorniaAugmentationCallback(
+                    augment_images=augment_images,
+                    low = 1, 
+                    high = 1
+                    )
+
     if torch.cuda.is_available():
         device = torch.device("cuda")
         print("Using GPU:", torch.cuda.get_device_name(0))
@@ -286,6 +281,8 @@ def main():
     ## EVAL
     eval_env = DummyVecEnv([make_env(env_name, i, seed=args.seed, eval_mode=True) for i in range(1)])
     eval_env.render_mode = 'rgb_array'
+    eval_env = VecVideoRecorder(eval_env, "videos/" + env_name + '/training_log' ,
+        record_video_trigger=lambda x: x % 30000 == 0, video_length=250)
     eval_envs = VecFrameStack(eval_env, n_stack = 3)
     
     log_path = './Reach_Target_vel/policy_best_model/' + env_name + '/' + time_now + '/'
@@ -297,10 +294,11 @@ def main():
 
     # Create a model using the vectorized environment
     #model = SAC("MultiInputPolicy", envs, buffer_size=1000, verbose=0)
-    model = PPO(CustomMultiInputPolicy, envs, ent_coef=ENTROPY, learning_rate=LR, clip_range=CR, n_steps = 1024, batch_size = 64, verbose=0, tensorboard_log=f"runs/{time_now}")
+    model = PPO(CustomMultiInputPolicy, envs, ent_coef=ENTROPY, learning_rate=LR, clip_range=CR, n_steps = 2048, batch_size = 64, verbose=0, tensorboard_log=f"runs/{time_now}")
     #model = PPO.load(r"./Reach_Target_vel/policy_best_model/" + env_name + '/' + loaded_model + '/best_model', envs, verbose=1, tensorboard_log=f"runs/{time_now}")
 
-    callback = CallbackList([augment_callback, eval_callback, WandbCallback(gradient_save_freq=100)])
+    #callback = CallbackList([augment_callback, eval_callback, WandbCallback(gradient_save_freq=100)])
+    callback = CallbackList([eval_callback, WandbCallback(gradient_save_freq=100)])
     
 
     model.learn(total_timesteps=training_steps, callback=callback)# , tb_log_name=env_name + "_" + time_now)

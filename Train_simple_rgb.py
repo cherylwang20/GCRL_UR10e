@@ -92,17 +92,19 @@ parser = argparse.ArgumentParser(description="Main script to train an agent")
 
 parser.add_argument("--seed", type=int, default=0, help="Seed for random number generator")
 parser.add_argument("--group", type=str, default='testing', help="environment name")
+parser.add_argument("--learning_rate", type=float, default=0.0003, help="Learning rate for the optimizer")
 
 args = parser.parse_args()
 
 time_now = datetime.now().strftime("%Y_%m_%d_%H_%M_%S")
+time_now = time_now + str(args.seed)
 
 IS_WnB_enabled = True
 env_name = 'UR10eReachFixed-v12'
 
 training_steps = 5000000
 ENTROPY = 0.01
-LR = linear_schedule(0.0003)
+LR = linear_schedule(args.learning_rate)
 CR = linear_schedule(0.1)
 
 loaded_model = '2024_12_11_10_10_44'
@@ -119,7 +121,7 @@ try:
         "max_episode_steps": 250,
         "seed": args.seed,
         "entropy": ENTROPY,
-        "lr": 0.0003,
+        "lr": 0.0002,
         "CR": 0.1,
         "num_envs": 8,
         "loaded_model": loaded_model,
