@@ -37,10 +37,10 @@ class FrameStackingWrapper(gym.Wrapper):
         self.frames[-1] = obs
         return self.frames.flatten(), reward, done, info
 
-env_name = 'UR10eReachFixed-v12'
-policy_env = 'UR10eReachFixed-v12'
+env_name = 'UR10eReachFixed-v13'
+policy_env = 'UR10eReachFixed-v13'
 
-model_num = '2024_12_11_12_12_12'
+model_num = '2024_12_11_17_15_14'
 
 
 env = gym.make(f'mj_envs.robohive.envs:{env_name}')

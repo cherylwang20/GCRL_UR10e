@@ -105,7 +105,7 @@ ENTROPY = 0.01
 LR = linear_schedule(0.0003)
 CR = linear_schedule(0.1)
 
-loaded_model = '2024_12_11_10_10_44'
+loaded_model = '2024_12_11_12_12_12'
 try:
     import wandb
     from wandb.integration.sb3 import WandbCallback

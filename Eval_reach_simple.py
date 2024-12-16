@@ -116,7 +116,7 @@ for i in tqdm(range(trial)):
           #obs = env.obsdict2obsvec(env.obs_dict, env.obs_keys)[1]
           #obs = np.stack([obs, obs, obs])
           #obs = env.get_obs_dict()        
-          action, _ = model.predict(obs, deterministic=True)
+          action, _ = model.predict(obs, deterministic=False)
           obs, reward, done, info = env.step(action)
           solved = info['solved']
           if i < trial:
