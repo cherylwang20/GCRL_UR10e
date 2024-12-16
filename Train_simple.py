@@ -58,7 +58,7 @@ ENTROPY = 0.01
 LR = linear_schedule(0.0003)
 CR = linear_schedule(0.1)
 
-env_name = 'UR10eReachFixed-v12'
+env_name = 'UR10eReachFixed-v11'
 
 training_steps = 2000000
 
