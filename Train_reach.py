@@ -38,6 +38,7 @@ parser.add_argument("--group", type=str, default='testing', help="environment na
 parser.add_argument("--learning_rate", type=float, default=0.0003, help="Learning rate for the optimizer")
 parser.add_argument("--clip_range", type=float, default=0.2, help="Clip range for the policy gradient update")
 
+parser.add_argument("--channel_num", type=int, default=4, help="channel num")
 args = parser.parse_args()
 
 class KorniaAugmentationCallback(BaseCallback):
@@ -152,8 +153,10 @@ class TensorboardCallback(BaseCallback):
 class CustomDictFeaturesExtractor(BaseFeaturesExtractor):
     def __init__(self, observation_space, features_dim=1024):  # Adjust features_dim if needed
         super(CustomDictFeaturesExtractor, self).__init__(observation_space, features_dim)
+
+        num_input_channels = observation_space.spaces['image'].shape[2]
         self.cnn = nn.Sequential(
-            nn.Conv2d(12, 32, kernel_size=8, stride=4, padding=2),  # Adjust padding to fit your needs
+            nn.Conv2d(num_input_channels, 32, kernel_size=8, stride=4, padding=2),  # Adjust padding to fit your needs
             nn.ReLU(),
             nn.Conv2d(32, 64, kernel_size=4, stride=2, padding=1),
             nn.ReLU(),
@@ -163,12 +166,12 @@ class CustomDictFeaturesExtractor(BaseFeaturesExtractor):
         )
 
         # Vector processing network
-        self.mlp = nn.Linear(observation_space.spaces['vector'].shape[0], 14)
+        self.mlp = nn.Linear(observation_space.spaces['vector'].shape[0], 512)
         
         print(observation_space.spaces.keys())
 
         # Calculate the total concatenated feature dimension
-        self._features_dim = 24974  # Adjust based on actual output dimensions of cnn and mlp
+        self._features_dim = 24960 + 512 # Adjust based on actual output dimensions of cnn and mlp
 
     def forward(self, observations):
         image = observations['image'].permute(0, 3, 1, 2)
@@ -203,9 +206,9 @@ def linear_schedule(initial_value: float) -> Callable[[float], float]:
 
     return func
 
-def make_env(env_name, idx, seed=0, eval_mode=False):
+def make_env(env_name, idx,  channel, seed=0,eval_mode=False):
     def _init():
-        env = gym.make(f'mj_envs.robohive.envs:{env_name}', eval_mode=eval_mode)
+        env = gym.make(f'mj_envs.robohive.envs:{env_name}', eval_mode=eval_mode, channel = channel)
         env.seed(seed + idx)
         return env
     return _init
@@ -213,7 +216,7 @@ def make_env(env_name, idx, seed=0, eval_mode=False):
 def main():
 
 
-    training_steps = 3500000
+    training_steps = 1500000
     env_name = args.env_name
     start_time = time.time()
     time_now = datetime.now().strftime("%Y_%m_%d_%H_%M_%S")
@@ -225,7 +228,7 @@ def main():
 
     IS_WnB_enabled = True
 
-    loaded_model = '2024_09_25_13_42_113'
+    #loaded_model = '2024_09_25_13_42_113'
     try:
         import wandb
         from wandb.integration.sb3 import WandbCallback
@@ -272,7 +275,7 @@ def main():
 
     num_cpu = args.num_envs
 
-    env = DummyVecEnv([make_env(env_name, i, seed=args.seed) for i in range(num_cpu)])
+    env = DummyVecEnv([make_env(env_name, i, seed=args.seed, channel = args.channel_num) for i in range(num_cpu)])
     env.render_mode = 'rgb_array'
     envs = VecVideoRecorder(env, "videos/" + env_name + '/training_log' ,
         record_video_trigger=lambda x: x % 30000 == 0, video_length=250)
@@ -280,7 +283,7 @@ def main():
     envs = VecFrameStack(envs, n_stack = 3)
 
     ## EVAL
-    eval_env = DummyVecEnv([make_env(env_name, i, seed=args.seed, eval_mode=True) for i in range(1)])
+    eval_env = DummyVecEnv([make_env(env_name, i, seed=args.seed,channel = args.channel_num, eval_mode=True) for i in range(1)])
     eval_env.render_mode = 'rgb_array'
     eval_env = VecVideoRecorder(eval_env, "videos/" + env_name + '/training_log' ,
         record_video_trigger=lambda x: x % 30000 == 0, video_length=250)
