@@ -1,0 +1,6 @@
+Requirement already satisfied: shimmy in /gpfs/home/wanghuiy/anaconda3/envs/mujoco_cheryl/lib/python3.10/site-packages (2.0.0)
+Requirement already satisfied: numpy>=1.18.0 in /gpfs/home/wanghuiy/anaconda3/envs/mujoco_cheryl/lib/python3.10/site-packages (from shimmy) (2.2.2)
+Requirement already satisfied: gymnasium>=1.0.0a1 in /gpfs/home/wanghuiy/anaconda3/envs/mujoco_cheryl/lib/python3.10/site-packages (from shimmy) (1.0.0)
+Requirement already satisfied: cloudpickle>=1.2.0 in /gpfs/home/wanghuiy/anaconda3/envs/mujoco_cheryl/lib/python3.10/site-packages (from gymnasium>=1.0.0a1->shimmy) (1.2.2)
+Requirement already satisfied: typing-extensions>=4.3.0 in /gpfs/home/wanghuiy/anaconda3/envs/mujoco_cheryl/lib/python3.10/site-packages (from gymnasium>=1.0.0a1->shimmy) (4.12.2)
+Requirement already satisfied: farama-notifications>=0.0.1 in /gpfs/home/wanghuiy/anaconda3/envs/mujoco_cheryl/lib/python3.10/site-packages (from gymnasium>=1.0.0a1->shimmy) (0.0.4)

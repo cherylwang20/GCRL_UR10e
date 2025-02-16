@@ -1,0 +1,78 @@
+Looking in indexes: https://pypi.org/simple, https://download.pytorch.org/whl/cu117
+Collecting torch==1.13.1+cu117
+  Downloading https://download.pytorch.org/whl/cu117/torch-1.13.1%2Bcu117-cp310-cp310-linux_x86_64.whl (1801.8 MB)
+     ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 1.8/1.8 GB 48.6 MB/s eta 0:00:00
+Requirement already satisfied: torchvision in /gpfs/home/wanghuiy/anaconda3/envs/mujoco_cheryl/lib/python3.10/site-packages (0.15.2+cu117)
+Requirement already satisfied: torchaudio in /gpfs/home/wanghuiy/anaconda3/envs/mujoco_cheryl/lib/python3.10/site-packages (2.0.2+cu117)
+Requirement already satisfied: typing-extensions in /gpfs/home/wanghuiy/anaconda3/envs/mujoco_cheryl/lib/python3.10/site-packages (from torch==1.13.1+cu117) (4.12.2)
+Requirement already satisfied: numpy in /gpfs/home/wanghuiy/anaconda3/envs/mujoco_cheryl/lib/python3.10/site-packages (from torchvision) (1.26.4)
+Requirement already satisfied: requests in /gpfs/home/wanghuiy/anaconda3/envs/mujoco_cheryl/lib/python3.10/site-packages (from torchvision) (2.28.1)
+INFO: pip is looking at multiple versions of torchvision to determine which version is compatible with other requirements. This could take a while.
+Collecting torchvision
+  Downloading torchvision-0.21.0-cp310-cp310-manylinux1_x86_64.whl.metadata (6.1 kB)
+  Downloading torchvision-0.20.1-cp310-cp310-manylinux1_x86_64.whl.metadata (6.1 kB)
+  Downloading torchvision-0.20.0-cp310-cp310-manylinux1_x86_64.whl.metadata (6.1 kB)
+  Downloading torchvision-0.19.1-cp310-cp310-manylinux1_x86_64.whl.metadata (6.0 kB)
+  Downloading torchvision-0.19.0-cp310-cp310-manylinux1_x86_64.whl.metadata (6.0 kB)
+  Downloading torchvision-0.18.1-cp310-cp310-manylinux1_x86_64.whl.metadata (6.6 kB)
+  Downloading torchvision-0.18.0-cp310-cp310-manylinux1_x86_64.whl.metadata (6.6 kB)
+INFO: pip is still looking at multiple versions of torchvision to determine which version is compatible with other requirements. This could take a while.
+  Downloading torchvision-0.17.2-cp310-cp310-manylinux1_x86_64.whl.metadata (6.6 kB)
+  Downloading torchvision-0.17.1-cp310-cp310-manylinux1_x86_64.whl.metadata (6.6 kB)
+  Downloading torchvision-0.17.0-cp310-cp310-manylinux1_x86_64.whl.metadata (6.6 kB)
+  Downloading torchvision-0.16.2-cp310-cp310-manylinux1_x86_64.whl.metadata (6.6 kB)
+  Downloading torchvision-0.16.1-cp310-cp310-manylinux1_x86_64.whl.metadata (6.6 kB)
+INFO: This is taking longer than usual. You might need to provide the dependency resolver with stricter constraints to reduce runtime. See https://pip.pypa.io/warnings/backtracking for guidance. If you want to abort this run, press Ctrl + C.
+  Downloading torchvision-0.16.0-cp310-cp310-manylinux1_x86_64.whl.metadata (6.6 kB)
+  Downloading torchvision-0.15.2-cp310-cp310-manylinux1_x86_64.whl.metadata (11 kB)
+  Downloading https://download.pytorch.org/whl/cu117/torchvision-0.15.1%2Bcu117-cp310-cp310-linux_x86_64.whl (6.1 MB)
+     ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 6.1/6.1 MB 56.7 MB/s eta 0:00:00
+  Downloading torchvision-0.15.1-cp310-cp310-manylinux1_x86_64.whl.metadata (11 kB)
+  Downloading https://download.pytorch.org/whl/cu117/torchvision-0.15.0%2Bcu117-cp310-cp310-linux_x86_64.whl (6.1 MB)
+     ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 6.1/6.1 MB 37.7 MB/s eta 0:00:00
+  Downloading https://download.pytorch.org/whl/cu117/torchvision-0.14.1%2Bcu117-cp310-cp310-linux_x86_64.whl (24.3 MB)
+     ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 24.3/24.3 MB 53.2 MB/s eta 0:00:00
+Requirement already satisfied: pillow!=8.3.*,>=5.3.0 in /gpfs/home/wanghuiy/anaconda3/envs/mujoco_cheryl/lib/python3.10/site-packages (from torchvision) (11.1.0)
+INFO: pip is looking at multiple versions of torchaudio to determine which version is compatible with other requirements. This could take a while.
+Collecting torchaudio
+  Downloading torchaudio-2.6.0-cp310-cp310-manylinux1_x86_64.whl.metadata (6.6 kB)
+  Downloading torchaudio-2.5.1-cp310-cp310-manylinux1_x86_64.whl.metadata (6.4 kB)
+  Downloading torchaudio-2.5.0-cp310-cp310-manylinux1_x86_64.whl.metadata (6.4 kB)
+  Downloading torchaudio-2.4.1-cp310-cp310-manylinux1_x86_64.whl.metadata (6.4 kB)
+  Downloading torchaudio-2.4.0-cp310-cp310-manylinux1_x86_64.whl.metadata (6.4 kB)
+  Downloading torchaudio-2.3.1-cp310-cp310-manylinux1_x86_64.whl.metadata (6.4 kB)
+  Downloading torchaudio-2.3.0-cp310-cp310-manylinux1_x86_64.whl.metadata (6.4 kB)
+INFO: pip is still looking at multiple versions of torchaudio to determine which version is compatible with other requirements. This could take a while.
+  Downloading torchaudio-2.2.2-cp310-cp310-manylinux1_x86_64.whl.metadata (6.4 kB)
+  Downloading torchaudio-2.2.1-cp310-cp310-manylinux1_x86_64.whl.metadata (6.4 kB)
+  Downloading torchaudio-2.2.0-cp310-cp310-manylinux1_x86_64.whl.metadata (6.4 kB)
+  Downloading torchaudio-2.1.2-cp310-cp310-manylinux1_x86_64.whl.metadata (6.4 kB)
+  Downloading torchaudio-2.1.1-cp310-cp310-manylinux1_x86_64.whl.metadata (6.4 kB)
+INFO: This is taking longer than usual. You might need to provide the dependency resolver with stricter constraints to reduce runtime. See https://pip.pypa.io/warnings/backtracking for guidance. If you want to abort this run, press Ctrl + C.
+  Downloading torchaudio-2.1.0-cp310-cp310-manylinux1_x86_64.whl.metadata (5.7 kB)
+  Downloading torchaudio-2.0.2-cp310-cp310-manylinux1_x86_64.whl.metadata (1.2 kB)
+  Downloading https://download.pytorch.org/whl/cu117/torchaudio-2.0.1%2Bcu117-cp310-cp310-linux_x86_64.whl (4.4 MB)
+     ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 4.4/4.4 MB 22.5 MB/s eta 0:00:00
+  Downloading torchaudio-2.0.1-cp310-cp310-manylinux1_x86_64.whl.metadata (1.2 kB)
+  Downloading https://download.pytorch.org/whl/cu117/torchaudio-2.0.0%2Bcu117-cp310-cp310-linux_x86_64.whl (4.4 MB)
+     ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 4.4/4.4 MB 25.0 MB/s eta 0:00:00
+  Downloading https://download.pytorch.org/whl/cu117/torchaudio-0.13.1%2Bcu117-cp310-cp310-linux_x86_64.whl (4.2 MB)
+     ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 4.2/4.2 MB 23.5 MB/s eta 0:00:00
+Requirement already satisfied: charset-normalizer<3,>=2 in /gpfs/home/wanghuiy/anaconda3/envs/mujoco_cheryl/lib/python3.10/site-packages (from requests->torchvision) (2.1.1)
+Requirement already satisfied: idna<4,>=2.5 in /gpfs/home/wanghuiy/anaconda3/envs/mujoco_cheryl/lib/python3.10/site-packages (from requests->torchvision) (3.4)
+Requirement already satisfied: urllib3<1.27,>=1.21.1 in /gpfs/home/wanghuiy/anaconda3/envs/mujoco_cheryl/lib/python3.10/site-packages (from requests->torchvision) (1.26.13)
+Requirement already satisfied: certifi>=2017.4.17 in /gpfs/home/wanghuiy/anaconda3/envs/mujoco_cheryl/lib/python3.10/site-packages (from requests->torchvision) (2024.12.14)
+Installing collected packages: torch, torchvision, torchaudio
+  Attempting uninstall: torch
+    Found existing installation: torch 2.0.1+cu117
+    Uninstalling torch-2.0.1+cu117:
+      Successfully uninstalled torch-2.0.1+cu117
+  Attempting uninstall: torchvision
+    Found existing installation: torchvision 0.15.2+cu117
+    Uninstalling torchvision-0.15.2+cu117:
+      Successfully uninstalled torchvision-0.15.2+cu117
+  Attempting uninstall: torchaudio
+    Found existing installation: torchaudio 2.0.2+cu117
+    Uninstalling torchaudio-2.0.2+cu117:
+      Successfully uninstalled torchaudio-2.0.2+cu117
+Successfully installed torch-1.13.1+cu117 torchaudio-0.13.1+cu117 torchvision-0.14.1+cu117
