@@ -1,0 +1,16 @@
+{"time":"2024-11-26T15:02:04.261929282-05:00","level":"INFO","msg":"using version","core version":"0.18.7"}
+{"time":"2024-11-26T15:02:04.261985434-05:00","level":"INFO","msg":"created symlink","path":"/home/cheryl/Documents/RL-Chemist/wandb/offline-run-20241126_150204-0cnz7a5b/logs/debug-core.log"}
+{"time":"2024-11-26T15:02:04.482310322-05:00","level":"INFO","msg":"created new stream","id":"0cnz7a5b"}
+{"time":"2024-11-26T15:02:04.482367611-05:00","level":"INFO","msg":"stream: started","id":"0cnz7a5b"}
+{"time":"2024-11-26T15:02:04.482454756-05:00","level":"INFO","msg":"writer: Do: started","stream_id":"0cnz7a5b"}
+{"time":"2024-11-26T15:02:04.482492225-05:00","level":"INFO","msg":"handler: started","stream_id":"0cnz7a5b"}
+{"time":"2024-11-26T15:02:04.482466068-05:00","level":"INFO","msg":"sender: started","stream_id":"0cnz7a5b"}
+{"time":"2024-11-26T15:02:04.502990861-05:00","level":"INFO","msg":"Starting system monitor"}
+{"time":"2024-11-26T15:02:20.427882359-05:00","level":"INFO","msg":"tensorboard: no root directory after 10 seconds, using working directory"}
+{"time":"2024-11-26T15:02:26.490842045-05:00","level":"INFO","msg":"stream: closing","id":"0cnz7a5b"}
+{"time":"2024-11-26T15:02:26.49087446-05:00","level":"INFO","msg":"Stopping system monitor"}
+{"time":"2024-11-26T15:02:26.491418421-05:00","level":"INFO","msg":"Stopped system monitor"}
+{"time":"2024-11-26T15:02:26.491775123-05:00","level":"INFO","msg":"handler: closed","stream_id":"0cnz7a5b"}
+{"time":"2024-11-26T15:02:26.491793547-05:00","level":"INFO","msg":"writer: Close: closed","stream_id":"0cnz7a5b"}
+{"time":"2024-11-26T15:02:26.491823847-05:00","level":"INFO","msg":"sender: closed","stream_id":"0cnz7a5b"}
+{"time":"2024-11-26T15:02:26.491868637-05:00","level":"INFO","msg":"stream: closed","id":"0cnz7a5b"}

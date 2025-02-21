@@ -1,0 +1,16 @@
+{"time":"2024-11-26T16:16:30.491140693-05:00","level":"INFO","msg":"using version","core version":"0.18.7"}
+{"time":"2024-11-26T16:16:30.491194359-05:00","level":"INFO","msg":"created symlink","path":"/home/cheryl/Documents/RL-Chemist/wandb/offline-run-20241126_161630-lgraw6jd/logs/debug-core.log"}
+{"time":"2024-11-26T16:16:30.711927256-05:00","level":"INFO","msg":"created new stream","id":"lgraw6jd"}
+{"time":"2024-11-26T16:16:30.711998058-05:00","level":"INFO","msg":"stream: started","id":"lgraw6jd"}
+{"time":"2024-11-26T16:16:30.7120396-05:00","level":"INFO","msg":"writer: Do: started","stream_id":"lgraw6jd"}
+{"time":"2024-11-26T16:16:30.712110048-05:00","level":"INFO","msg":"handler: started","stream_id":"lgraw6jd"}
+{"time":"2024-11-26T16:16:30.712125084-05:00","level":"INFO","msg":"sender: started","stream_id":"lgraw6jd"}
+{"time":"2024-11-26T16:16:30.732498729-05:00","level":"INFO","msg":"Starting system monitor"}
+{"time":"2024-11-26T16:16:46.608470338-05:00","level":"INFO","msg":"tensorboard: no root directory after 10 seconds, using working directory"}
+{"time":"2024-11-26T16:17:07.884592722-05:00","level":"INFO","msg":"stream: closing","id":"lgraw6jd"}
+{"time":"2024-11-26T16:17:07.88466126-05:00","level":"INFO","msg":"Stopping system monitor"}
+{"time":"2024-11-26T16:17:07.885464114-05:00","level":"INFO","msg":"Stopped system monitor"}
+{"time":"2024-11-26T16:17:07.886165093-05:00","level":"INFO","msg":"handler: closed","stream_id":"lgraw6jd"}
+{"time":"2024-11-26T16:17:07.886193316-05:00","level":"INFO","msg":"writer: Close: closed","stream_id":"lgraw6jd"}
+{"time":"2024-11-26T16:17:07.886239825-05:00","level":"INFO","msg":"sender: closed","stream_id":"lgraw6jd"}
+{"time":"2024-11-26T16:17:07.886361696-05:00","level":"INFO","msg":"stream: closed","id":"lgraw6jd"}

@@ -1,0 +1,16 @@
+{"time":"2024-11-27T11:11:31.351532948-05:00","level":"INFO","msg":"using version","core version":"0.18.7"}
+{"time":"2024-11-27T11:11:31.351586605-05:00","level":"INFO","msg":"created symlink","path":"/home/cheryl/Documents/RL-Chemist/wandb/offline-run-20241127_111131-l4kmqp20/logs/debug-core.log"}
+{"time":"2024-11-27T11:11:31.571076344-05:00","level":"INFO","msg":"created new stream","id":"l4kmqp20"}
+{"time":"2024-11-27T11:11:31.571162588-05:00","level":"INFO","msg":"stream: started","id":"l4kmqp20"}
+{"time":"2024-11-27T11:11:31.571243861-05:00","level":"INFO","msg":"writer: Do: started","stream_id":"l4kmqp20"}
+{"time":"2024-11-27T11:11:31.571302617-05:00","level":"INFO","msg":"sender: started","stream_id":"l4kmqp20"}
+{"time":"2024-11-27T11:11:31.571377068-05:00","level":"INFO","msg":"handler: started","stream_id":"l4kmqp20"}
+{"time":"2024-11-27T11:11:31.592941954-05:00","level":"INFO","msg":"Starting system monitor"}
+{"time":"2024-11-27T11:11:43.110358138-05:00","level":"INFO","msg":"stream: closing","id":"l4kmqp20"}
+{"time":"2024-11-27T11:11:43.110398402-05:00","level":"INFO","msg":"Stopping system monitor"}
+{"time":"2024-11-27T11:11:43.111167679-05:00","level":"INFO","msg":"Stopped system monitor"}
+{"time":"2024-11-27T11:11:48.26146487-05:00","level":"INFO","msg":"tensorboard: no root directory after 10 seconds, using working directory"}
+{"time":"2024-11-27T11:11:48.262509767-05:00","level":"INFO","msg":"handler: closed","stream_id":"l4kmqp20"}
+{"time":"2024-11-27T11:11:48.262542887-05:00","level":"INFO","msg":"sender: closed","stream_id":"l4kmqp20"}
+{"time":"2024-11-27T11:11:48.262541332-05:00","level":"INFO","msg":"writer: Close: closed","stream_id":"l4kmqp20"}
+{"time":"2024-11-27T11:11:48.26270796-05:00","level":"INFO","msg":"stream: closed","id":"l4kmqp20"}

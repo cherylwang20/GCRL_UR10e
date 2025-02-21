@@ -1,0 +1,16 @@
+{"time":"2024-11-27T11:08:55.890670227-05:00","level":"INFO","msg":"using version","core version":"0.18.7"}
+{"time":"2024-11-27T11:08:55.890717087-05:00","level":"INFO","msg":"created symlink","path":"/home/cheryl/Documents/RL-Chemist/wandb/offline-run-20241127_110855-jprk6739/logs/debug-core.log"}
+{"time":"2024-11-27T11:08:56.110100108-05:00","level":"INFO","msg":"created new stream","id":"jprk6739"}
+{"time":"2024-11-27T11:08:56.110158463-05:00","level":"INFO","msg":"stream: started","id":"jprk6739"}
+{"time":"2024-11-27T11:08:56.110268382-05:00","level":"INFO","msg":"writer: Do: started","stream_id":"jprk6739"}
+{"time":"2024-11-27T11:08:56.11029284-05:00","level":"INFO","msg":"handler: started","stream_id":"jprk6739"}
+{"time":"2024-11-27T11:08:56.110265281-05:00","level":"INFO","msg":"sender: started","stream_id":"jprk6739"}
+{"time":"2024-11-27T11:08:56.13443332-05:00","level":"INFO","msg":"Starting system monitor"}
+{"time":"2024-11-27T11:09:07.522506896-05:00","level":"INFO","msg":"stream: closing","id":"jprk6739"}
+{"time":"2024-11-27T11:09:07.522539697-05:00","level":"INFO","msg":"Stopping system monitor"}
+{"time":"2024-11-27T11:09:07.523119962-05:00","level":"INFO","msg":"Stopped system monitor"}
+{"time":"2024-11-27T11:09:12.776328792-05:00","level":"INFO","msg":"tensorboard: no root directory after 10 seconds, using working directory"}
+{"time":"2024-11-27T11:09:12.777419295-05:00","level":"INFO","msg":"handler: closed","stream_id":"jprk6739"}
+{"time":"2024-11-27T11:09:12.77744781-05:00","level":"INFO","msg":"writer: Close: closed","stream_id":"jprk6739"}
+{"time":"2024-11-27T11:09:12.777459409-05:00","level":"INFO","msg":"sender: closed","stream_id":"jprk6739"}
+{"time":"2024-11-27T11:09:12.777570781-05:00","level":"INFO","msg":"stream: closed","id":"jprk6739"}

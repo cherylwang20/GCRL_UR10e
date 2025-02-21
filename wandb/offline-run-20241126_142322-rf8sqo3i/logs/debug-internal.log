@@ -1,0 +1,15 @@
+{"time":"2024-11-26T14:23:22.770440876-05:00","level":"INFO","msg":"using version","core version":"0.18.7"}
+{"time":"2024-11-26T14:23:22.770498006-05:00","level":"INFO","msg":"created symlink","path":"/home/cheryl/Documents/RL-Chemist/wandb/offline-run-20241126_142322-rf8sqo3i/logs/debug-core.log"}
+{"time":"2024-11-26T14:23:22.989093656-05:00","level":"INFO","msg":"created new stream","id":"rf8sqo3i"}
+{"time":"2024-11-26T14:23:22.989146721-05:00","level":"INFO","msg":"stream: started","id":"rf8sqo3i"}
+{"time":"2024-11-26T14:23:22.989175105-05:00","level":"INFO","msg":"writer: Do: started","stream_id":"rf8sqo3i"}
+{"time":"2024-11-26T14:23:22.98919042-05:00","level":"INFO","msg":"handler: started","stream_id":"rf8sqo3i"}
+{"time":"2024-11-26T14:23:22.989264108-05:00","level":"INFO","msg":"sender: started","stream_id":"rf8sqo3i"}
+{"time":"2024-11-26T14:23:23.010225133-05:00","level":"INFO","msg":"Starting system monitor"}
+{"time":"2024-11-26T14:23:24.917850482-05:00","level":"INFO","msg":"stream: closing","id":"rf8sqo3i"}
+{"time":"2024-11-26T14:23:24.917913591-05:00","level":"INFO","msg":"Stopping system monitor"}
+{"time":"2024-11-26T14:23:24.918882919-05:00","level":"INFO","msg":"Stopped system monitor"}
+{"time":"2024-11-26T14:23:24.919247303-05:00","level":"INFO","msg":"handler: closed","stream_id":"rf8sqo3i"}
+{"time":"2024-11-26T14:23:24.919272216-05:00","level":"INFO","msg":"writer: Close: closed","stream_id":"rf8sqo3i"}
+{"time":"2024-11-26T14:23:24.919319734-05:00","level":"INFO","msg":"sender: closed","stream_id":"rf8sqo3i"}
+{"time":"2024-11-26T14:23:24.919381384-05:00","level":"INFO","msg":"stream: closed","id":"rf8sqo3i"}

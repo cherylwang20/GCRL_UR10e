@@ -1,0 +1,16 @@
+{"time":"2024-11-26T16:00:28.273877462-05:00","level":"INFO","msg":"using version","core version":"0.18.7"}
+{"time":"2024-11-26T16:00:28.273923542-05:00","level":"INFO","msg":"created symlink","path":"/home/cheryl/Documents/RL-Chemist/wandb/offline-run-20241126_160028-ungry00r/logs/debug-core.log"}
+{"time":"2024-11-26T16:00:28.494535385-05:00","level":"INFO","msg":"created new stream","id":"ungry00r"}
+{"time":"2024-11-26T16:00:28.494600743-05:00","level":"INFO","msg":"stream: started","id":"ungry00r"}
+{"time":"2024-11-26T16:00:28.494701545-05:00","level":"INFO","msg":"handler: started","stream_id":"ungry00r"}
+{"time":"2024-11-26T16:00:28.494707154-05:00","level":"INFO","msg":"writer: Do: started","stream_id":"ungry00r"}
+{"time":"2024-11-26T16:00:28.494722344-05:00","level":"INFO","msg":"sender: started","stream_id":"ungry00r"}
+{"time":"2024-11-26T16:00:28.515780037-05:00","level":"INFO","msg":"Starting system monitor"}
+{"time":"2024-11-26T16:00:41.291964948-05:00","level":"INFO","msg":"stream: closing","id":"ungry00r"}
+{"time":"2024-11-26T16:00:41.292051641-05:00","level":"INFO","msg":"Stopping system monitor"}
+{"time":"2024-11-26T16:00:41.292731679-05:00","level":"INFO","msg":"Stopped system monitor"}
+{"time":"2024-11-26T16:00:44.466374988-05:00","level":"INFO","msg":"tensorboard: no root directory after 10 seconds, using working directory"}
+{"time":"2024-11-26T16:00:44.467451485-05:00","level":"INFO","msg":"handler: closed","stream_id":"ungry00r"}
+{"time":"2024-11-26T16:00:44.467475629-05:00","level":"INFO","msg":"writer: Close: closed","stream_id":"ungry00r"}
+{"time":"2024-11-26T16:00:44.467488754-05:00","level":"INFO","msg":"sender: closed","stream_id":"ungry00r"}
+{"time":"2024-11-26T16:00:44.467664898-05:00","level":"INFO","msg":"stream: closed","id":"ungry00r"}

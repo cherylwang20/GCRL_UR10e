@@ -1,0 +1,16 @@
+{"time":"2024-11-27T11:06:56.072235894-05:00","level":"INFO","msg":"using version","core version":"0.18.7"}
+{"time":"2024-11-27T11:06:56.072283118-05:00","level":"INFO","msg":"created symlink","path":"/home/cheryl/Documents/RL-Chemist/wandb/offline-run-20241127_110656-bt0ul1gs/logs/debug-core.log"}
+{"time":"2024-11-27T11:06:56.29385124-05:00","level":"INFO","msg":"created new stream","id":"bt0ul1gs"}
+{"time":"2024-11-27T11:06:56.293950352-05:00","level":"INFO","msg":"stream: started","id":"bt0ul1gs"}
+{"time":"2024-11-27T11:06:56.29401297-05:00","level":"INFO","msg":"writer: Do: started","stream_id":"bt0ul1gs"}
+{"time":"2024-11-27T11:06:56.294025646-05:00","level":"INFO","msg":"handler: started","stream_id":"bt0ul1gs"}
+{"time":"2024-11-27T11:06:56.294031509-05:00","level":"INFO","msg":"sender: started","stream_id":"bt0ul1gs"}
+{"time":"2024-11-27T11:06:56.314511116-05:00","level":"INFO","msg":"Starting system monitor"}
+{"time":"2024-11-27T11:07:07.766171162-05:00","level":"INFO","msg":"stream: closing","id":"bt0ul1gs"}
+{"time":"2024-11-27T11:07:07.766217214-05:00","level":"INFO","msg":"Stopping system monitor"}
+{"time":"2024-11-27T11:07:07.766810297-05:00","level":"INFO","msg":"Stopped system monitor"}
+{"time":"2024-11-27T11:07:13.066262844-05:00","level":"INFO","msg":"tensorboard: no root directory after 10 seconds, using working directory"}
+{"time":"2024-11-27T11:07:13.067343568-05:00","level":"INFO","msg":"handler: closed","stream_id":"bt0ul1gs"}
+{"time":"2024-11-27T11:07:13.067391105-05:00","level":"INFO","msg":"writer: Close: closed","stream_id":"bt0ul1gs"}
+{"time":"2024-11-27T11:07:13.067420681-05:00","level":"INFO","msg":"sender: closed","stream_id":"bt0ul1gs"}
+{"time":"2024-11-27T11:07:13.067526423-05:00","level":"INFO","msg":"stream: closed","id":"bt0ul1gs"}

@@ -1,0 +1,473 @@
+diff --git a/Train_reach_4.py b/Train_reach_4.py
+index 4802333..e0baec8 100644
+--- a/Train_reach_4.py
++++ b/Train_reach_4.py
+@@ -2,6 +2,7 @@ import gym
+ import os
+ from gym import spaces
+ from PIL import Image
++import cv2
+ import torchvision.transforms as transforms
+ import torch 
+ import random
+@@ -45,6 +46,7 @@ class KorniaAugmentationCallback(BaseCallback):
+         self.beta = beta
+         self.gamma = gamma
+         self.augment_images = augment_images
++        self.display = True
+         self.transform = torch.nn.Sequential(
+             KAug.RandomContrast(contrast=(0.7, 1.2), clip_output=True, p=1.0),
+             KAug.RandomBrightness((0.7, 1.2)),
+@@ -56,7 +58,8 @@ class KorniaAugmentationCallback(BaseCallback):
+         # Assume observations['image'] has the shape [batch_size, height, width, channels]
+         images = self.model.rollout_buffer.observations['image']
+ 
+-        images = images.reshape(images.shape[0] * images.shape[1], 120, 212, 12)
++        #images = images.reshape(images.shape[0] * images.shape[1], 120, 212, 12)
++        images.squeeze(1)
+ 
+         # Reshape to separate frames and channels
+         # New shape: [batch_size, height, width, num_frames, channels_per_frame]
+@@ -98,6 +101,14 @@ class KorniaAugmentationCallback(BaseCallback):
+         # Update the observations in the rollout buffer
+         self.model.rollout_buffer.observations['image'] = final_output.numpy()
+ 
++        if self.display:
++            for tensor in final_tensors:
++                tensor = tensor.permute(0, 2, 3, 1).int().numpy()
++                for img in tensor:
++                    cv2.imshow('Processed Image', img)
++                    cv2.waitKey(1)  # Display the window until a key is pressed or for 1 ms
++
++
+         return True
+     
+     def _on_step(self):
+diff --git a/background/IMG_9745.jpg b/background/IMG_9745.jpg
+new file mode 100644
+index 0000000..8d175bb
+Binary files /dev/null and b/background/IMG_9745.jpg differ
+diff --git a/background/IMG_9746.jpg b/background/IMG_9746.jpg
+new file mode 100644
+index 0000000..4128abd
+Binary files /dev/null and b/background/IMG_9746.jpg differ
+diff --git a/background/IMG_9747.jpg b/background/IMG_9747.jpg
+new file mode 100644
+index 0000000..47eebbb
+Binary files /dev/null and b/background/IMG_9747.jpg differ
+diff --git a/background/IMG_9748.jpg b/background/IMG_9748.jpg
+new file mode 100644
+index 0000000..87dae19
+Binary files /dev/null and b/background/IMG_9748.jpg differ
+diff --git a/background/IMG_9749.jpg b/background/IMG_9749.jpg
+new file mode 100644
+index 0000000..3809eea
+Binary files /dev/null and b/background/IMG_9749.jpg differ
+diff --git a/background/IMG_9750.jpg b/background/IMG_9750.jpg
+new file mode 100644
+index 0000000..809f97b
+Binary files /dev/null and b/background/IMG_9750.jpg differ
+diff --git a/background/IMG_9751.jpg b/background/IMG_9751.jpg
+new file mode 100644
+index 0000000..130e20c
+Binary files /dev/null and b/background/IMG_9751.jpg differ
+diff --git a/background/lab.jpeg b/background/lab.jpeg
+new file mode 100644
+index 0000000..f5dba12
+Binary files /dev/null and b/background/lab.jpeg differ
+diff --git a/background/lab2.jpeg b/background/lab2.jpeg
+new file mode 100644
+index 0000000..1edd184
+Binary files /dev/null and b/background/lab2.jpeg differ
+diff --git a/background/lab3.jpeg b/background/lab3.jpeg
+new file mode 100644
+index 0000000..954214b
+Binary files /dev/null and b/background/lab3.jpeg differ
+diff --git a/background/lab4.jpeg b/background/lab4.jpeg
+new file mode 100644
+index 0000000..9d33609
+Binary files /dev/null and b/background/lab4.jpeg differ
+diff --git a/background/lab5.jpeg b/background/lab5.jpeg
+new file mode 100644
+index 0000000..76d1aaa
+Binary files /dev/null and b/background/lab5.jpeg differ
+diff --git a/background/lab6.jpeg b/background/lab6.jpeg
+new file mode 100644
+index 0000000..4b6d815
+Binary files /dev/null and b/background/lab6.jpeg differ
+Submodule mj_envs contains modified content
+Submodule robohive/simhive/scene_sim contains modified content
+diff --git a/mj_envs/robohive/simhive/scene_sim/topfloor_scene.xml b/mj_envs/robohive/simhive/scene_sim/topfloor_scene.xml
+index 06f3e49..6fb102e 100644
+--- a/mj_envs/robohive/simhive/scene_sim/topfloor_scene.xml
++++ b/mj_envs/robohive/simhive/scene_sim/topfloor_scene.xml
+@@ -8,7 +8,7 @@
+ ====================================================== -->
+ 
+   <asset>
+-    <!-- <texture name="skybox" type="skybox" builtin="gradient" rgb1=".08 .09 .10" rgb2="0 0 0" width="800" height="800" mark="random" markrgb=".8 .8 .8"/> -->
++    <!--texture name="skybox" type="skybox" builtin="gradient" rgb1=".08 .09 .10" rgb2="0 0 0" width="800" height="800" mark="random" markrgb=".8 .8 .8"/>-->
+     <texture name="skybox" type="skybox" gridsize="3 4" gridlayout=".U..LFRB.D.." file="../scene_sim/textures/dawn.png"/>
+     <texture name="texplane" type="2d" height="1" width="1" file="../scene_sim/textures/white_marble_tile2.png"/>
+     <!-- <texture name="texplane" type="2d" height="1" width="1" file="../scene_sim/textures/floor0.png"/> -->
+@@ -19,10 +19,10 @@
+     <material name="MatGlass" reflectance="1" specular=".4" emission=".25" rgba=".6 .6 .65 .1"/>
+     <material name="MatWindow" reflectance="0" texture="texwindow" texrepeat="1 1" texuniform="true" rgba="1 0 0 1"/>
+ 
+-    <mesh name="wall" file="../scene_sim/meshes/highwindow.stl" scale="1 1 1"/>
+-    <mesh name="skyline" file="../scene_sim/meshes/skyline.stl" scale="2.2 2.2 1"/>
+-    <mesh name="robohive" file="../scene_sim/meshes/robohive_text.stl"/>
+-    <mesh name="robohive_half" file="../scene_sim/meshes/robohive_logohalf.stl" scale="4 4 4"/>
++    <mesh name="wall" file="../../../../simhive/scene_sim/meshes/highwindow.stl" scale="1 1 1"/>
++    <mesh name="skyline" file="../../../../simhive/scene_sim/meshes/skyline.stl" scale="2.2 2.2 1"/>
++    <mesh name="robohive" file="../../../../simhive/scene_sim/meshes/robohive_text.stl"/>
++    <mesh name="robohive_half" file="../../../../simhive/scene_sim/meshes/robohive_logohalf.stl" scale="4 4 4"/>
+   </asset>
+ 
+   <compiler angle="radian"/>
+@@ -61,11 +61,11 @@
+     <geom class='scene' mesh="wall" pos="10 0 0" type="mesh" material="MatMetal" euler="0 0 -1.57"/>
+     <geom class='scene' type="box" pos="10 0 3.5" size=".01 5 3.5" material="MatGlass"/>
+     <geom class='scene' mesh="wall" pos="-10 0 0" type="mesh" material="MatMetal" euler="0 0 1.57"/>
+-    <geom class='scene' type="box" pos="-10 0 3.5" size=".01 5 3.5" material="MatGlass"/>
++    <geom class='scene' type="box" pos="-10 0 3.5" size=".01 5 3.5" material="MatGlass"/>-->
+ 
+     <!-- co-ordinate axis -->
+     <site name="xaxis" fromto="0 0 0 1 0 0" size=".005" type="capsule" rgba="1 0 0 .25" group="3"/>
+     <site name="yaxis" fromto="0 0 0 0 1 0" size=".005" type="capsule" rgba="0 1 0 .25" group="3"/>
+   </worldbody>
+ 
+-</mujoco>
++</mujoco>
+\ No newline at end of file
+diff --git a/videos/UR10ePickPlaceFixed-v0/2024_04_27_22_52_12front_video.mp4 b/videos/UR10ePickPlaceFixed-v0/2024_04_27_22_52_12front_video.mp4
+deleted file mode 100644
+index adac5ae..0000000
+Binary files a/videos/UR10ePickPlaceFixed-v0/2024_04_27_22_52_12front_video.mp4 and /dev/null differ
+diff --git a/videos/UR10ePickPlaceFixed-v0/2024_04_27_23_53_17front_video.mp4 b/videos/UR10ePickPlaceFixed-v0/2024_04_27_23_53_17front_video.mp4
+deleted file mode 100644
+index a3cdbbb..0000000
+Binary files a/videos/UR10ePickPlaceFixed-v0/2024_04_27_23_53_17front_video.mp4 and /dev/null differ
+diff --git a/videos/UR10ePickPlaceFixed-v0/2024_04_28_00_38_04front_video.mp4 b/videos/UR10ePickPlaceFixed-v0/2024_04_28_00_38_04front_video.mp4
+deleted file mode 100644
+index a01f1ee..0000000
+Binary files a/videos/UR10ePickPlaceFixed-v0/2024_04_28_00_38_04front_video.mp4 and /dev/null differ
+diff --git a/videos/UR10ePickPlaceFixed-v0/2024_04_28_17_04_14front_video.mp4 b/videos/UR10ePickPlaceFixed-v0/2024_04_28_17_04_14front_video.mp4
+deleted file mode 100644
+index 00f6449..0000000
+Binary files a/videos/UR10ePickPlaceFixed-v0/2024_04_28_17_04_14front_video.mp4 and /dev/null differ
+diff --git a/videos/UR10ePickPlaceFixed-v0/2024_04_29_10_31_11front_video.mp4 b/videos/UR10ePickPlaceFixed-v0/2024_04_29_10_31_11front_video.mp4
+deleted file mode 100644
+index 21b03cd..0000000
+Binary files a/videos/UR10ePickPlaceFixed-v0/2024_04_29_10_31_11front_video.mp4 and /dev/null differ
+diff --git a/videos/UR10ePickPlaceFixed-v0/2024_04_29_11_29_42front_video.mp4 b/videos/UR10ePickPlaceFixed-v0/2024_04_29_11_29_42front_video.mp4
+deleted file mode 100644
+index 997114c..0000000
+Binary files a/videos/UR10ePickPlaceFixed-v0/2024_04_29_11_29_42front_video.mp4 and /dev/null differ
+diff --git a/videos/UR10ePickPlaceFixed-v0/2024_05_02_14_26_27front_video.mp4 b/videos/UR10ePickPlaceFixed-v0/2024_05_02_14_26_27front_video.mp4
+deleted file mode 100644
+index 88bad3b..0000000
+Binary files a/videos/UR10ePickPlaceFixed-v0/2024_05_02_14_26_27front_video.mp4 and /dev/null differ
+diff --git a/videos/UR10ePickPlaceFixed-v0/2024_05_02_18_06_34front_video.mp4 b/videos/UR10ePickPlaceFixed-v0/2024_05_02_18_06_34front_video.mp4
+deleted file mode 100644
+index cfa3742..0000000
+Binary files a/videos/UR10ePickPlaceFixed-v0/2024_05_02_18_06_34front_video.mp4 and /dev/null differ
+diff --git a/videos/UR10ePickPlaceFixed-v0/2024_05_03_13_40_57front_video.mp4 b/videos/UR10ePickPlaceFixed-v0/2024_05_03_13_40_57front_video.mp4
+deleted file mode 100644
+index b76ae84..0000000
+Binary files a/videos/UR10ePickPlaceFixed-v0/2024_05_03_13_40_57front_video.mp4 and /dev/null differ
+diff --git a/videos/UR10ePickPlaceFixed-v0/2024_05_03_14_49_55front_video.mp4 b/videos/UR10ePickPlaceFixed-v0/2024_05_03_14_49_55front_video.mp4
+deleted file mode 100644
+index 5962742..0000000
+Binary files a/videos/UR10ePickPlaceFixed-v0/2024_05_03_14_49_55front_video.mp4 and /dev/null differ
+diff --git a/videos/UR10ePickPlaceFixed-v0/2024_05_03_15_23_56front_video.mp4 b/videos/UR10ePickPlaceFixed-v0/2024_05_03_15_23_56front_video.mp4
+deleted file mode 100644
+index 9ad9d27..0000000
+Binary files a/videos/UR10ePickPlaceFixed-v0/2024_05_03_15_23_56front_video.mp4 and /dev/null differ
+diff --git a/videos/UR10eReachFixed-v0/2024_04_27_19_03_05front_video.mp4 b/videos/UR10eReachFixed-v0/2024_04_27_19_03_05front_video.mp4
+deleted file mode 100644
+index 455a9af..0000000
+Binary files a/videos/UR10eReachFixed-v0/2024_04_27_19_03_05front_video.mp4 and /dev/null differ
+diff --git a/videos/UR10eReachFixed-v0/2024_04_30_18_32_34front_video.mp4 b/videos/UR10eReachFixed-v0/2024_04_30_18_32_34front_video.mp4
+deleted file mode 100644
+index acc8f70..0000000
+Binary files a/videos/UR10eReachFixed-v0/2024_04_30_18_32_34front_video.mp4 and /dev/null differ
+diff --git a/videos/UR10eReachFixed-v0/2024_05_01_09_33_44front_video.mp4 b/videos/UR10eReachFixed-v0/2024_05_01_09_33_44front_video.mp4
+deleted file mode 100644
+index daf01ad..0000000
+Binary files a/videos/UR10eReachFixed-v0/2024_05_01_09_33_44front_video.mp4 and /dev/null differ
+diff --git a/videos/UR10eReachFixed-v0/2024_05_01_10_55_51front_video.mp4 b/videos/UR10eReachFixed-v0/2024_05_01_10_55_51front_video.mp4
+deleted file mode 100644
+index 4f3a64c..0000000
+Binary files a/videos/UR10eReachFixed-v0/2024_05_01_10_55_51front_video.mp4 and /dev/null differ
+diff --git a/videos/UR10eReachFixed-v0/2024_05_01_11_11_08front_video.mp4 b/videos/UR10eReachFixed-v0/2024_05_01_11_11_08front_video.mp4
+deleted file mode 100644
+index 6308ec8..0000000
+Binary files a/videos/UR10eReachFixed-v0/2024_05_01_11_11_08front_video.mp4 and /dev/null differ
+diff --git a/videos/UR10eReachFixed-v0/2024_05_01_12_40_38front_video.mp4 b/videos/UR10eReachFixed-v0/2024_05_01_12_40_38front_video.mp4
+deleted file mode 100644
+index 01111f0..0000000
+Binary files a/videos/UR10eReachFixed-v0/2024_05_01_12_40_38front_video.mp4 and /dev/null differ
+diff --git a/videos/UR10eReachFixed-v0/2024_05_01_12_55_52front_video.mp4 b/videos/UR10eReachFixed-v0/2024_05_01_12_55_52front_video.mp4
+deleted file mode 100644
+index 3451072..0000000
+Binary files a/videos/UR10eReachFixed-v0/2024_05_01_12_55_52front_video.mp4 and /dev/null differ
+diff --git a/videos/UR10eReachFixed-v0/2024_05_01_13_33_14front_video.mp4 b/videos/UR10eReachFixed-v0/2024_05_01_13_33_14front_video.mp4
+deleted file mode 100644
+index 238b36a..0000000
+Binary files a/videos/UR10eReachFixed-v0/2024_05_01_13_33_14front_video.mp4 and /dev/null differ
+diff --git a/videos/UR10eReachFixed-v0/2024_05_01_13_59_50front_video.mp4 b/videos/UR10eReachFixed-v0/2024_05_01_13_59_50front_video.mp4
+deleted file mode 100644
+index d82b208..0000000
+Binary files a/videos/UR10eReachFixed-v0/2024_05_01_13_59_50front_video.mp4 and /dev/null differ
+diff --git a/videos/UR10eReachFixed-v0/2024_05_01_14_10_49front_video.mp4 b/videos/UR10eReachFixed-v0/2024_05_01_14_10_49front_video.mp4
+deleted file mode 100644
+index 9719ce3..0000000
+Binary files a/videos/UR10eReachFixed-v0/2024_05_01_14_10_49front_video.mp4 and /dev/null differ
+diff --git a/videos/UR10eReachFixed-v0/2024_05_01_14_20_38front_video.mp4 b/videos/UR10eReachFixed-v0/2024_05_01_14_20_38front_video.mp4
+deleted file mode 100644
+index aa5f458..0000000
+Binary files a/videos/UR10eReachFixed-v0/2024_05_01_14_20_38front_video.mp4 and /dev/null differ
+diff --git a/videos/UR10eReachFixed-v0/2024_05_01_14_35_51front_video.mp4 b/videos/UR10eReachFixed-v0/2024_05_01_14_35_51front_video.mp4
+deleted file mode 100644
+index 5ede918..0000000
+Binary files a/videos/UR10eReachFixed-v0/2024_05_01_14_35_51front_video.mp4 and /dev/null differ
+diff --git a/videos/UR10eReachFixed-v0/2024_05_01_18_59_50front_video.mp4 b/videos/UR10eReachFixed-v0/2024_05_01_18_59_50front_video.mp4
+deleted file mode 100644
+index 90f699f..0000000
+Binary files a/videos/UR10eReachFixed-v0/2024_05_01_18_59_50front_video.mp4 and /dev/null differ
+diff --git a/videos/UR10eReachFixed-v0/2024_05_01_19_18_48front_video.mp4 b/videos/UR10eReachFixed-v0/2024_05_01_19_18_48front_video.mp4
+deleted file mode 100644
+index 71443bf..0000000
+Binary files a/videos/UR10eReachFixed-v0/2024_05_01_19_18_48front_video.mp4 and /dev/null differ
+diff --git a/videos/UR10eReachFixed-v0/2024_05_01_20_51_26front_video.mp4 b/videos/UR10eReachFixed-v0/2024_05_01_20_51_26front_video.mp4
+deleted file mode 100644
+index 2b0d729..0000000
+Binary files a/videos/UR10eReachFixed-v0/2024_05_01_20_51_26front_video.mp4 and /dev/null differ
+diff --git a/videos/UR10eReachFixed-v0/2024_05_01_21_06_27front_video.mp4 b/videos/UR10eReachFixed-v0/2024_05_01_21_06_27front_video.mp4
+deleted file mode 100644
+index 3cedf1f..0000000
+Binary files a/videos/UR10eReachFixed-v0/2024_05_01_21_06_27front_video.mp4 and /dev/null differ
+diff --git a/videos/UR10eReachFixed-v0/2024_05_01_21_29_07front_video.mp4 b/videos/UR10eReachFixed-v0/2024_05_01_21_29_07front_video.mp4
+deleted file mode 100644
+index 11ef15c..0000000
+Binary files a/videos/UR10eReachFixed-v0/2024_05_01_21_29_07front_video.mp4 and /dev/null differ
+diff --git a/videos/UR10eReachFixed-v0/2024_05_01_22_15_54front_video.mp4 b/videos/UR10eReachFixed-v0/2024_05_01_22_15_54front_video.mp4
+deleted file mode 100644
+index fc97a6e..0000000
+Binary files a/videos/UR10eReachFixed-v0/2024_05_01_22_15_54front_video.mp4 and /dev/null differ
+diff --git a/videos/UR10eReachFixed-v0/2024_05_02_11_22_30front_video.mp4 b/videos/UR10eReachFixed-v0/2024_05_02_11_22_30front_video.mp4
+deleted file mode 100644
+index b88a01d..0000000
+Binary files a/videos/UR10eReachFixed-v0/2024_05_02_11_22_30front_video.mp4 and /dev/null differ
+diff --git a/videos/UR10eReachFixed-v0/2024_05_02_11_47_33front_video.mp4 b/videos/UR10eReachFixed-v0/2024_05_02_11_47_33front_video.mp4
+deleted file mode 100644
+index 34c01dd..0000000
+Binary files a/videos/UR10eReachFixed-v0/2024_05_02_11_47_33front_video.mp4 and /dev/null differ
+diff --git a/videos/UR10eReachFixed-v0/2024_05_02_12_45_37front_video.mp4 b/videos/UR10eReachFixed-v0/2024_05_02_12_45_37front_video.mp4
+deleted file mode 100644
+index 34a6b6a..0000000
+Binary files a/videos/UR10eReachFixed-v0/2024_05_02_12_45_37front_video.mp4 and /dev/null differ
+diff --git a/videos/UR10eReachFixed-v0/2024_05_02_13_19_02front_video.mp4 b/videos/UR10eReachFixed-v0/2024_05_02_13_19_02front_video.mp4
+deleted file mode 100644
+index 1d614a0..0000000
+Binary files a/videos/UR10eReachFixed-v0/2024_05_02_13_19_02front_video.mp4 and /dev/null differ
+diff --git a/videos/UR10eReachFixed-v0/2024_05_02_13_39_06front_video.mp4 b/videos/UR10eReachFixed-v0/2024_05_02_13_39_06front_video.mp4
+deleted file mode 100644
+index cd3bbdf..0000000
+Binary files a/videos/UR10eReachFixed-v0/2024_05_02_13_39_06front_video.mp4 and /dev/null differ
+diff --git a/videos/UR10eReachFixed-v0/2024_05_02_13_39_06video.mp4 b/videos/UR10eReachFixed-v0/2024_05_02_13_39_06video.mp4
+deleted file mode 100644
+index e7b7367..0000000
+Binary files a/videos/UR10eReachFixed-v0/2024_05_02_13_39_06video.mp4 and /dev/null differ
+diff --git a/videos/UR10eReachFixed-v0/2024_05_03_14_42_58front_video.mp4 b/videos/UR10eReachFixed-v0/2024_05_03_14_42_58front_video.mp4
+deleted file mode 100644
+index 481bd9a..0000000
+Binary files a/videos/UR10eReachFixed-v0/2024_05_03_14_42_58front_video.mp4 and /dev/null differ
+diff --git a/videos/UR10eReachFixed-v0/2024_05_03_15_26_32front_video.mp4 b/videos/UR10eReachFixed-v0/2024_05_03_15_26_32front_video.mp4
+deleted file mode 100644
+index f2b28ac..0000000
+Binary files a/videos/UR10eReachFixed-v0/2024_05_03_15_26_32front_video.mp4 and /dev/null differ
+diff --git a/videos/UR10eReachFixed-v1/2024_05_11_13_21_30front_video.mp4 b/videos/UR10eReachFixed-v1/2024_05_11_13_21_30front_video.mp4
+deleted file mode 100644
+index 79c896d..0000000
+Binary files a/videos/UR10eReachFixed-v1/2024_05_11_13_21_30front_video.mp4 and /dev/null differ
+diff --git a/videos/UR10eReachFixed-v1/2024_05_11_21_43_32front_video.mp4 b/videos/UR10eReachFixed-v1/2024_05_11_21_43_32front_video.mp4
+deleted file mode 100644
+index 81dc78c..0000000
+Binary files a/videos/UR10eReachFixed-v1/2024_05_11_21_43_32front_video.mp4 and /dev/null differ
+diff --git a/videos/UR10eReachFixed-v1/2024_05_11_21_52_53front_video.mp4 b/videos/UR10eReachFixed-v1/2024_05_11_21_52_53front_video.mp4
+deleted file mode 100644
+index 3be04bf..0000000
+Binary files a/videos/UR10eReachFixed-v1/2024_05_11_21_52_53front_video.mp4 and /dev/null differ
+diff --git a/videos/UR10eReachFixed-v1/2024_05_12_18_06_35front_video.mp4 b/videos/UR10eReachFixed-v1/2024_05_12_18_06_35front_video.mp4
+deleted file mode 100644
+index e0edba4..0000000
+Binary files a/videos/UR10eReachFixed-v1/2024_05_12_18_06_35front_video.mp4 and /dev/null differ
+diff --git a/videos/UR10eReachFixed-v1/2024_05_12_18_58_25front_video.mp4 b/videos/UR10eReachFixed-v1/2024_05_12_18_58_25front_video.mp4
+deleted file mode 100644
+index 969293f..0000000
+Binary files a/videos/UR10eReachFixed-v1/2024_05_12_18_58_25front_video.mp4 and /dev/null differ
+diff --git a/videos/UR10eReachFixed-v1/2024_05_12_19_18_06front_video.mp4 b/videos/UR10eReachFixed-v1/2024_05_12_19_18_06front_video.mp4
+deleted file mode 100644
+index d276b25..0000000
+Binary files a/videos/UR10eReachFixed-v1/2024_05_12_19_18_06front_video.mp4 and /dev/null differ
+diff --git a/videos/UR10eReachFixed-v1/2024_05_12_19_28_57front_video.mp4 b/videos/UR10eReachFixed-v1/2024_05_12_19_28_57front_video.mp4
+deleted file mode 100644
+index ed175d7..0000000
+Binary files a/videos/UR10eReachFixed-v1/2024_05_12_19_28_57front_video.mp4 and /dev/null differ
+diff --git a/videos/UR10eReachFixed-v1/2024_05_13_11_47_17front_video.mp4 b/videos/UR10eReachFixed-v1/2024_05_13_11_47_17front_video.mp4
+deleted file mode 100644
+index 459cd69..0000000
+Binary files a/videos/UR10eReachFixed-v1/2024_05_13_11_47_17front_video.mp4 and /dev/null differ
+diff --git a/videos/UR10eReachFixed-v1/2024_05_13_12_00_15front_video.mp4 b/videos/UR10eReachFixed-v1/2024_05_13_12_00_15front_video.mp4
+deleted file mode 100644
+index 7d94de3..0000000
+Binary files a/videos/UR10eReachFixed-v1/2024_05_13_12_00_15front_video.mp4 and /dev/null differ
+diff --git a/videos/UR10eReachFixed-v1/2024_05_13_12_12_37front_video.mp4 b/videos/UR10eReachFixed-v1/2024_05_13_12_12_37front_video.mp4
+deleted file mode 100644
+index 0f5d59e..0000000
+Binary files a/videos/UR10eReachFixed-v1/2024_05_13_12_12_37front_video.mp4 and /dev/null differ
+diff --git a/videos/UR10eReachFixed-v1/2024_05_13_23_28_12front_video.mp4 b/videos/UR10eReachFixed-v1/2024_05_13_23_28_12front_video.mp4
+deleted file mode 100644
+index 464a56a..0000000
+Binary files a/videos/UR10eReachFixed-v1/2024_05_13_23_28_12front_video.mp4 and /dev/null differ
+diff --git a/videos/UR10eReachFixed-v1/2024_05_14_15_34_00front_video.mp4 b/videos/UR10eReachFixed-v1/2024_05_14_15_34_00front_video.mp4
+deleted file mode 100644
+index 9bdd03c..0000000
+Binary files a/videos/UR10eReachFixed-v1/2024_05_14_15_34_00front_video.mp4 and /dev/null differ
+diff --git a/videos/UR10eReachFixed-v1/2024_05_14_16_57_04front_video.mp4 b/videos/UR10eReachFixed-v1/2024_05_14_16_57_04front_video.mp4
+deleted file mode 100644
+index 03c6c69..0000000
+Binary files a/videos/UR10eReachFixed-v1/2024_05_14_16_57_04front_video.mp4 and /dev/null differ
+diff --git a/videos/UR10eReachFixed-v1/2024_05_14_20_30_20front_video.mp4 b/videos/UR10eReachFixed-v1/2024_05_14_20_30_20front_video.mp4
+deleted file mode 100644
+index 73241f6..0000000
+Binary files a/videos/UR10eReachFixed-v1/2024_05_14_20_30_20front_video.mp4 and /dev/null differ
+diff --git a/videos/UR10eReachFixed-v1/2024_05_15_11_28_31front_video.mp4 b/videos/UR10eReachFixed-v1/2024_05_15_11_28_31front_video.mp4
+deleted file mode 100644
+index f0758fd..0000000
+Binary files a/videos/UR10eReachFixed-v1/2024_05_15_11_28_31front_video.mp4 and /dev/null differ
+diff --git a/videos/UR10eReachFixed-v1/2024_05_15_14_32_50+grab_1.mp4 b/videos/UR10eReachFixed-v1/2024_05_15_14_32_50+grab_1.mp4
+deleted file mode 100644
+index 9db0590..0000000
+Binary files a/videos/UR10eReachFixed-v1/2024_05_15_14_32_50+grab_1.mp4 and /dev/null differ
+diff --git a/videos/UR10eReachFixed-v1/2024_05_15_14_32_50_grab_2.mp4 b/videos/UR10eReachFixed-v1/2024_05_15_14_32_50_grab_2.mp4
+deleted file mode 100644
+index 7005dad..0000000
+Binary files a/videos/UR10eReachFixed-v1/2024_05_15_14_32_50_grab_2.mp4 and /dev/null differ
+diff --git a/videos/UR10eReachFixed-v1/2024_05_15_14_32_50front_video.mp4 b/videos/UR10eReachFixed-v1/2024_05_15_14_32_50front_video.mp4
+deleted file mode 100644
+index d8ad0ee..0000000
+Binary files a/videos/UR10eReachFixed-v1/2024_05_15_14_32_50front_video.mp4 and /dev/null differ
+diff --git a/videos/UR10eReachFixed-v1/2024_05_15_16_45_28end_video.avi b/videos/UR10eReachFixed-v1/2024_05_15_16_45_28end_video.avi
+deleted file mode 100644
+index e69de29..0000000
+diff --git a/videos/UR10eReachFixed-v1/2024_05_15_16_45_28front_mask_video.mp4 b/videos/UR10eReachFixed-v1/2024_05_15_16_45_28front_mask_video.mp4
+deleted file mode 100644
+index 42b044d..0000000
+Binary files a/videos/UR10eReachFixed-v1/2024_05_15_16_45_28front_mask_video.mp4 and /dev/null differ
+diff --git a/videos/UR10eReachFixed-v1/2024_05_15_16_45_28front_video.mp4 b/videos/UR10eReachFixed-v1/2024_05_15_16_45_28front_video.mp4
+deleted file mode 100644
+index dbd360c..0000000
+Binary files a/videos/UR10eReachFixed-v1/2024_05_15_16_45_28front_video.mp4 and /dev/null differ
+diff --git "a/videos/UR10eReachFixed-v1/\346\227\240\346\240\207\351\242\230\350\247\206\351\242\221\342\200\224\342\200\224\344\275\277\347\224\250Clipchamp\345\210\266\344\275\234 (2).mp4" "b/videos/UR10eReachFixed-v1/\346\227\240\346\240\207\351\242\230\350\247\206\351\242\221\342\200\224\342\200\224\344\275\277\347\224\250Clipchamp\345\210\266\344\275\234 (2).mp4"
+deleted file mode 100644
+index 368c5bf..0000000
+Binary files "a/videos/UR10eReachFixed-v1/\346\227\240\346\240\207\351\242\230\350\247\206\351\242\221\342\200\224\342\200\224\344\275\277\347\224\250Clipchamp\345\210\266\344\275\234 (2).mp4" and /dev/null differ
+diff --git a/videos/UR10eReachFixed-v2/2024_06_17_13_16_41front_mask_video.mp4 b/videos/UR10eReachFixed-v2/2024_06_17_13_16_41front_mask_video.mp4
+deleted file mode 100644
+index 2c2e3f5..0000000
+Binary files a/videos/UR10eReachFixed-v2/2024_06_17_13_16_41front_mask_video.mp4 and /dev/null differ
+diff --git a/videos/UR10eReachFixed-v2/2024_06_17_13_16_41front_video.mp4 b/videos/UR10eReachFixed-v2/2024_06_17_13_16_41front_video.mp4
+deleted file mode 100644
+index 10138ff..0000000
+Binary files a/videos/UR10eReachFixed-v2/2024_06_17_13_16_41front_video.mp4 and /dev/null differ
+diff --git a/videos/UR10eReachFixed-v2/2024_06_17_18_45_32front_mask_video.mp4 b/videos/UR10eReachFixed-v2/2024_06_17_18_45_32front_mask_video.mp4
+deleted file mode 100644
+index f7b5284..0000000
+Binary files a/videos/UR10eReachFixed-v2/2024_06_17_18_45_32front_mask_video.mp4 and /dev/null differ
+diff --git a/videos/UR10eReachFixed-v2/2024_06_17_18_45_32front_video.mp4 b/videos/UR10eReachFixed-v2/2024_06_17_18_45_32front_video.mp4
+deleted file mode 100644
+index df456ff..0000000
+Binary files a/videos/UR10eReachFixed-v2/2024_06_17_18_45_32front_video.mp4 and /dev/null differ
+diff --git a/videos/UR10eReachFixed-v2/2024_06_20_11_12_34front_mask_video.mp4 b/videos/UR10eReachFixed-v2/2024_06_20_11_12_34front_mask_video.mp4
+deleted file mode 100644
+index 12ce96c..0000000
+Binary files a/videos/UR10eReachFixed-v2/2024_06_20_11_12_34front_mask_video.mp4 and /dev/null differ
+diff --git a/videos/UR10eReachFixed-v2/2024_06_20_11_12_34front_video.mp4 b/videos/UR10eReachFixed-v2/2024_06_20_11_12_34front_video.mp4
+deleted file mode 100644
+index 3471b39..0000000
+Binary files a/videos/UR10eReachFixed-v2/2024_06_20_11_12_34front_video.mp4 and /dev/null differ
+diff --git a/videos/UR10eReachFixed-v2/2024_06_21_08_41_26front_mask_video.mp4 b/videos/UR10eReachFixed-v2/2024_06_21_08_41_26front_mask_video.mp4
+deleted file mode 100644
+index 100057b..0000000
+Binary files a/videos/UR10eReachFixed-v2/2024_06_21_08_41_26front_mask_video.mp4 and /dev/null differ
+diff --git a/videos/UR10eReachFixed-v2/2024_06_21_08_41_26front_video.mp4 b/videos/UR10eReachFixed-v2/2024_06_21_08_41_26front_video.mp4
+deleted file mode 100644
+index 704677a..0000000
+Binary files a/videos/UR10eReachFixed-v2/2024_06_21_08_41_26front_video.mp4 and /dev/null differ
+diff --git a/videos/UR10eReachFixed-v2/2024_06_21_23_59_31front_mask_video.mp4 b/videos/UR10eReachFixed-v2/2024_06_21_23_59_31front_mask_video.mp4
+deleted file mode 100644
+index b6329ce..0000000
+Binary files a/videos/UR10eReachFixed-v2/2024_06_21_23_59_31front_mask_video.mp4 and /dev/null differ
+diff --git a/videos/UR10eReachFixed-v2/2024_06_21_23_59_31front_video.mp4 b/videos/UR10eReachFixed-v2/2024_06_21_23_59_31front_video.mp4
+deleted file mode 100644
+index 12a5d80..0000000
+Binary files a/videos/UR10eReachFixed-v2/2024_06_21_23_59_31front_video.mp4 and /dev/null differ
+diff --git a/videos/UR10eReachFixed-v2/2024_06_22_11_11_14front_mask_video.mp4 b/videos/UR10eReachFixed-v2/2024_06_22_11_11_14front_mask_video.mp4
+deleted file mode 100644
+index e7a0f99..0000000
+Binary files a/videos/UR10eReachFixed-v2/2024_06_22_11_11_14front_mask_video.mp4 and /dev/null differ
+diff --git a/videos/UR10eReachFixed-v2/2024_06_22_11_11_14front_video.mp4 b/videos/UR10eReachFixed-v2/2024_06_22_11_11_14front_video.mp4
+deleted file mode 100644
+index 511c4e2..0000000
+Binary files a/videos/UR10eReachFixed-v2/2024_06_22_11_11_14front_video.mp4 and /dev/null differ
+diff --git a/videos/UR10eReachFixed-v2/2024_06_22_19_48_33front_mask_video.mp4 b/videos/UR10eReachFixed-v2/2024_06_22_19_48_33front_mask_video.mp4
+deleted file mode 100644
+index e3e192d..0000000
+Binary files a/videos/UR10eReachFixed-v2/2024_06_22_19_48_33front_mask_video.mp4 and /dev/null differ
+diff --git a/videos/UR10eReachFixed-v2/2024_06_22_19_48_33front_video.mp4 b/videos/UR10eReachFixed-v2/2024_06_22_19_48_33front_video.mp4
+deleted file mode 100644
+index f89252a..0000000
+Binary files a/videos/UR10eReachFixed-v2/2024_06_22_19_48_33front_video.mp4 and /dev/null differ
+diff --git a/videos/UR10eReachFixed-v2/2024_06_23_02_03_41front_mask_video.mp4 b/videos/UR10eReachFixed-v2/2024_06_23_02_03_41front_mask_video.mp4
+deleted file mode 100644
+index fca4432..0000000
+Binary files a/videos/UR10eReachFixed-v2/2024_06_23_02_03_41front_mask_video.mp4 and /dev/null differ
+diff --git a/videos/UR10eReachFixed-v2/2024_06_23_02_03_41front_video.mp4 b/videos/UR10eReachFixed-v2/2024_06_23_02_03_41front_video.mp4
+deleted file mode 100644
+index a721329..0000000
+Binary files a/videos/UR10eReachFixed-v2/2024_06_23_02_03_41front_video.mp4 and /dev/null differ
+diff --git a/videos/UR10eReachFixed-v2/2024_06_24_01_01_18front_mask_video.mp4 b/videos/UR10eReachFixed-v2/2024_06_24_01_01_18front_mask_video.mp4
+deleted file mode 100644
+index ff59faa..0000000
+Binary files a/videos/UR10eReachFixed-v2/2024_06_24_01_01_18front_mask_video.mp4 and /dev/null differ
+diff --git a/videos/UR10eReachFixed-v2/2024_06_24_01_01_18front_video.mp4 b/videos/UR10eReachFixed-v2/2024_06_24_01_01_18front_video.mp4
+deleted file mode 100644
+index 6e9fc9d..0000000
+Binary files a/videos/UR10eReachFixed-v2/2024_06_24_01_01_18front_video.mp4 and /dev/null differ
+diff --git a/videos/UR10eReachFixed-v2/2024_06_24_11_10_04front_mask_video.mp4 b/videos/UR10eReachFixed-v2/2024_06_24_11_10_04front_mask_video.mp4
+deleted file mode 100644
+index eabba29..0000000
+Binary files a/videos/UR10eReachFixed-v2/2024_06_24_11_10_04front_mask_video.mp4 and /dev/null differ
+diff --git a/videos/UR10eReachFixed-v2/2024_06_24_11_10_04front_video.mp4 b/videos/UR10eReachFixed-v2/2024_06_24_11_10_04front_video.mp4
+deleted file mode 100644
+index ecde798..0000000
+Binary files a/videos/UR10eReachFixed-v2/2024_06_24_11_10_04front_video.mp4 and /dev/null differ
+diff --git a/videos/UR10eReachFixed-v2/2024_06_25_00_46_36front_mask_video.mp4 b/videos/UR10eReachFixed-v2/2024_06_25_00_46_36front_mask_video.mp4
+deleted file mode 100644
+index 714965b..0000000
+Binary files a/videos/UR10eReachFixed-v2/2024_06_25_00_46_36front_mask_video.mp4 and /dev/null differ
+diff --git a/videos/UR10eReachFixed-v2/2024_06_25_00_46_36front_video.mp4 b/videos/UR10eReachFixed-v2/2024_06_25_00_46_36front_video.mp4
+deleted file mode 100644
+index bc13ddf..0000000
+Binary files a/videos/UR10eReachFixed-v2/2024_06_25_00_46_36front_video.mp4 and /dev/null differ
+diff --git a/videos1/UR10eMask3C-v1/2024_09_13_15_26_302front_mask_video.mp4 b/videos1/UR10eMask3C-v1/2024_09_13_15_26_302front_mask_video.mp4
+deleted file mode 100644
+index 39327bb..0000000
+Binary files a/videos1/UR10eMask3C-v1/2024_09_13_15_26_302front_mask_video.mp4 and /dev/null differ
+diff --git a/videos1/UR10eMask3C-v1/2024_09_13_15_26_302front_video.mp4 b/videos1/UR10eMask3C-v1/2024_09_13_15_26_302front_video.mp4
+deleted file mode 100644
+index 8e661ea..0000000
+Binary files a/videos1/UR10eMask3C-v1/2024_09_13_15_26_302front_video.mp4 and /dev/null differ

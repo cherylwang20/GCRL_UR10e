@@ -1,0 +1,16 @@
+{"time":"2024-11-26T14:44:28.638706756-05:00","level":"INFO","msg":"using version","core version":"0.18.7"}
+{"time":"2024-11-26T14:44:28.638765841-05:00","level":"INFO","msg":"created symlink","path":"/home/cheryl/Documents/RL-Chemist/wandb/offline-run-20241126_144428-efcivgul/logs/debug-core.log"}
+{"time":"2024-11-26T14:44:28.858172816-05:00","level":"INFO","msg":"created new stream","id":"efcivgul"}
+{"time":"2024-11-26T14:44:28.858216481-05:00","level":"INFO","msg":"stream: started","id":"efcivgul"}
+{"time":"2024-11-26T14:44:28.858318321-05:00","level":"INFO","msg":"handler: started","stream_id":"efcivgul"}
+{"time":"2024-11-26T14:44:28.85832462-05:00","level":"INFO","msg":"writer: Do: started","stream_id":"efcivgul"}
+{"time":"2024-11-26T14:44:28.85842652-05:00","level":"INFO","msg":"sender: started","stream_id":"efcivgul"}
+{"time":"2024-11-26T14:44:28.879157257-05:00","level":"INFO","msg":"Starting system monitor"}
+{"time":"2024-11-26T14:44:35.603910654-05:00","level":"INFO","msg":"stream: closing","id":"efcivgul"}
+{"time":"2024-11-26T14:44:35.603944487-05:00","level":"INFO","msg":"Stopping system monitor"}
+{"time":"2024-11-26T14:44:35.604880853-05:00","level":"INFO","msg":"Stopped system monitor"}
+{"time":"2024-11-26T14:44:44.850044528-05:00","level":"INFO","msg":"tensorboard: no root directory after 10 seconds, using working directory"}
+{"time":"2024-11-26T14:44:44.85148067-05:00","level":"INFO","msg":"handler: closed","stream_id":"efcivgul"}
+{"time":"2024-11-26T14:44:44.851523661-05:00","level":"INFO","msg":"writer: Close: closed","stream_id":"efcivgul"}
+{"time":"2024-11-26T14:44:44.851543938-05:00","level":"INFO","msg":"sender: closed","stream_id":"efcivgul"}
+{"time":"2024-11-26T14:44:44.851696809-05:00","level":"INFO","msg":"stream: closed","id":"efcivgul"}

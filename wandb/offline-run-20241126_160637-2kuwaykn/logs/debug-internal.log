@@ -1,0 +1,15 @@
+{"time":"2024-11-26T16:06:37.649365216-05:00","level":"INFO","msg":"using version","core version":"0.18.7"}
+{"time":"2024-11-26T16:06:37.649421948-05:00","level":"INFO","msg":"created symlink","path":"/home/cheryl/Documents/RL-Chemist/wandb/offline-run-20241126_160637-2kuwaykn/logs/debug-core.log"}
+{"time":"2024-11-26T16:06:37.868338907-05:00","level":"INFO","msg":"created new stream","id":"2kuwaykn"}
+{"time":"2024-11-26T16:06:37.868379163-05:00","level":"INFO","msg":"stream: started","id":"2kuwaykn"}
+{"time":"2024-11-26T16:06:37.868424559-05:00","level":"INFO","msg":"writer: Do: started","stream_id":"2kuwaykn"}
+{"time":"2024-11-26T16:06:37.868481787-05:00","level":"INFO","msg":"sender: started","stream_id":"2kuwaykn"}
+{"time":"2024-11-26T16:06:37.869562171-05:00","level":"INFO","msg":"handler: started","stream_id":"2kuwaykn"}
+{"time":"2024-11-26T16:06:37.890745924-05:00","level":"INFO","msg":"Starting system monitor"}
+{"time":"2024-11-26T16:06:41.793436293-05:00","level":"INFO","msg":"stream: closing","id":"2kuwaykn"}
+{"time":"2024-11-26T16:06:41.793525609-05:00","level":"INFO","msg":"Stopping system monitor"}
+{"time":"2024-11-26T16:06:41.794400349-05:00","level":"INFO","msg":"Stopped system monitor"}
+{"time":"2024-11-26T16:06:41.794718461-05:00","level":"INFO","msg":"handler: closed","stream_id":"2kuwaykn"}
+{"time":"2024-11-26T16:06:41.79475389-05:00","level":"INFO","msg":"writer: Close: closed","stream_id":"2kuwaykn"}
+{"time":"2024-11-26T16:06:41.794786397-05:00","level":"INFO","msg":"sender: closed","stream_id":"2kuwaykn"}
+{"time":"2024-11-26T16:06:41.794860227-05:00","level":"INFO","msg":"stream: closed","id":"2kuwaykn"}

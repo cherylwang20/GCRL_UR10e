@@ -1,0 +1,16 @@
+{"time":"2024-11-27T10:16:55.376489031-05:00","level":"INFO","msg":"using version","core version":"0.18.7"}
+{"time":"2024-11-27T10:16:55.376535386-05:00","level":"INFO","msg":"created symlink","path":"/home/cheryl/Documents/RL-Chemist/wandb/offline-run-20241127_101655-ff2avnhn/logs/debug-core.log"}
+{"time":"2024-11-27T10:16:55.596299039-05:00","level":"INFO","msg":"created new stream","id":"ff2avnhn"}
+{"time":"2024-11-27T10:16:55.596411408-05:00","level":"INFO","msg":"stream: started","id":"ff2avnhn"}
+{"time":"2024-11-27T10:16:55.596471395-05:00","level":"INFO","msg":"writer: Do: started","stream_id":"ff2avnhn"}
+{"time":"2024-11-27T10:16:55.596527731-05:00","level":"INFO","msg":"handler: started","stream_id":"ff2avnhn"}
+{"time":"2024-11-27T10:16:55.596604055-05:00","level":"INFO","msg":"sender: started","stream_id":"ff2avnhn"}
+{"time":"2024-11-27T10:16:55.625624372-05:00","level":"INFO","msg":"Starting system monitor"}
+{"time":"2024-11-27T10:17:12.06820625-05:00","level":"INFO","msg":"tensorboard: no root directory after 10 seconds, using working directory"}
+{"time":"2024-11-27T10:17:34.361528487-05:00","level":"INFO","msg":"stream: closing","id":"ff2avnhn"}
+{"time":"2024-11-27T10:17:34.361592927-05:00","level":"INFO","msg":"Stopping system monitor"}
+{"time":"2024-11-27T10:17:34.362653498-05:00","level":"INFO","msg":"Stopped system monitor"}
+{"time":"2024-11-27T10:17:34.365943159-05:00","level":"INFO","msg":"handler: closed","stream_id":"ff2avnhn"}
+{"time":"2024-11-27T10:17:34.365973581-05:00","level":"INFO","msg":"sender: closed","stream_id":"ff2avnhn"}
+{"time":"2024-11-27T10:17:34.365968386-05:00","level":"INFO","msg":"writer: Close: closed","stream_id":"ff2avnhn"}
+{"time":"2024-11-27T10:17:34.36615019-05:00","level":"INFO","msg":"stream: closed","id":"ff2avnhn"}
