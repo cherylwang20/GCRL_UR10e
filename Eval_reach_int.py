@@ -64,6 +64,7 @@ parser.add_argument("--env_name", type=str, default='NA', help="environment name
 parser.add_argument("--policy_env", type=str, default='NA', help="environment name")
 parser.add_argument("--model_num", type=str, default='testing', help="environment name")
 parser.add_argument("--movie", type=str, default='False', help="environment name")
+parser.add_argument("--channel_num", type=int, default=4, help="channel num")
 args = parser.parse_args()
 
 # Ignore specific warning
@@ -75,7 +76,7 @@ model_num = args.model_num
 env_name = args.env_name 
 print(env_name)
 policy_env = args.policy_env
-env = gym.make(f'mj_envs.robohive.envs:{env_name}')
+env = gym.make(f'mj_envs.robohive.envs:{env_name}', channel = args.channel_num)
 env = CustomFrameStack(env, n_stack=3)
 
 seed_value = 47004  # Seed value for reproducibility
@@ -97,7 +98,7 @@ detect_color = 'green'
 
 env.reset()
 
-trial = 5
+trial = 1
 success = 0
 
 frames = []
@@ -111,7 +112,7 @@ for i in tqdm(range(trial)):
     #obs = np.stack([obs, obs, obs])
     step = 0
     #ret, frame = cap.read()
-    while step < 200:
+    while step < 200 and not solved:
           #obs = env.obsdict2obsvec(env.obs_dict, env.obs_keys)[1]
           #obs = np.stack([obs, obs, obs])
           #obs = env.get_obs_dict()        

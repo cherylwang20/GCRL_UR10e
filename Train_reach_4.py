@@ -37,6 +37,7 @@ parser.add_argument("--env_name", type=str, default='N/A', help="environment nam
 parser.add_argument("--group", type=str, default='testing', help="environment name")
 parser.add_argument("--learning_rate", type=float, default=0.0003, help="Learning rate for the optimizer")
 parser.add_argument("--clip_range", type=float, default=0.2, help="Clip range for the policy gradient update")
+parser.add_argument("--channel_num", type=int, default=4, help="channel num")
 
 args = parser.parse_args()
 

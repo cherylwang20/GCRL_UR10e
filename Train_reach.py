@@ -228,7 +228,7 @@ def main():
 
     IS_WnB_enabled = True
 
-    #loaded_model = '2024_09_25_13_42_113'
+    loaded_model = 'N/A' #'2024_09_25_13_42_113'
     try:
         import wandb
         from wandb.integration.sb3 import WandbCallback
