@@ -1,0 +1,1277 @@
+diff --git a/Eval_reach_int.py b/Eval_reach_int.py
+index 0d0a300..bbff488 100644
+--- a/Eval_reach_int.py
++++ b/Eval_reach_int.py
+@@ -116,7 +116,6 @@ for i in tqdm(range(trial)):
+           #obs = np.stack([obs, obs, obs])
+           #obs = env.get_obs_dict()        
+           action, _ = model.predict(obs, deterministic=False)
+-          print(action)
+           obs, reward, done, info = env.step(action)
+           solved = info['solved']
+           if i < trial:
+diff --git a/Train_reach_4.py b/Train_reach_4.py
+index 4802333..2a31b75 100644
+--- a/Train_reach_4.py
++++ b/Train_reach_4.py
+@@ -2,6 +2,7 @@ import gym
+ import os
+ from gym import spaces
+ from PIL import Image
++import cv2
+ import torchvision.transforms as transforms
+ import torch 
+ import random
+@@ -45,14 +46,45 @@ class KorniaAugmentationCallback(BaseCallback):
+         self.beta = beta
+         self.gamma = gamma
+         self.augment_images = augment_images
++        self.display = True
+         self.transform = torch.nn.Sequential(
+             KAug.RandomContrast(contrast=(0.7, 1.2), clip_output=True, p=1.0),
+             KAug.RandomBrightness((0.7, 1.2)),
+             KAug.RandomSaturation((0.7, 1.2)), 
+             KAug.RandomGaussianBlur(kernel_size=(5, 5), sigma=(0.7, 1.2), p=0.5)
+         )
++    
++    def show_images(self, images, title='Image'):
++        images = images.permute(0, 2, 3, 1).numpy().astype(np.uint8)
++        for index, img in enumerate(images):
++            cv2.imwrite(f'test_{index}.png', img)
++            if cv2.waitKey(0) & 0xFF == ord('q'):
++                break
++        cv2.destroyAllWindows()
++    
++    def visualize_images(self, buffer):
++        # Assuming buffer is a numpy array with shape (1024, 1, 120, 212, 12)
++        # Reshape to isolate individual images: we focus on the first frame of each step
++        n_steps, _, height, width, channels = buffer.shape
++        images = buffer.squeeze(1)
++        images = torch.from_numpy(images)
++        images = images.permute(0, 2, 3, 1).numpy()
++        print(images.shape)
++        
++        for i in range(n_steps):
++            # Extract the first frame (first 3 channels assuming they are RGB)
++            # We take the first 4 channels as one frame and select the first 3 for RGB visualization
++            img = images[i, :, :, :3]  # Assuming RGB channels are the first 3 of each frame
++            img = (img * 255).astype(np.uint8)
++            print(img)
++            
++            cv2.imshow('Frame {}'.format(i), img)
++            if cv2.waitKey(0) & 0xFF == ord('q'):  # Press 'q' to exit the display loop
++                break
++
++        cv2.destroyAllWindows()
+ 
+-    def _on_rollout_start(self):
++    def _on_rollout_end(self):
+         # Assume observations['image'] has the shape [batch_size, height, width, channels]
+         images = self.model.rollout_buffer.observations['image']
+ 
+@@ -72,8 +104,13 @@ class KorniaAugmentationCallback(BaseCallback):
+             
+             half_index = rgb_channel.shape[0] // 2  # Assuming split along the height
+             first_half = rgb_channel[:half_index, :, :, :]
++            print(first_half)
+             second_half = rgb_channel[half_index:, :, :, :]
+ 
++            if self.display:
++                # Display original first half
++                self.show_images(first_half, title='Original First Half')
++
+             rgb_transform = self.transform(first_half)
+ 
+             enhanced_transform = torch.empty_like(second_half)
+@@ -273,7 +310,7 @@ def main():
+ 
+     # Create a model using the vectorized environment
+     #model = SAC("MultiInputPolicy", envs, buffer_size=1000, verbose=0)
+-    model = PPO(CustomMultiInputPolicy, envs, ent_coef=ENTROPY, learning_rate=LR, clip_range=CR, n_steps = 1024, batch_size = 64, verbose=0, tensorboard_log=f"runs/{time_now}")
++    model = PPO(CustomMultiInputPolicy, envs, ent_coef=ENTROPY, learning_rate=LR, clip_range=CR, n_steps = 64, batch_size = 64, verbose=0, tensorboard_log=f"runs/{time_now}")
+     #model = PPO.load(r"./Reach_Target_vel/policy_best_model/" + env_name + '/' + loaded_model + '/best_model', envs, verbose=1, tensorboard_log=f"runs/{time_now}")
+ 
+     callback = CallbackList([augment_callback, eval_callback, WandbCallback(gradient_save_freq=100)])
+Submodule mj_envs contains modified content
+Submodule mj_envs 114a75a..3bd7d88:
+diff --git a/mj_envs/.gitmodules b/mj_envs/.gitmodules
+index 24106c6..4ac86a6 100644
+--- a/mj_envs/.gitmodules
++++ b/mj_envs/.gitmodules
+@@ -10,7 +10,7 @@
+ 	url = https://github.com/vikashplus/franka_sim.git
+ [submodule "robohive/simhive/scene_sim"]
+ 	path = robohive/simhive/scene_sim
+-	url = https://github.com/vikashplus/scene_sim.git
++	url = https://github.com/cherylwang20/scene_sim.git
+ [submodule "robohive/simhive/sawyer_sim"]
+ 	path = robohive/simhive/sawyer_sim
+ 	url = https://github.com/vikashplus/sawyer_sim.git
+diff --git a/mj_envs/robohive/envs/arms/mask_4d_v1.py b/mj_envs/robohive/envs/arms/mask_4d_v1.py
+index 97ecccf..c355a31 100644
+--- a/mj_envs/robohive/envs/arms/mask_4d_v1.py
++++ b/mj_envs/robohive/envs/arms/mask_4d_v1.py
+@@ -21,6 +21,7 @@ import groundingdino
+ from PIL import Image, ImageDraw
+ from torchvision.ops import box_convert
+ import torch
++import math
+ import random
+ 
+ # Set environment variables
+@@ -42,7 +43,7 @@ from robohive.envs.arms.python_api_2 import BodyIdInfo, arm_control, get_touchin
+ class ReachBaseV0(env_base_1.MujocoEnv):
+ 
+     DEFAULT_OBS_KEYS = [
+-        'time', 'qp_robot', 'qv_robot'
++        'qp_robot', 'qv_robot'
+     ]
+     DEFAULT_PROPRIO_KEYS = [
+         'qp_robot', 'qv_robot'
+@@ -85,10 +86,10 @@ class ReachBaseV0(env_base_1.MujocoEnv):
+                target_site_name,
+                goal_site_name,
+                target_xyz_range,
+-               image_width=224,
+-               image_height=224,
++               image_width=212,
++               image_height=120,
+                obj_xyz_range = None,
+-               frame_skip = 12,#40,
++               frame_skip = 20,#40,
+                reward_mode = "dense",
+                obs_keys=DEFAULT_OBS_KEYS,
+                proprio_keys=DEFAULT_PROPRIO_KEYS,
+@@ -122,12 +123,13 @@ class ReachBaseV0(env_base_1.MujocoEnv):
+         self.total_pix = 0
+         self.touch_success = 0
+         self.single_touch = 0
+-        self.cx, self.cy = 0, 0
+-        self.r = 0
++        self.target_x, self.target_y = 0, 0
++        self.target_r = 0
++        self.r = 2
+         self.depth = 0
+         self.eval = False
+-        np.random.seed(47006)
+-        random.seed(47006)
++        #np.random.seed(47006)
++        #random.seed(47006)
+ 
+ 
+ 
+@@ -342,8 +344,14 @@ class ReachBaseV0(env_base_1.MujocoEnv):
+ 
+         obs = super().reset(reset_qpos = reset_qpos, reset_qvel = None, **kwargs)
+         #self._last_robot_qpos = self.sim.model.key_qpos[0].copy()
+-        self.final_image = np.ones((self.IMAGE_WIDTH, self.IMAGE_HEIGHT, 4), dtype=np.uint8)
+-        self.color = np.random.choice(['green'])
++        self.final_image = np.ones((self.IMAGE_HEIGHT, self.IMAGE_WIDTH, 4), dtype=np.uint8)
++        
++        site_pos = self.sim.data.site_xpos[self.target_sid]
++        camera_matrix = self.compute_camera_matrix()
++        self.target_x, self.target_y  = self.world_2_pixel(site_pos, camera_matrix) 
++        site_pos[0] += 0.04
++        rx, ry  = self.world_2_pixel(site_pos, camera_matrix) 
++        self.r = math.sqrt((rx - self.target_x) ** 2 + (ry - self.target_y) ** 2)
+         return {'image': self.final_image, 'vector': obs}
+     
+ 
+@@ -360,17 +368,15 @@ class ReachBaseV0(env_base_1.MujocoEnv):
+         )
+         #depth = self.depth_2_meters(depth) #we don't need this, already in meters
+         site_pos = self.sim.data.site_xpos[self.target_sid]
+-        pixel_x, pixel_y, radius = self.world_2_pixel(site_pos)
+-        self.cx, self.cy = pixel_x, pixel_y
+-        self.r = radius
++        camera_matrix = self.compute_camera_matrix()
++        self.target_x, self.target_y = self.world_2_pixel(site_pos, camera_matrix) 
++        site_pos[0] += 0.04
++        rx, ry  = self.world_2_pixel(site_pos, camera_matrix) 
++        self.r = math.sqrt((rx - self.target_x) ** 2 + (ry - self.target_y) ** 2)
++        #pixel_x, pixel_y = self.world_2_pixel(site_pos)
+ 
+         observation = {}
+         observation["rgb"] = rgb
+-        #observation["depth"] =   np.array([depth[pixel_y][pixel_x]]) #np.array([ 2.701]) #
+-        #print(np.array([depth[pixel_y][pixel_x]]), np.array([depth[pixel_y][224 - pixel_x]]))
+-        #observation["pixel_coords"] = [pixel_x, pixel_y]
+-        #print('pixel coords,', pixel_x, pixel_y)
+-
+         return observation
+ 
+     #setting a boundary of virtual box such that the arm will not accidentally
+@@ -453,7 +459,7 @@ class ReachBaseV0(env_base_1.MujocoEnv):
+     def set_color(self, color):
+             self.color = color
+     
+-    def get_image_data(self, show=False, camera="end_effector_cam", width=224, height=224):
++    def get_image_data(self, show=False, camera="end_effector_cam", width=212, height=120):
+         """
+         Returns the RGB and depth images of the provided camera.
+ 
+@@ -472,16 +478,13 @@ class ReachBaseV0(env_base_1.MujocoEnv):
+         self.rgb_out = rgb
+ 
+         rgb = cv.cvtColor(rgb, cv.COLOR_BGR2RGB)
+-        blurred = cv.GaussianBlur(rgb, (11, 11), 0)
+-        hsv = cv.cvtColor(blurred, cv.COLOR_BGR2HSV)
+         
+-        mask = np.zeros(( self.IMAGE_HEIGHT,  self.IMAGE_HEIGHT), dtype=np.uint8)
+-        x, y = self.cx, self.cy
+-        if isinstance(self.r, np.ndarray):
+-            half_side = int(self.r.item())
+-        else:
+-            half_side = int(self.r)
+-        cv.rectangle(mask, (224 - x - half_side, y - half_side), (224- x + half_side, y + half_side), 255, thickness=-1)
++        mask = np.zeros(( self.IMAGE_HEIGHT,  self.IMAGE_WIDTH), dtype=np.uint8)
++        x, y = int(self.target_x), int(self.target_y)
++        
++        half_side = int(max(self.r, 2))
++        
++        cv.rectangle(mask, (x - half_side, y - half_side), (x + half_side, y + half_side), 255, thickness=-1)
+ 
+         self.mask_out = mask
+ 
+@@ -498,11 +501,10 @@ class ReachBaseV0(env_base_1.MujocoEnv):
+ 
+         self.current_image = np.concatenate((rgb/255, np.expand_dims(mask/255, axis=-1)), axis=2)
+ 
+-        #print(self.current_image.shape)
+         
+         #define the grasping rectangle
+-        x1, y1 = int(63/200 * self.IMAGE_HEIGHT), self.IMAGE_HEIGHT - int(68/200 * self.IMAGE_HEIGHT)
+-        x2, y2 = int(136/200 * self.IMAGE_HEIGHT), self.IMAGE_HEIGHT 
++        x1, x2 = int(self.IMAGE_WIDTH * 0.25), int(self.IMAGE_WIDTH * 0.75)
++        y1, y2 = int(self.IMAGE_HEIGHT * 0.40), int(self.IMAGE_HEIGHT * 0.80)
+ 
+         cv.rectangle(rgb, (x1, y1), (x2, y2), (0, 0, 255), thickness=2)
+         cv.rectangle(mask, (x1, y1), (x2, y2), 255, thickness=1)
+@@ -513,10 +515,6 @@ class ReachBaseV0(env_base_1.MujocoEnv):
+         self.pixel_perc = (white_pixels / total_pixels) * 100
+         self.total_pix = (np.sum(mask==255)/mask.size) * 100
+ 
+-
+-        #print('total pixel',self.total_pix)
+-
+-
+         return np.array(np.fliplr(np.flipud(rgb))), np.array(np.fliplr(np.flipud(depth)))
+ 
+     def create_mask(self, image_source: np.ndarray, boxes: torch.Tensor) -> np.ndarray:
+@@ -556,7 +554,7 @@ class ReachBaseV0(env_base_1.MujocoEnv):
+         mode='rgb_array'
+         if mode == 'rgb_array':
+             rgb, depth = copy.deepcopy(
+-            self.sim.renderer.render_offscreen(width=224, height=224, camera_id='end_effector_cam', depth = True)
++            self.sim.renderer.render_offscreen(width=212, height=120, camera_id='end_effector_cam', depth = True)
+             )
+             return rgb
+         else:
+@@ -587,7 +585,7 @@ class ReachBaseV0(env_base_1.MujocoEnv):
+         far = self.model.vis.map.zfar * extend
+         return near / (1 - depth * (1 - near / far))
+ 
+-    def pixel_2_world(self, pixel_x, pixel_y, depth, width=224, height=224, camera="end_effector_cam"):
++    def pixel_2_world(self, pixel_x, pixel_y, depth, width=212, height=120, camera="end_effector_cam"):
+         """
+         Converts pixel coordinates into world coordinates.
+ 
+@@ -615,23 +613,44 @@ class ReachBaseV0(env_base_1.MujocoEnv):
+ 
+         return pos_w
+ 
+-    def _setup_camera(self, height=224, width=224):
++    def _setup_camera(self, height=212, width=120):
+         """Sets up the camera to render the scene from the required view."""
+         # This assumes you have a fixed camera in your model XML
+         self.camera_id = self.sim.model.camera_name2id('end_effector_cam')
+-        self.get_camera_matrices(self.camera_id, height, width)
++        #self.get_camera_matrices(self.camera_id, height, width)
+     
+-    def get_camera_matrices(self, camera_id, height, width):
+-        """Retrieve projection, position, and rotation matrices for the specified camera."""
+-        fovy = self.sim.model.cam_fovy[camera_id]  # Fetch camera settings
+-        # Calculate focal length
+-        f = 0.5 * height / np.tan(fovy * np.pi / 360)
+-        #construct camera matrix
+-        self.cam_matrix = np.array(((f, 0, width / 2), (0, f, height / 2), (0, 0, 1)))
+-        self.cam_init = True
++    def compute_camera_matrix(self, camera="end_effector_cam"):
++        """Returns the 3x4 camera matrix."""
++        # If the camera is a 'free' camera, we get its position and orientation
++        # from the scene data structure. It is a stereo camera, so we average over
++        # the left and right channels. Note: we call `self.update()` in order to
++        # ensure that the contents of `scene.camera` are correct.
++
++        pos = self.sim.data.cam_xpos[self.sim.model.camera_name2id(camera)]
++        rot_mat = self.sim.data.cam_xmat[self.sim.model.camera_name2id(camera)].reshape(3, 3)
++        camera_id = self.sim.model.camera_name2id(camera)
++        fov = self.sim.model.cam_fovy[camera_id]
++
++        # Translation matrix (4x4).
++        translation = np.eye(4)
++        translation[0:3, 3] = -pos
++
++        # Rotation matrix (4x4).
++        rotation = np.eye(4)
++        rotation[0:3, 0:3] = rot_mat.T
++
++        # Focal transformation matrix (3x4).
++        focal_scaling = (1./np.tan(np.deg2rad(fov)/2)) * self.IMAGE_HEIGHT / 2.0
++        focal = np.diag([-focal_scaling, focal_scaling, 1.0, 0])[0:3, :]
++
++        # Image matrix (3x3).
++        image = np.eye(3)
++        image[0, 2] = (self.IMAGE_WIDTH - 1) / 2.0
++        image[1, 2] = (self.IMAGE_HEIGHT - 1) / 2.0
++        return image @ focal @ rotation @ translation
+     
+ 
+-    def world_2_pixel(self, world_coordinate, width=224, height=224, camera="end_effector_cam"):
++    def world_2_pixel(self, world_coordinate, camera_matrix):
+         """
+         Takes a XYZ world position and transforms it into pixel coordinates.
+         Mainly implemented for testing the correctness of the camera matrix, focal length etc.
+@@ -642,26 +661,13 @@ class ReachBaseV0(env_base_1.MujocoEnv):
+             height: Height of the image (pixel).
+             camera: Name of camera used to obtain the image.
+         """
+-
+-        if not self.cam_init:
+-            self.create_camera_data(width, height, camera)
+-        self.cam_pos = self.sim.data.cam_xpos[self.sim.model.camera_name2id(camera)]
+         
+-        self.cam_rot_mat = self.sim.data.cam_xmat[self.sim.model.camera_name2id(camera)].reshape(3, 3)
+-
+-        
+-        cam_coord = self.cam_rot_mat.T @ (world_coordinate - self.cam_pos)
+-    
+-
+-        # Project to image plane
+-        hom_pixel = self.cam_matrix @ cam_coord
+-        # Real image point
+-        if hom_pixel[2] != 0:
+-            pixel = hom_pixel[:2] / hom_pixel[2]
+-        else:
+-            pixel = hom_pixel[:2]  # Avoid division by zero
+-        radius = self.calculate_radius(self.depth)
+-        return np.round(pixel[0]).astype(int), np.round(pixel[1]).astype(int), radius
++        w = np.ones((4,), dtype=float)
++        w[0:3] = world_coordinate
++        xs, ys, s = camera_matrix @ w 
++        x = xs / s
++        y = ys / s 
++        return np.round(x).astype(int), np.round(y).astype(int)
+     
+     def calculate_radius(self, d_depth):
+         """
+diff --git a/mj_envs/robohive/envs/arms/reach_1h_v0.py b/mj_envs/robohive/envs/arms/reach_1h_v0.py
+index d7d2cd7..008b17d 100644
+--- a/mj_envs/robohive/envs/arms/reach_1h_v0.py
++++ b/mj_envs/robohive/envs/arms/reach_1h_v0.py
+@@ -117,8 +117,8 @@ class ReachBaseV0(env_base_2.MujocoEnv):
+         self.one_hot = np.zeros(8)
+         self.cx, self.cy = 0, 0
+         self.eval = True
+-        np.random.seed(47006)
+-        random.seed(47006)
++        np.random.seed(47004)
++        random.seed(47004)
+         
+         if 'eval_mode' in kwargs:
+             self.eval_mode = kwargs['eval_mode']
+@@ -267,7 +267,7 @@ class ReachBaseV0(env_base_2.MujocoEnv):
+ 
+         print(self.one_hot)
+         obj_xyz_ranges = {
+-            'object': {'low': [-0.1, -0.1, 0], 'high': [0.1, 0.1, 0]},
++            'object': {'low': [-0.05, -0.05, 0], 'high': [0.05, 0.05, 0]},
+         }
+ 
+         new_x, new_y = np.random.uniform(
+@@ -317,6 +317,9 @@ class ReachBaseV0(env_base_2.MujocoEnv):
+             if obj_name == 'object_4':
+                 pos[-1] += 0.08  # Adjust z by 0.05 for object_4
+ 
++            if obj_name == 'object_8':
++                pos[-1] += 0.08  # Adjust z by 0.05 for object_4
++
+             reset_qpos[object_qpos_adr:object_qpos_adr + 3] = pos
+ 
+             if obj_name == 'object_4':  # Special handling for object_4
+diff --git a/mj_envs/robohive/envs/arms/reach_3d_v0.py b/mj_envs/robohive/envs/arms/reach_3d_v0.py
+index da28a3d..fe7d6f2 100644
+--- a/mj_envs/robohive/envs/arms/reach_3d_v0.py
++++ b/mj_envs/robohive/envs/arms/reach_3d_v0.py
+@@ -115,9 +115,9 @@ class ReachBaseV0(env_base.MujocoEnv):
+         self.touch_success = 0
+         self.single_touch = 0
+         self.cx, self.cy = 0, 0
+-        self.eval = False
+-        np.random.seed(47006)
+-        random.seed(47006)
++        self.eval = True
++        np.random.seed(47004)
++        random.seed(47004)
+         
+         if 'eval_mode' in kwargs:
+             self.eval_mode = kwargs['eval_mode']
+diff --git a/mj_envs/robohive/envs/arms/reach_4d_v1.py b/mj_envs/robohive/envs/arms/reach_4d_v1.py
+index 6555ff3..06b1949 100644
+--- a/mj_envs/robohive/envs/arms/reach_4d_v1.py
++++ b/mj_envs/robohive/envs/arms/reach_4d_v1.py
+@@ -10,11 +10,16 @@ License :: Under Apache License, Version 2.0 (the "License"); you may not use th
+ We are using this as a testing ground for reaching with visual inputs. 
+ """
+ 
++import warnings
++
++# Suppress all deprecation warnings
++warnings.simplefilter("ignore", DeprecationWarning)
+ 
+ import collections
+ #import mujoco as mp
+ import os
+ from torchvision.ops import box_convert
++from scipy.spatial.transform import Rotation as R
+ import torch
+ import random
+ # Set environment variables
+@@ -22,6 +27,7 @@ import gym
+ import numpy as np
+ import cv2 as cv
+ import os
++import math
+ import matplotlib.pyplot as plt
+ import copy
+ from robohive.physics.sim_scene import SimScene
+@@ -36,7 +42,7 @@ from robohive.envs.arms.python_api_2 import BodyIdInfo, arm_control, get_touchin
+ class ReachBaseV0(env_base_1.MujocoEnv):
+ 
+     DEFAULT_OBS_KEYS = [
+-        'time', 'qp_robot', 'qv_robot'
++        'qp_robot', 'qv_robot'
+     ]
+     DEFAULT_PROPRIO_KEYS = [
+         'qp_robot', 'qv_robot'
+@@ -79,10 +85,10 @@ class ReachBaseV0(env_base_1.MujocoEnv):
+                target_site_name,
+                goal_site_name,
+                target_xyz_range,
+-               image_width=224,
+-               image_height=224,
++               image_width = 212,
++               image_height= 120,
+                obj_xyz_range = None,
+-               frame_skip = 12,#40,
++               frame_skip = 20,#40,
+                reward_mode = "dense",
+                obs_keys=DEFAULT_OBS_KEYS,
+                proprio_keys=DEFAULT_PROPRIO_KEYS,
+@@ -107,21 +113,28 @@ class ReachBaseV0(env_base_1.MujocoEnv):
+         self.fixed_positions = None
+         self.cam_init = True
+         self._setup_camera()
+-        self.color = np.random.choice(['green'])
++
+         self.current_image = np.ones((image_width, image_height, 4), dtype=np.uint8)
+         self.object_image = np.ones((image_width, image_height, 3), dtype=np.uint8)
+-        self.rgb_out = np.ones((image_height, image_width))
+-        self.mask_out = np.ones((image_height, image_width))
++        self.rgb_out = np.ones((image_width, image_height))
++        self.mask_out = np.ones((image_width, image_height))
++        
++        self.obj_scale_change = [0.05, 0.05, 0.05]
++        self.obj_mass_change = (-0.050, 0.050)
++        self.obj_friction_change = (0.1, 0.001, 0.00002)
++       
+         self.pixel_perc = 0
+         self.total_pix = 0
+         self.touch_success = 0
+         self.single_touch = 0
+-        self.cx, self.cy = 0, 0
+-        self.r = 0
++        self.target_x, self.target_y = 0, 0
++        self.target_r = 0
++        self.r = 2
++        self.camera_matrix = None
+         self.depth = 0
+         self.eval = False
+-        np.random.seed(47006)
+-        random.seed(47006)
++        #np.random.seed(47005)
++        #random.seed(47005)
+         
+ 
+         if 'eval_mode' in kwargs:
+@@ -137,7 +150,7 @@ class ReachBaseV0(env_base_1.MujocoEnv):
+                        reward_mode=reward_mode,
+                        frame_skip=frame_skip,
+                        **kwargs)
+-        self.init_qpos[:] = self.sim.model.key_qpos[1].copy()
++        self.init_qpos[:] = self.sim.model.key_qpos[3].copy()
+ 
+ 
+     def get_obs_dict(self, sim):
+@@ -145,6 +158,7 @@ class ReachBaseV0(env_base_1.MujocoEnv):
+         obs_dict['time'] = np.array([self.sim.data.time])
+         obs_dict['qp_robot'] = sim.data.qpos[:7].copy()
+         obs_dict['qv_robot'] = sim.data.qvel[:7].copy()
++        #print('gripper velocity & position', obs_dict['qp_robot'][-1], obs_dict['qv_robot'][-1])
+         obs_dict['xmat_pinch'] = mat2euler(np.reshape(self.sim.data.site_xmat[self.grasp_sid], (3, 3)))
+         #obs_dict['obj_ori'] = mat2euler(np.reshape(self.sim.data.site_xmat[self.target_sid], (3, 3)))
+         #obs_dict['obj_ori_err'] =  obs_dict['obj_ori'] - np.array([np.pi/2, 0, 0])
+@@ -238,7 +252,6 @@ class ReachBaseV0(env_base_1.MujocoEnv):
+         self.grasp_attempt = 0
+         self.touch_success = 0
+         self.single_touch = 0
+-        self.cx, self.cy = 0, 0
+ 
+         #randomly choose between the five objects; color it green, and the rest as white. 
+         if self.eval:
+@@ -247,7 +260,7 @@ class ReachBaseV0(env_base_1.MujocoEnv):
+             number = np.random.randint(0, 3)
+         else:
+             target_sites = ['object_1', 'object_2', 'object_3', 'object_4', 'object_5']
+-            target_names = ['apple', 'block', 'donut','beaker', 'rubber duck']
++            target_names = ['apple', 'block', 'donut', 'beaker', 'rubber duck']
+             number = np.random.randint(0, 5)
+         self.target_site_name = target_sites[number]
+         print(self.target_site_name)
+@@ -266,7 +279,7 @@ class ReachBaseV0(env_base_1.MujocoEnv):
+                 size=2
+         )
+ 
+-        reset_qpos = self.sim.model.key_qpos[1].copy()
++        reset_qpos = self.sim.model.key_qpos[3].copy()
+         position_vec = []
+ 
+         for obj_name in target_sites:
+@@ -317,11 +330,34 @@ class ReachBaseV0(env_base_1.MujocoEnv):
+                 object_qpos_adr = self.sim.model.jnt_qposadr[object_jnt_adr]
+                 pos[-1] -= 0.01
+                 reset_qpos[object_qpos_adr:object_qpos_adr + 3] = pos
++        
++        for i in range(len(target_sites)):
++            objec_bid = self.sim.model.body_name2id(target_sites[i])
++            #self.object_augment(objec_bid, target_names[i])
++        
++            object_gid = self.sim.model.geom_name2id(target_sites[i])  # Get the geometry ID
++
++            # Access the current RGBA values for the geometry
++            current_rgba = self.sim.model.geom_rgba[object_gid]
++
++            # Create a small random change for RGB, leaving alpha unchanged
++            random_change = np.random.uniform(-0.1, 0.1, size=3)  # Small random change for RGB
++            new_rgb = np.clip(current_rgba[:3] + random_change, 0, 1)  # Adjust RGB and ensure values are within [0, 1]
++
++            # Update the RGBA values in the simulation
++            self.sim.model.geom_rgba[object_gid, :3] = new_rgb
+ 
+         obs = super().reset(reset_qpos = reset_qpos, reset_qvel = None, **kwargs)
+         #self._last_robot_qpos = self.sim.model.key_qpos[0].copy()
+-        self.final_image = np.ones((self.IMAGE_WIDTH, self.IMAGE_HEIGHT, 4), dtype=np.uint8)
+-        self.color = np.random.choice(['green'])
++        
++        site_pos = self.sim.data.site_xpos[self.target_sid]
++        camera_matrix = self.compute_camera_matrix()
++        self.target_x, self.target_y  = self.world_2_pixel(site_pos, camera_matrix) 
++        site_pos[0] += 0.04
++        rx, ry  = self.world_2_pixel(site_pos, camera_matrix) 
++        self.r = math.sqrt((rx - self.target_x) ** 2 + (ry - self.target_y) ** 2)
++        
++        self.final_image = np.ones((self.IMAGE_HEIGHT, self.IMAGE_WIDTH, 4), dtype=np.uint8)
+         return {'image': self.final_image, 'vector': obs}
+     
+ 
+@@ -338,9 +374,11 @@ class ReachBaseV0(env_base_1.MujocoEnv):
+         )
+         #depth = self.depth_2_meters(depth) #we don't need this, already in meters
+         site_pos = self.sim.data.site_xpos[self.target_sid]
+-        pixel_x, pixel_y, radius = self.world_2_pixel(site_pos)
+-        self.cx, self.cy = pixel_x, pixel_y
+-        self.r = radius
++        camera_matrix = self.compute_camera_matrix()
++        self.target_x, self.target_y = self.world_2_pixel(site_pos, camera_matrix) 
++        site_pos[0] += 0.04
++        rx, ry  = self.world_2_pixel(site_pos, camera_matrix) 
++        self.r = math.sqrt((rx - self.target_x) ** 2 + (ry - self.target_y) ** 2)
+         #pixel_x, pixel_y = self.world_2_pixel(site_pos)
+ 
+         observation = {}
+@@ -412,6 +450,10 @@ class ReachBaseV0(env_base_1.MujocoEnv):
+                                         render_cbk=self.mj_render if self.mujoco_render_frames else None)
+         else:
+             a = np.clip(a, self.action_space.low, self.action_space.high)
++            if self.time < 1.5:
++                a[-1] = 1
++            else:
++                a[-1] = -1
+             self.fixed_positions = None
+             self.last_ctrl = self.robot.step(ctrl_desired=a,
+                                         last_qpos = self.sim.data.qpos[:7].copy(),
+@@ -437,13 +479,13 @@ class ReachBaseV0(env_base_1.MujocoEnv):
+         mode='rgb_array'
+         if mode == 'rgb_array':
+             rgb, depth = copy.deepcopy(
+-            self.sim.renderer.render_offscreen(width=224, height=224, camera_id='end_effector_cam', depth = True)
++            self.sim.renderer.render_offscreen(width=self.IMAGE_WIDTH, height=self.IMAGE_HEIGHT, camera_id='end_effector_cam', depth = True)
+             )
+             return rgb
+         else:
+             super().render(mode)
+     
+-    def get_image_data(self, show=False, camera="end_effector_cam", width=224, height=224):
++    def get_image_data(self, show=False, camera="end_effector_cam", width= 212, height= 120):
+         """
+         Returns the RGB and depth images of the provided camera.
+ 
+@@ -456,22 +498,27 @@ class ReachBaseV0(env_base_1.MujocoEnv):
+ 
+         # Initialize the simulator
+         rgb, depth = copy.deepcopy(
+-            self.sim.renderer.render_offscreen(width=width, height=height, camera_id=camera, depth = True)
++            self.sim.renderer.render_offscreen(height=height,width=width,  camera_id=camera, depth = True)
+         )
+ 
+         self.rgb_out = rgb
+ 
+         rgb = cv.cvtColor(rgb, cv.COLOR_BGR2RGB)
+-        blurred = cv.GaussianBlur(rgb, (11, 11), 0)
+-        hsv = cv.cvtColor(blurred, cv.COLOR_BGR2HSV)
+-        mask = np.zeros(( self.IMAGE_HEIGHT,  self.IMAGE_HEIGHT), dtype=np.uint8)
+-        x, y = self.cx, self.cy
++
++        mask = np.zeros(( self.IMAGE_HEIGHT,  self.IMAGE_WIDTH), dtype=np.uint8)
++        x, y = int(self.target_x), int(self.target_y)
++        
++        half_side = int(max(self.r, 2))
++        
++        cv.rectangle(mask, (x - half_side, y - half_side), (x + half_side, y + half_side), 255, thickness=-1)
++
++        '''
+         if isinstance(self.r, np.ndarray):
+             half_side = int(self.r.item())
+         else:
+             half_side = int(self.r)
+         cv.rectangle(mask, (224 - x - half_side, y - half_side), (224- x + half_side, y + half_side), 255, thickness=-1)
+-
++        '''
+         self.mask_out = mask
+ 
+         #print(self.TEXT_PROMPT, boxes, logits, phrases)
+@@ -487,11 +534,10 @@ class ReachBaseV0(env_base_1.MujocoEnv):
+ 
+         self.current_image = np.concatenate((rgb/255, np.expand_dims(mask/255, axis=-1)), axis=2)
+ 
+-        #print(self.current_image.shape)
+         
+         #define the grasping rectangle
+-        x1, y1 = int(63/200 * self.IMAGE_HEIGHT), self.IMAGE_HEIGHT - int(68/200 * self.IMAGE_HEIGHT)
+-        x2, y2 = int(136/200 * self.IMAGE_HEIGHT), self.IMAGE_HEIGHT 
++        x1, x2 = int(self.IMAGE_WIDTH * 0.25), int(self.IMAGE_WIDTH * 0.75)
++        y1, y2 = int(self.IMAGE_HEIGHT * 0.40), int(self.IMAGE_HEIGHT * 0.80)
+ 
+         cv.rectangle(rgb, (x1, y1), (x2, y2), (0, 0, 255), thickness=2)
+         cv.rectangle(mask, (x1, y1), (x2, y2), 255, thickness=1)
+@@ -530,7 +576,7 @@ class ReachBaseV0(env_base_1.MujocoEnv):
+         far = self.model.vis.map.zfar * extend
+         return near / (1 - depth * (1 - near / far))
+ 
+-    def pixel_2_world(self, pixel_x, pixel_y, depth, width=224, height=224, camera="end_effector_cam"):
++    def pixel_2_world(self, pixel_x, pixel_y, depth, width=212, height=120, camera="end_effector_cam"):
+         """
+         Converts pixel coordinates into world coordinates.
+ 
+@@ -558,23 +604,44 @@ class ReachBaseV0(env_base_1.MujocoEnv):
+ 
+         return pos_w
+ 
+-    def _setup_camera(self, height=224, width=224):
++    def _setup_camera(self, height=120, width = 212):
+         """Sets up the camera to render the scene from the required view."""
+         # This assumes you have a fixed camera in your model XML
+         self.camera_id = self.sim.model.camera_name2id('end_effector_cam')
+-        self.get_camera_matrices(self.camera_id, height, width)
++        #self.get_camera_matrices(self.camera_id, height, width)
+     
+-    def get_camera_matrices(self, camera_id, height, width):
+-        """Retrieve projection, position, and rotation matrices for the specified camera."""
+-        fovy = self.sim.model.cam_fovy[camera_id]  # Fetch camera settings
+-        # Calculate focal length
+-        f = 0.5 * height / np.tan(fovy * np.pi / 360)
+-        #construct camera matrix
+-        self.cam_matrix = np.array(((f, 0, width / 2), (0, f, height / 2), (0, 0, 1)))
+-        self.cam_init = True
++    def compute_camera_matrix(self, camera="end_effector_cam"):
++        """Returns the 3x4 camera matrix."""
++        # If the camera is a 'free' camera, we get its position and orientation
++        # from the scene data structure. It is a stereo camera, so we average over
++        # the left and right channels. Note: we call `self.update()` in order to
++        # ensure that the contents of `scene.camera` are correct.
++
++        pos = self.sim.data.cam_xpos[self.sim.model.camera_name2id(camera)]
++        rot_mat = self.sim.data.cam_xmat[self.sim.model.camera_name2id(camera)].reshape(3, 3)
++        camera_id = self.sim.model.camera_name2id(camera)
++        fov = self.sim.model.cam_fovy[camera_id]
++
++        # Translation matrix (4x4).
++        translation = np.eye(4)
++        translation[0:3, 3] = -pos
++
++        # Rotation matrix (4x4).
++        rotation = np.eye(4)
++        rotation[0:3, 0:3] = rot_mat.T
++
++        # Focal transformation matrix (3x4).
++        focal_scaling = (1./np.tan(np.deg2rad(fov)/2)) * self.IMAGE_HEIGHT / 2.0
++        focal = np.diag([-focal_scaling, focal_scaling, 1.0, 0])[0:3, :]
++
++        # Image matrix (3x3).
++        image = np.eye(3)
++        image[0, 2] = (self.IMAGE_WIDTH - 1) / 2.0
++        image[1, 2] = (self.IMAGE_HEIGHT - 1) / 2.0
++        return image @ focal @ rotation @ translation
+     
+ 
+-    def world_2_pixel(self, world_coordinate, width=224, height=224, camera="end_effector_cam"):
++    def world_2_pixel(self, world_coordinate, camera_matrix):
+         """
+         Takes a XYZ world position and transforms it into pixel coordinates.
+         Mainly implemented for testing the correctness of the camera matrix, focal length etc.
+@@ -585,26 +652,13 @@ class ReachBaseV0(env_base_1.MujocoEnv):
+             height: Height of the image (pixel).
+             camera: Name of camera used to obtain the image.
+         """
+-
+-        if not self.cam_init:
+-            self.create_camera_data(width, height, camera)
+-        self.cam_pos = self.sim.data.cam_xpos[self.sim.model.camera_name2id(camera)]
+         
+-        self.cam_rot_mat = self.sim.data.cam_xmat[self.sim.model.camera_name2id(camera)].reshape(3, 3)
+-
+-        
+-        cam_coord = self.cam_rot_mat.T @ (world_coordinate - self.cam_pos)
+-    
+-
+-        # Project to image plane
+-        hom_pixel = self.cam_matrix @ cam_coord
+-        # Real image point
+-        if hom_pixel[2] != 0:
+-            pixel = hom_pixel[:2] / hom_pixel[2]
+-        else:
+-            pixel = hom_pixel[:2]  # Avoid division by zero
+-        radius = self.calculate_radius(self.depth)
+-        return np.round(pixel[0]).astype(int), np.round(pixel[1]).astype(int), radius
++        w = np.ones((4,), dtype=float)
++        w[0:3] = world_coordinate
++        xs, ys, s = camera_matrix @ w 
++        x = xs / s
++        y = ys / s 
++        return np.round(x).astype(int), np.round(y).astype(int)
+     
+     def calculate_radius(self, d_depth):
+         """
+@@ -616,4 +670,66 @@ class ReachBaseV0(env_base_1.MujocoEnv):
+             radius = base_radius*0.2/d_depth
+             return radius  # Example function: Decrease radius with depth
+         else:
+-            return 5
+\ No newline at end of file
++            return 5
++    
++    def object_augment(self, object_id, object_name):
++        self.obj_scale_range = ({'low': -np.array(self.obj_scale_change), 'high': self.obj_scale_change} 
++                                if self.obj_scale_change else None)
++        
++        self.obj_mass_range = ({'low': self.sim.model.body_mass[object_id] + self.obj_mass_change[0], 
++                                'high': self.sim.model.body_mass[object_id] + self.obj_mass_change[1]}
++                                if self.obj_mass_change else None
++                                )
++        self.obj_friction_range = ({'low': self.sim.model.geom_friction[object_id] - self.obj_friction_change,
++                                    'high': self.sim.model.geom_friction[object_id] + self.obj_friction_change}
++                                    if self.obj_friction_change else None)
++
++
++        object_gid = self.sim.model.body(object_id).geomadr + 1
++        self.obj_size0 = self.sim.model.geom_size[object_gid].copy()
++        
++        if self.obj_scale_change:
++            if object_name != 'block':
++              if object_name == 'beaker':
++                object_name = 'rbf'
++                self.__center_box_mesh(object_id, object_name)
++
++        if self.obj_scale_range:
++            self.sim.model.body_mass[object_id] = self.np_random.uniform( **self.obj_mass_range)
++
++        if self.obj_friction_range:
++            self.sim.model.geom_friction[object_id] = self.np_random.uniform( **self.obj_friction_range)
++        
++        if self.obj_scale_range:
++            obj_scales = self.np_random.uniform( **self.obj_scale_range) + 1
++            self.sim.model.geom(object_id).size = self.obj_size0 * obj_scales
++
++            if self.sim.renderer._window:
++                self.sim.model.mesh_vert[self.obj_vert_addr] = obj_scales[None, :] * self.mesh_vert0
++                self.sim_renderer._windows.update_mesh(self.obj_mid)
++       
++        self.sim.forward()
++
++    def __center_box_mesh(self, object_id, object_name):
++        """
++        Adjusts the mesh geom's transform and vertices so scaling is straightforward afterwards. Only makes sense
++        to call this method within setup after relevant ids have been identified.
++        """
++
++        self.obj_gid = self.sim.model.body(object_id).geomadr + 1
++        self.obj_mid = next(i for i in range(self.sim.model.nmesh)
++                            if object_name in self.sim.model.mesh(i).name)
++        self.obj_size0 = self.sim.model.geom_size[self.obj_gid].copy()
++        self.obj_vert_addr = np.arange(self.sim.model.mesh(self.obj_mid).vertadr,
++                                       self.sim.model.mesh(self.obj_mid).vertadr + self.sim.model.mesh(0).vertnum)
++        q = self.sim.model.geom(self.obj_gid - 1).quat
++        r = R.from_quat([q[1], q[2], q[3], q[0]])
++        self.sim.model.mesh_vert[self.obj_vert_addr] = r.apply(self.sim.model.mesh_vert[self.obj_vert_addr])
++        self.sim.model.mesh_normal[self.obj_vert_addr] = r.apply(self.sim.model.mesh_normal[self.obj_vert_addr])
++        self.sim.model.geom(self.obj_gid - 1).quat = [1, 0, 0, 0]
++        self.sim.model.mesh_vert[self.obj_vert_addr] += (self.sim.model.geom(self.obj_gid - 1).pos
++                                                         - self.sim.model.geom(self.obj_gid).pos)[None, :]
++
++        self.sim.model.geom(self.obj_gid - 1).pos = self.sim.model.geom(self.obj_gid).pos
++        self.mesh_vert0 = self.sim.model.mesh_vert[self.obj_vert_addr].copy()
++        #self.ignore_first_scale = True
+\ No newline at end of file
+diff --git a/mj_envs/robohive/envs/arms/ur10e/scene_five_obj.xml b/mj_envs/robohive/envs/arms/ur10e/scene_five_obj.xml
+index 05b1660..178709a 100644
+--- a/mj_envs/robohive/envs/arms/ur10e/scene_five_obj.xml
++++ b/mj_envs/robohive/envs/arms/ur10e/scene_five_obj.xml
+@@ -76,7 +76,7 @@
+       <freejoint/>
+       <site name="object_3" size="0.001" pos="0 0.0 0."/>
+       <inertial pos="0. 0 0" mass="0.088" diaginertia="0.0001 0.0001 0.0001" />
+-      <geom name="torusmedium_visual" rgba="0.9 0.54 0.26 1" mesh="torusmedium" class="visual_b"/>
++      <geom name="object_3" rgba="0.9 0.54 0.26 1" mesh="torusmedium" class="visual_b"/>
+       <geom name="torusmedium_contact0" mesh="t_contact0" class="collision_b"/>
+       <geom name="torusmedium_contact1" mesh="t_contact1" class="collision_b"/>
+       <geom name="torusmedium_contact2" mesh="t_contact2" class="collision_b"/>
+@@ -87,7 +87,7 @@
+     <body name="object_4" pos="0.3 0.42 1.0" euler="1.57 0 0">
+       <freejoint/>
+       <site name="object_4" size="0.001" pos="0 0.0 0.0"/>
+-      <geom name = "object_4" rgba="0 0.9 0.3 .7" mesh="rbf_0" class="visual_b"/>
++      <geom name = "object_4" rgba="1 1 1 1" mesh="rbf_0" class="visual_b"/>
+       <geom rgba="1 1 1 .4" mesh="rbf_1" class="visual_b"/>
+       <geom mesh="rbf_collision_0" class="collision_b"/>
+       <geom mesh="rbf_collision_1" class="collision_b"/>
+@@ -130,7 +130,7 @@
+       <freejoint/>
+       <site name="object_5" size="0.001" pos="0 0.0 0.0"/>
+       <inertial pos="0 0 0" mass="0.088" diaginertia="0.0001 0.0001 0.0001" />
+-      <geom name="rubberduck_visual" rgba="0.8 0.8 0 1"  class="visual_b" mesh="rubberduck"/>
++      <geom name="object_5" rgba="0.8 0.8 0 1"  class="visual_b" mesh="rubberduck"/>
+       <geom name="rubberduck_contact0" mesh="d_contact0" class="collision_b"/>
+       <geom name="rubberduck_contact1" mesh="d_contact1" class="collision_b"/>
+       <geom name="rubberduck_contact2" mesh="d_contact2" class="collision_b"/>
+@@ -144,6 +144,6 @@
+       <key qpos='1.69641 -1.75924 -0.7855 -1.13622 1.57075 -0.00449232 0.00435232 0.000149045 0.00285231 -0.00308148 0.00260377 0.000143225 0.00284262 -0.00307378 0.199743 0.620779 0.854309 0.999901 -0.0132687 -0.00474585 7.63322e-05 -0.33 0.619987 0.844784 0.707107 0.707107 -3.49206e-19 3.49857e-19 -0.0800058 0.619996 0.838445 1 0.000109371 -0.000173641 3.76565e-07 0.102435 0.379085 0.932896 0.704953 0.709239 0.00340008 -0.00305067 0.100133 0.379521 0.924862 0.707101 0.707113 -9.06699e-05 -8.54061e-05 -0.200002 0.38 0.873686 0.92106 -6.68178e-06 -1.86463e-05 0.38942'/>
+       <key qpos='1.69641 -0.81679 -2.60786 -0.43981 1.57924 0.00360276 0.00254555 0.000149076 0.00285237 -0.00308157 0.00260376 0.000143194 0.00284257 -0.00307368 0.150597 0.42244 0.854077 0.999096 -0.041598 0.00880455 0.000394671 -0.15 0.419987 0.844784 0.707107 0.707107 6.08712e-19 -6.10417e-19 -1.07039e-05 0.419997 0.838446 1 8.83859e-05 -0.000283882 2.51816e-07 0.303179 0.420191 0.932889 0.705661 0.708526 0.00471417 -0.00340816 0.300749 0.42052 0.924862 0.707102 0.707111 -4.8005e-05 -5.36094e-05 -0.300001 0.420001 0.873686 0.921059 -1.44679e-05 -1.01486e-05 0.389423'/>
+       <key name = 'home' qpos='1.69641 -0.81679 -2.60786 -0.43981 1.57924 0.00360276 0.00254555 0.000149028 0.00285228 -0.00308143 0.00260377 0.000143243 0.00284266 -0.00307383 0.129576 0.420459 0.854341 0.999943 -0.00782853 -0.00731608 1.53647e-05 -0.13 0.419987 0.844784 0.707107 0.707107 -2.94273e-19 2.9393e-19 -1.22759e-05 0.650018 0.838445 1 0.000102597 -0.000173719 -1.10769e-06 0.301709 0.248624 0.932949 0.704714 0.709488 0.00174455 -0.00149364 0.299715 0.24903 0.924861 0.707102 0.707112 -1.36951e-05 -1.61762e-05 -0.300061 0.249977 0.873696 0.921061 -1.58566e-05 -0.00065147 0.389419'/>
+-
++      <key qpos='4.78074 -2.07339 2.61212 3.05433 -1.58792 0 0.00254555 0.000149076 0.00285237 -0.00308157 0.00260376 0.000143194 0.00284257 -0.00307368 0.150597 0.42244 0.854077 0.999096 -0.041598 0.00880455 0.000394671 -0.15 0.419987 0.844784 0.707107 0.707107 6.08712e-19 -6.10417e-19 -1.07039e-05 0.419997 0.838446 1 8.83859e-05 -0.000283882 2.51816e-07 0.303179 0.420191 0.932889 0.705661 0.708526 0.00471417 -0.00340816 0.300749 0.42052 0.924862 0.707102 0.707111 -4.8005e-05 -5.36094e-05 -0.300001 0.420001 0.873686 0.921059 -1.44679e-05 -1.01486e-05 0.389423'/>
+   </keyframe>
+ </mujoco>
+diff --git a/mj_envs/robohive/envs/arms/ur10e/ur10e_v0.config b/mj_envs/robohive/envs/arms/ur10e/ur10e_v0.config
+index 9833bc7..9ff536c 100644
+--- a/mj_envs/robohive/envs/arms/ur10e/ur10e_v0.config
++++ b/mj_envs/robohive/envs/arms/ur10e/ur10e_v0.config
+@@ -5,7 +5,7 @@
+ 	<qpos2 name='q2' pos_bound='-6.28 6.28' vel_bound='-3.14 3.14' pos_noise_amp='0.1' vel_noise_amp='0.1' />
+ 	<qpos3 name='q3' pos_bound='-6.28 6.28' vel_bound='-3.14 3.14' pos_noise_amp='0.1' vel_noise_amp='0.1' />
+ 	<qpos4 name='q4' pos_bound='-6.28 6.28' vel_bound='-3.14 3.14' pos_noise_amp='0.1' vel_noise_amp='0.1' />
+-	<qpos5 name='q5' pos_bound='-6.28 6.28' vel_bound='-3.14 3.14' pos_noise_amp='0.1' vel_noise_amp='0.1' />
+-	<qpos6 name='q6' pos_bound='0 1' vel_bound='-3.14 3.14' pos_noise_amp='0.1' vel_noise_amp='0.1' />
++	<qpos5 name='q5' pos_bound='-0.9 0.9' vel_bound='-3.14 3.14' pos_noise_amp='0.1' vel_noise_amp='0.1' />
++	<qpos6 name='q6' pos_bound='0 255' vel_bound='0 255' pos_noise_amp='0.1' vel_noise_amp='0.1' />
+ 
+ </config>
+\ No newline at end of file
+diff --git a/mj_envs/robohive/envs/arms/ur10e/ur10e_vel_assets.xml b/mj_envs/robohive/envs/arms/ur10e/ur10e_vel_assets.xml
+index 5f850a9..aeb0a61 100644
+--- a/mj_envs/robohive/envs/arms/ur10e/ur10e_vel_assets.xml
++++ b/mj_envs/robohive/envs/arms/ur10e/ur10e_vel_assets.xml
+@@ -305,19 +305,6 @@
+             solref="0.005 1"/>
+     </equality>
+ 
+-
+-    <!--actuator>
+-        <velocity class="size4" name="shoulder_pan" joint="shoulder_pan_joint" kv="100"/>
+-        <velocity class="size4" name="shoulder_lift" joint="shoulder_lift_joint" kv="100"/>
+-        <velocity class="size3_limited" name="elbow" joint="elbow_joint" kv="100"/>
+-
+-        <velocity class="size2" name="wrist_1" joint="wrist_1_joint" kv="100"/>
+-        <velocity class="size2" name="wrist_2" joint="wrist_2_joint" kv="100"/>
+-        <velocity class="size2" name="wrist_3" joint="wrist_3_joint" kv="100"/>
+-        <general class="2f85" name="fingers_actuator" tendon="split" forcerange="-5 5" ctrlrange="0 1"
+-        gainprm="80 0 0" biasprm="0 -100 -10"/>
+-
+-    </actuator>-->
+     
+     <actuator>
+         <general class="size4" name="shoulder_pan" joint="shoulder_pan_joint"/>
+diff --git a/mj_envs/robohive/envs/env_base_1.py b/mj_envs/robohive/envs/env_base_1.py
+index a6f573f..b27ed3b 100644
+--- a/mj_envs/robohive/envs/env_base_1.py
++++ b/mj_envs/robohive/envs/env_base_1.py
+@@ -137,8 +137,8 @@ class MujocoEnv(gym.Env, gym.utils.EzPickle, ObsVecDict):
+         # observation = self.reset()
+         assert not done, "Check initialization. Simulation starts in a done state."
+         self.observation_space = gym.spaces.Dict({
+-            'image': gym.spaces.Box(low=0, high=255, shape=(224, 224, 4), dtype=np.float32),  # Use np.float32 here
+-            'vector': gym.spaces.Box(obs_range[0]*np.ones(15), obs_range[1]*np.ones(15), dtype=np.float32)  # Ensure consistency in dtype usage
++            'image': gym.spaces.Box(low=0, high=255, shape=(120, 212, 4), dtype=np.float32),  # Use np.float32 here
++            'vector': gym.spaces.Box(obs_range[0]*np.ones(14), obs_range[1]*np.ones(14), dtype=np.float32)  # Ensure consistency in dtype usage
+         })
+         
+         #self.observation_space = gym.spaces.Box(obs_range[0]*np.ones(observation.size), obs_range[1]*np.ones(observation.size), dtype=np.float32)
+@@ -295,7 +295,7 @@ class MujocoEnv(gym.Env, gym.utils.EzPickle, ObsVecDict):
+ 
+         # returns obs(t+1), rwd(t+1), done(t+1), info(t+1)
+         #print(image.size)
+-        obs = {'image': image.reshape((224, 224, 4)), 'vector': obs}
++        obs = {'image': image.reshape((120, 212, 4)), 'vector': obs}
+ 
+         return obs, env_info['rwd_'+self.rwd_mode], bool(env_info['done']), env_info
+ 
+diff --git a/videos/UR10ePickPlaceFixed-v0/2024_04_27_22_52_12front_video.mp4 b/videos/UR10ePickPlaceFixed-v0/2024_04_27_22_52_12front_video.mp4
+deleted file mode 100644
+index adac5ae..0000000
+Binary files a/videos/UR10ePickPlaceFixed-v0/2024_04_27_22_52_12front_video.mp4 and /dev/null differ
+diff --git a/videos/UR10ePickPlaceFixed-v0/2024_04_27_23_53_17front_video.mp4 b/videos/UR10ePickPlaceFixed-v0/2024_04_27_23_53_17front_video.mp4
+deleted file mode 100644
+index a3cdbbb..0000000
+Binary files a/videos/UR10ePickPlaceFixed-v0/2024_04_27_23_53_17front_video.mp4 and /dev/null differ
+diff --git a/videos/UR10ePickPlaceFixed-v0/2024_04_28_00_38_04front_video.mp4 b/videos/UR10ePickPlaceFixed-v0/2024_04_28_00_38_04front_video.mp4
+deleted file mode 100644
+index a01f1ee..0000000
+Binary files a/videos/UR10ePickPlaceFixed-v0/2024_04_28_00_38_04front_video.mp4 and /dev/null differ
+diff --git a/videos/UR10ePickPlaceFixed-v0/2024_04_28_17_04_14front_video.mp4 b/videos/UR10ePickPlaceFixed-v0/2024_04_28_17_04_14front_video.mp4
+deleted file mode 100644
+index 00f6449..0000000
+Binary files a/videos/UR10ePickPlaceFixed-v0/2024_04_28_17_04_14front_video.mp4 and /dev/null differ
+diff --git a/videos/UR10ePickPlaceFixed-v0/2024_04_29_10_31_11front_video.mp4 b/videos/UR10ePickPlaceFixed-v0/2024_04_29_10_31_11front_video.mp4
+deleted file mode 100644
+index 21b03cd..0000000
+Binary files a/videos/UR10ePickPlaceFixed-v0/2024_04_29_10_31_11front_video.mp4 and /dev/null differ
+diff --git a/videos/UR10ePickPlaceFixed-v0/2024_04_29_11_29_42front_video.mp4 b/videos/UR10ePickPlaceFixed-v0/2024_04_29_11_29_42front_video.mp4
+deleted file mode 100644
+index 997114c..0000000
+Binary files a/videos/UR10ePickPlaceFixed-v0/2024_04_29_11_29_42front_video.mp4 and /dev/null differ
+diff --git a/videos/UR10ePickPlaceFixed-v0/2024_05_02_14_26_27front_video.mp4 b/videos/UR10ePickPlaceFixed-v0/2024_05_02_14_26_27front_video.mp4
+deleted file mode 100644
+index 88bad3b..0000000
+Binary files a/videos/UR10ePickPlaceFixed-v0/2024_05_02_14_26_27front_video.mp4 and /dev/null differ
+diff --git a/videos/UR10ePickPlaceFixed-v0/2024_05_02_18_06_34front_video.mp4 b/videos/UR10ePickPlaceFixed-v0/2024_05_02_18_06_34front_video.mp4
+deleted file mode 100644
+index cfa3742..0000000
+Binary files a/videos/UR10ePickPlaceFixed-v0/2024_05_02_18_06_34front_video.mp4 and /dev/null differ
+diff --git a/videos/UR10ePickPlaceFixed-v0/2024_05_03_13_40_57front_video.mp4 b/videos/UR10ePickPlaceFixed-v0/2024_05_03_13_40_57front_video.mp4
+deleted file mode 100644
+index b76ae84..0000000
+Binary files a/videos/UR10ePickPlaceFixed-v0/2024_05_03_13_40_57front_video.mp4 and /dev/null differ
+diff --git a/videos/UR10ePickPlaceFixed-v0/2024_05_03_14_49_55front_video.mp4 b/videos/UR10ePickPlaceFixed-v0/2024_05_03_14_49_55front_video.mp4
+deleted file mode 100644
+index 5962742..0000000
+Binary files a/videos/UR10ePickPlaceFixed-v0/2024_05_03_14_49_55front_video.mp4 and /dev/null differ
+diff --git a/videos/UR10ePickPlaceFixed-v0/2024_05_03_15_23_56front_video.mp4 b/videos/UR10ePickPlaceFixed-v0/2024_05_03_15_23_56front_video.mp4
+deleted file mode 100644
+index 9ad9d27..0000000
+Binary files a/videos/UR10ePickPlaceFixed-v0/2024_05_03_15_23_56front_video.mp4 and /dev/null differ
+diff --git a/videos/UR10eReachFixed-v0/2024_04_27_19_03_05front_video.mp4 b/videos/UR10eReachFixed-v0/2024_04_27_19_03_05front_video.mp4
+deleted file mode 100644
+index 455a9af..0000000
+Binary files a/videos/UR10eReachFixed-v0/2024_04_27_19_03_05front_video.mp4 and /dev/null differ
+diff --git a/videos/UR10eReachFixed-v0/2024_04_30_18_32_34front_video.mp4 b/videos/UR10eReachFixed-v0/2024_04_30_18_32_34front_video.mp4
+deleted file mode 100644
+index acc8f70..0000000
+Binary files a/videos/UR10eReachFixed-v0/2024_04_30_18_32_34front_video.mp4 and /dev/null differ
+diff --git a/videos/UR10eReachFixed-v0/2024_05_01_09_33_44front_video.mp4 b/videos/UR10eReachFixed-v0/2024_05_01_09_33_44front_video.mp4
+deleted file mode 100644
+index daf01ad..0000000
+Binary files a/videos/UR10eReachFixed-v0/2024_05_01_09_33_44front_video.mp4 and /dev/null differ
+diff --git a/videos/UR10eReachFixed-v0/2024_05_01_10_55_51front_video.mp4 b/videos/UR10eReachFixed-v0/2024_05_01_10_55_51front_video.mp4
+deleted file mode 100644
+index 4f3a64c..0000000
+Binary files a/videos/UR10eReachFixed-v0/2024_05_01_10_55_51front_video.mp4 and /dev/null differ
+diff --git a/videos/UR10eReachFixed-v0/2024_05_01_11_11_08front_video.mp4 b/videos/UR10eReachFixed-v0/2024_05_01_11_11_08front_video.mp4
+deleted file mode 100644
+index 6308ec8..0000000
+Binary files a/videos/UR10eReachFixed-v0/2024_05_01_11_11_08front_video.mp4 and /dev/null differ
+diff --git a/videos/UR10eReachFixed-v0/2024_05_01_12_40_38front_video.mp4 b/videos/UR10eReachFixed-v0/2024_05_01_12_40_38front_video.mp4
+deleted file mode 100644
+index 01111f0..0000000
+Binary files a/videos/UR10eReachFixed-v0/2024_05_01_12_40_38front_video.mp4 and /dev/null differ
+diff --git a/videos/UR10eReachFixed-v0/2024_05_01_12_55_52front_video.mp4 b/videos/UR10eReachFixed-v0/2024_05_01_12_55_52front_video.mp4
+deleted file mode 100644
+index 3451072..0000000
+Binary files a/videos/UR10eReachFixed-v0/2024_05_01_12_55_52front_video.mp4 and /dev/null differ
+diff --git a/videos/UR10eReachFixed-v0/2024_05_01_13_33_14front_video.mp4 b/videos/UR10eReachFixed-v0/2024_05_01_13_33_14front_video.mp4
+deleted file mode 100644
+index 238b36a..0000000
+Binary files a/videos/UR10eReachFixed-v0/2024_05_01_13_33_14front_video.mp4 and /dev/null differ
+diff --git a/videos/UR10eReachFixed-v0/2024_05_01_13_59_50front_video.mp4 b/videos/UR10eReachFixed-v0/2024_05_01_13_59_50front_video.mp4
+deleted file mode 100644
+index d82b208..0000000
+Binary files a/videos/UR10eReachFixed-v0/2024_05_01_13_59_50front_video.mp4 and /dev/null differ
+diff --git a/videos/UR10eReachFixed-v0/2024_05_01_14_10_49front_video.mp4 b/videos/UR10eReachFixed-v0/2024_05_01_14_10_49front_video.mp4
+deleted file mode 100644
+index 9719ce3..0000000
+Binary files a/videos/UR10eReachFixed-v0/2024_05_01_14_10_49front_video.mp4 and /dev/null differ
+diff --git a/videos/UR10eReachFixed-v0/2024_05_01_14_20_38front_video.mp4 b/videos/UR10eReachFixed-v0/2024_05_01_14_20_38front_video.mp4
+deleted file mode 100644
+index aa5f458..0000000
+Binary files a/videos/UR10eReachFixed-v0/2024_05_01_14_20_38front_video.mp4 and /dev/null differ
+diff --git a/videos/UR10eReachFixed-v0/2024_05_01_14_35_51front_video.mp4 b/videos/UR10eReachFixed-v0/2024_05_01_14_35_51front_video.mp4
+deleted file mode 100644
+index 5ede918..0000000
+Binary files a/videos/UR10eReachFixed-v0/2024_05_01_14_35_51front_video.mp4 and /dev/null differ
+diff --git a/videos/UR10eReachFixed-v0/2024_05_01_18_59_50front_video.mp4 b/videos/UR10eReachFixed-v0/2024_05_01_18_59_50front_video.mp4
+deleted file mode 100644
+index 90f699f..0000000
+Binary files a/videos/UR10eReachFixed-v0/2024_05_01_18_59_50front_video.mp4 and /dev/null differ
+diff --git a/videos/UR10eReachFixed-v0/2024_05_01_19_18_48front_video.mp4 b/videos/UR10eReachFixed-v0/2024_05_01_19_18_48front_video.mp4
+deleted file mode 100644
+index 71443bf..0000000
+Binary files a/videos/UR10eReachFixed-v0/2024_05_01_19_18_48front_video.mp4 and /dev/null differ
+diff --git a/videos/UR10eReachFixed-v0/2024_05_01_20_51_26front_video.mp4 b/videos/UR10eReachFixed-v0/2024_05_01_20_51_26front_video.mp4
+deleted file mode 100644
+index 2b0d729..0000000
+Binary files a/videos/UR10eReachFixed-v0/2024_05_01_20_51_26front_video.mp4 and /dev/null differ
+diff --git a/videos/UR10eReachFixed-v0/2024_05_01_21_06_27front_video.mp4 b/videos/UR10eReachFixed-v0/2024_05_01_21_06_27front_video.mp4
+deleted file mode 100644
+index 3cedf1f..0000000
+Binary files a/videos/UR10eReachFixed-v0/2024_05_01_21_06_27front_video.mp4 and /dev/null differ
+diff --git a/videos/UR10eReachFixed-v0/2024_05_01_21_29_07front_video.mp4 b/videos/UR10eReachFixed-v0/2024_05_01_21_29_07front_video.mp4
+deleted file mode 100644
+index 11ef15c..0000000
+Binary files a/videos/UR10eReachFixed-v0/2024_05_01_21_29_07front_video.mp4 and /dev/null differ
+diff --git a/videos/UR10eReachFixed-v0/2024_05_01_22_15_54front_video.mp4 b/videos/UR10eReachFixed-v0/2024_05_01_22_15_54front_video.mp4
+deleted file mode 100644
+index fc97a6e..0000000
+Binary files a/videos/UR10eReachFixed-v0/2024_05_01_22_15_54front_video.mp4 and /dev/null differ
+diff --git a/videos/UR10eReachFixed-v0/2024_05_02_11_22_30front_video.mp4 b/videos/UR10eReachFixed-v0/2024_05_02_11_22_30front_video.mp4
+deleted file mode 100644
+index b88a01d..0000000
+Binary files a/videos/UR10eReachFixed-v0/2024_05_02_11_22_30front_video.mp4 and /dev/null differ
+diff --git a/videos/UR10eReachFixed-v0/2024_05_02_11_47_33front_video.mp4 b/videos/UR10eReachFixed-v0/2024_05_02_11_47_33front_video.mp4
+deleted file mode 100644
+index 34c01dd..0000000
+Binary files a/videos/UR10eReachFixed-v0/2024_05_02_11_47_33front_video.mp4 and /dev/null differ
+diff --git a/videos/UR10eReachFixed-v0/2024_05_02_12_45_37front_video.mp4 b/videos/UR10eReachFixed-v0/2024_05_02_12_45_37front_video.mp4
+deleted file mode 100644
+index 34a6b6a..0000000
+Binary files a/videos/UR10eReachFixed-v0/2024_05_02_12_45_37front_video.mp4 and /dev/null differ
+diff --git a/videos/UR10eReachFixed-v0/2024_05_02_13_19_02front_video.mp4 b/videos/UR10eReachFixed-v0/2024_05_02_13_19_02front_video.mp4
+deleted file mode 100644
+index 1d614a0..0000000
+Binary files a/videos/UR10eReachFixed-v0/2024_05_02_13_19_02front_video.mp4 and /dev/null differ
+diff --git a/videos/UR10eReachFixed-v0/2024_05_02_13_39_06front_video.mp4 b/videos/UR10eReachFixed-v0/2024_05_02_13_39_06front_video.mp4
+deleted file mode 100644
+index cd3bbdf..0000000
+Binary files a/videos/UR10eReachFixed-v0/2024_05_02_13_39_06front_video.mp4 and /dev/null differ
+diff --git a/videos/UR10eReachFixed-v0/2024_05_02_13_39_06video.mp4 b/videos/UR10eReachFixed-v0/2024_05_02_13_39_06video.mp4
+deleted file mode 100644
+index e7b7367..0000000
+Binary files a/videos/UR10eReachFixed-v0/2024_05_02_13_39_06video.mp4 and /dev/null differ
+diff --git a/videos/UR10eReachFixed-v0/2024_05_03_14_42_58front_video.mp4 b/videos/UR10eReachFixed-v0/2024_05_03_14_42_58front_video.mp4
+deleted file mode 100644
+index 481bd9a..0000000
+Binary files a/videos/UR10eReachFixed-v0/2024_05_03_14_42_58front_video.mp4 and /dev/null differ
+diff --git a/videos/UR10eReachFixed-v0/2024_05_03_15_26_32front_video.mp4 b/videos/UR10eReachFixed-v0/2024_05_03_15_26_32front_video.mp4
+deleted file mode 100644
+index f2b28ac..0000000
+Binary files a/videos/UR10eReachFixed-v0/2024_05_03_15_26_32front_video.mp4 and /dev/null differ
+diff --git a/videos/UR10eReachFixed-v1/2024_05_11_13_21_30front_video.mp4 b/videos/UR10eReachFixed-v1/2024_05_11_13_21_30front_video.mp4
+deleted file mode 100644
+index 79c896d..0000000
+Binary files a/videos/UR10eReachFixed-v1/2024_05_11_13_21_30front_video.mp4 and /dev/null differ
+diff --git a/videos/UR10eReachFixed-v1/2024_05_11_21_43_32front_video.mp4 b/videos/UR10eReachFixed-v1/2024_05_11_21_43_32front_video.mp4
+deleted file mode 100644
+index 81dc78c..0000000
+Binary files a/videos/UR10eReachFixed-v1/2024_05_11_21_43_32front_video.mp4 and /dev/null differ
+diff --git a/videos/UR10eReachFixed-v1/2024_05_11_21_52_53front_video.mp4 b/videos/UR10eReachFixed-v1/2024_05_11_21_52_53front_video.mp4
+deleted file mode 100644
+index 3be04bf..0000000
+Binary files a/videos/UR10eReachFixed-v1/2024_05_11_21_52_53front_video.mp4 and /dev/null differ
+diff --git a/videos/UR10eReachFixed-v1/2024_05_12_18_06_35front_video.mp4 b/videos/UR10eReachFixed-v1/2024_05_12_18_06_35front_video.mp4
+deleted file mode 100644
+index e0edba4..0000000
+Binary files a/videos/UR10eReachFixed-v1/2024_05_12_18_06_35front_video.mp4 and /dev/null differ
+diff --git a/videos/UR10eReachFixed-v1/2024_05_12_18_58_25front_video.mp4 b/videos/UR10eReachFixed-v1/2024_05_12_18_58_25front_video.mp4
+deleted file mode 100644
+index 969293f..0000000
+Binary files a/videos/UR10eReachFixed-v1/2024_05_12_18_58_25front_video.mp4 and /dev/null differ
+diff --git a/videos/UR10eReachFixed-v1/2024_05_12_19_18_06front_video.mp4 b/videos/UR10eReachFixed-v1/2024_05_12_19_18_06front_video.mp4
+deleted file mode 100644
+index d276b25..0000000
+Binary files a/videos/UR10eReachFixed-v1/2024_05_12_19_18_06front_video.mp4 and /dev/null differ
+diff --git a/videos/UR10eReachFixed-v1/2024_05_12_19_28_57front_video.mp4 b/videos/UR10eReachFixed-v1/2024_05_12_19_28_57front_video.mp4
+deleted file mode 100644
+index ed175d7..0000000
+Binary files a/videos/UR10eReachFixed-v1/2024_05_12_19_28_57front_video.mp4 and /dev/null differ
+diff --git a/videos/UR10eReachFixed-v1/2024_05_13_11_47_17front_video.mp4 b/videos/UR10eReachFixed-v1/2024_05_13_11_47_17front_video.mp4
+deleted file mode 100644
+index 459cd69..0000000
+Binary files a/videos/UR10eReachFixed-v1/2024_05_13_11_47_17front_video.mp4 and /dev/null differ
+diff --git a/videos/UR10eReachFixed-v1/2024_05_13_12_00_15front_video.mp4 b/videos/UR10eReachFixed-v1/2024_05_13_12_00_15front_video.mp4
+deleted file mode 100644
+index 7d94de3..0000000
+Binary files a/videos/UR10eReachFixed-v1/2024_05_13_12_00_15front_video.mp4 and /dev/null differ
+diff --git a/videos/UR10eReachFixed-v1/2024_05_13_12_12_37front_video.mp4 b/videos/UR10eReachFixed-v1/2024_05_13_12_12_37front_video.mp4
+deleted file mode 100644
+index 0f5d59e..0000000
+Binary files a/videos/UR10eReachFixed-v1/2024_05_13_12_12_37front_video.mp4 and /dev/null differ
+diff --git a/videos/UR10eReachFixed-v1/2024_05_13_23_28_12front_video.mp4 b/videos/UR10eReachFixed-v1/2024_05_13_23_28_12front_video.mp4
+deleted file mode 100644
+index 464a56a..0000000
+Binary files a/videos/UR10eReachFixed-v1/2024_05_13_23_28_12front_video.mp4 and /dev/null differ
+diff --git a/videos/UR10eReachFixed-v1/2024_05_14_15_34_00front_video.mp4 b/videos/UR10eReachFixed-v1/2024_05_14_15_34_00front_video.mp4
+deleted file mode 100644
+index 9bdd03c..0000000
+Binary files a/videos/UR10eReachFixed-v1/2024_05_14_15_34_00front_video.mp4 and /dev/null differ
+diff --git a/videos/UR10eReachFixed-v1/2024_05_14_16_57_04front_video.mp4 b/videos/UR10eReachFixed-v1/2024_05_14_16_57_04front_video.mp4
+deleted file mode 100644
+index 03c6c69..0000000
+Binary files a/videos/UR10eReachFixed-v1/2024_05_14_16_57_04front_video.mp4 and /dev/null differ
+diff --git a/videos/UR10eReachFixed-v1/2024_05_14_20_30_20front_video.mp4 b/videos/UR10eReachFixed-v1/2024_05_14_20_30_20front_video.mp4
+deleted file mode 100644
+index 73241f6..0000000
+Binary files a/videos/UR10eReachFixed-v1/2024_05_14_20_30_20front_video.mp4 and /dev/null differ
+diff --git a/videos/UR10eReachFixed-v1/2024_05_15_11_28_31front_video.mp4 b/videos/UR10eReachFixed-v1/2024_05_15_11_28_31front_video.mp4
+deleted file mode 100644
+index f0758fd..0000000
+Binary files a/videos/UR10eReachFixed-v1/2024_05_15_11_28_31front_video.mp4 and /dev/null differ
+diff --git a/videos/UR10eReachFixed-v1/2024_05_15_14_32_50+grab_1.mp4 b/videos/UR10eReachFixed-v1/2024_05_15_14_32_50+grab_1.mp4
+deleted file mode 100644
+index 9db0590..0000000
+Binary files a/videos/UR10eReachFixed-v1/2024_05_15_14_32_50+grab_1.mp4 and /dev/null differ
+diff --git a/videos/UR10eReachFixed-v1/2024_05_15_14_32_50_grab_2.mp4 b/videos/UR10eReachFixed-v1/2024_05_15_14_32_50_grab_2.mp4
+deleted file mode 100644
+index 7005dad..0000000
+Binary files a/videos/UR10eReachFixed-v1/2024_05_15_14_32_50_grab_2.mp4 and /dev/null differ
+diff --git a/videos/UR10eReachFixed-v1/2024_05_15_14_32_50front_video.mp4 b/videos/UR10eReachFixed-v1/2024_05_15_14_32_50front_video.mp4
+deleted file mode 100644
+index d8ad0ee..0000000
+Binary files a/videos/UR10eReachFixed-v1/2024_05_15_14_32_50front_video.mp4 and /dev/null differ
+diff --git a/videos/UR10eReachFixed-v1/2024_05_15_16_45_28end_video.avi b/videos/UR10eReachFixed-v1/2024_05_15_16_45_28end_video.avi
+deleted file mode 100644
+index e69de29..0000000
+diff --git a/videos/UR10eReachFixed-v1/2024_05_15_16_45_28front_mask_video.mp4 b/videos/UR10eReachFixed-v1/2024_05_15_16_45_28front_mask_video.mp4
+deleted file mode 100644
+index 42b044d..0000000
+Binary files a/videos/UR10eReachFixed-v1/2024_05_15_16_45_28front_mask_video.mp4 and /dev/null differ
+diff --git a/videos/UR10eReachFixed-v1/2024_05_15_16_45_28front_video.mp4 b/videos/UR10eReachFixed-v1/2024_05_15_16_45_28front_video.mp4
+deleted file mode 100644
+index dbd360c..0000000
+Binary files a/videos/UR10eReachFixed-v1/2024_05_15_16_45_28front_video.mp4 and /dev/null differ
+diff --git "a/videos/UR10eReachFixed-v1/\346\227\240\346\240\207\351\242\230\350\247\206\351\242\221\342\200\224\342\200\224\344\275\277\347\224\250Clipchamp\345\210\266\344\275\234 (2).mp4" "b/videos/UR10eReachFixed-v1/\346\227\240\346\240\207\351\242\230\350\247\206\351\242\221\342\200\224\342\200\224\344\275\277\347\224\250Clipchamp\345\210\266\344\275\234 (2).mp4"
+deleted file mode 100644
+index 368c5bf..0000000
+Binary files "a/videos/UR10eReachFixed-v1/\346\227\240\346\240\207\351\242\230\350\247\206\351\242\221\342\200\224\342\200\224\344\275\277\347\224\250Clipchamp\345\210\266\344\275\234 (2).mp4" and /dev/null differ
+diff --git a/videos/UR10eReachFixed-v2/2024_06_17_13_16_41front_mask_video.mp4 b/videos/UR10eReachFixed-v2/2024_06_17_13_16_41front_mask_video.mp4
+deleted file mode 100644
+index 2c2e3f5..0000000
+Binary files a/videos/UR10eReachFixed-v2/2024_06_17_13_16_41front_mask_video.mp4 and /dev/null differ
+diff --git a/videos/UR10eReachFixed-v2/2024_06_17_13_16_41front_video.mp4 b/videos/UR10eReachFixed-v2/2024_06_17_13_16_41front_video.mp4
+deleted file mode 100644
+index 10138ff..0000000
+Binary files a/videos/UR10eReachFixed-v2/2024_06_17_13_16_41front_video.mp4 and /dev/null differ
+diff --git a/videos/UR10eReachFixed-v2/2024_06_17_18_45_32front_mask_video.mp4 b/videos/UR10eReachFixed-v2/2024_06_17_18_45_32front_mask_video.mp4
+deleted file mode 100644
+index f7b5284..0000000
+Binary files a/videos/UR10eReachFixed-v2/2024_06_17_18_45_32front_mask_video.mp4 and /dev/null differ
+diff --git a/videos/UR10eReachFixed-v2/2024_06_17_18_45_32front_video.mp4 b/videos/UR10eReachFixed-v2/2024_06_17_18_45_32front_video.mp4
+deleted file mode 100644
+index df456ff..0000000
+Binary files a/videos/UR10eReachFixed-v2/2024_06_17_18_45_32front_video.mp4 and /dev/null differ
+diff --git a/videos/UR10eReachFixed-v2/2024_06_20_11_12_34front_mask_video.mp4 b/videos/UR10eReachFixed-v2/2024_06_20_11_12_34front_mask_video.mp4
+deleted file mode 100644
+index 12ce96c..0000000
+Binary files a/videos/UR10eReachFixed-v2/2024_06_20_11_12_34front_mask_video.mp4 and /dev/null differ
+diff --git a/videos/UR10eReachFixed-v2/2024_06_20_11_12_34front_video.mp4 b/videos/UR10eReachFixed-v2/2024_06_20_11_12_34front_video.mp4
+deleted file mode 100644
+index 3471b39..0000000
+Binary files a/videos/UR10eReachFixed-v2/2024_06_20_11_12_34front_video.mp4 and /dev/null differ
+diff --git a/videos/UR10eReachFixed-v2/2024_06_21_08_41_26front_mask_video.mp4 b/videos/UR10eReachFixed-v2/2024_06_21_08_41_26front_mask_video.mp4
+deleted file mode 100644
+index 100057b..0000000
+Binary files a/videos/UR10eReachFixed-v2/2024_06_21_08_41_26front_mask_video.mp4 and /dev/null differ
+diff --git a/videos/UR10eReachFixed-v2/2024_06_21_08_41_26front_video.mp4 b/videos/UR10eReachFixed-v2/2024_06_21_08_41_26front_video.mp4
+deleted file mode 100644
+index 704677a..0000000
+Binary files a/videos/UR10eReachFixed-v2/2024_06_21_08_41_26front_video.mp4 and /dev/null differ
+diff --git a/videos/UR10eReachFixed-v2/2024_06_21_23_59_31front_mask_video.mp4 b/videos/UR10eReachFixed-v2/2024_06_21_23_59_31front_mask_video.mp4
+deleted file mode 100644
+index b6329ce..0000000
+Binary files a/videos/UR10eReachFixed-v2/2024_06_21_23_59_31front_mask_video.mp4 and /dev/null differ
+diff --git a/videos/UR10eReachFixed-v2/2024_06_21_23_59_31front_video.mp4 b/videos/UR10eReachFixed-v2/2024_06_21_23_59_31front_video.mp4
+deleted file mode 100644
+index 12a5d80..0000000
+Binary files a/videos/UR10eReachFixed-v2/2024_06_21_23_59_31front_video.mp4 and /dev/null differ
+diff --git a/videos/UR10eReachFixed-v2/2024_06_22_11_11_14front_mask_video.mp4 b/videos/UR10eReachFixed-v2/2024_06_22_11_11_14front_mask_video.mp4
+deleted file mode 100644
+index e7a0f99..0000000
+Binary files a/videos/UR10eReachFixed-v2/2024_06_22_11_11_14front_mask_video.mp4 and /dev/null differ
+diff --git a/videos/UR10eReachFixed-v2/2024_06_22_11_11_14front_video.mp4 b/videos/UR10eReachFixed-v2/2024_06_22_11_11_14front_video.mp4
+deleted file mode 100644
+index 511c4e2..0000000
+Binary files a/videos/UR10eReachFixed-v2/2024_06_22_11_11_14front_video.mp4 and /dev/null differ
+diff --git a/videos/UR10eReachFixed-v2/2024_06_22_19_48_33front_mask_video.mp4 b/videos/UR10eReachFixed-v2/2024_06_22_19_48_33front_mask_video.mp4
+deleted file mode 100644
+index e3e192d..0000000
+Binary files a/videos/UR10eReachFixed-v2/2024_06_22_19_48_33front_mask_video.mp4 and /dev/null differ
+diff --git a/videos/UR10eReachFixed-v2/2024_06_22_19_48_33front_video.mp4 b/videos/UR10eReachFixed-v2/2024_06_22_19_48_33front_video.mp4
+deleted file mode 100644
+index f89252a..0000000
+Binary files a/videos/UR10eReachFixed-v2/2024_06_22_19_48_33front_video.mp4 and /dev/null differ
+diff --git a/videos/UR10eReachFixed-v2/2024_06_23_02_03_41front_mask_video.mp4 b/videos/UR10eReachFixed-v2/2024_06_23_02_03_41front_mask_video.mp4
+deleted file mode 100644
+index fca4432..0000000
+Binary files a/videos/UR10eReachFixed-v2/2024_06_23_02_03_41front_mask_video.mp4 and /dev/null differ
+diff --git a/videos/UR10eReachFixed-v2/2024_06_23_02_03_41front_video.mp4 b/videos/UR10eReachFixed-v2/2024_06_23_02_03_41front_video.mp4
+deleted file mode 100644
+index a721329..0000000
+Binary files a/videos/UR10eReachFixed-v2/2024_06_23_02_03_41front_video.mp4 and /dev/null differ
+diff --git a/videos/UR10eReachFixed-v2/2024_06_24_01_01_18front_mask_video.mp4 b/videos/UR10eReachFixed-v2/2024_06_24_01_01_18front_mask_video.mp4
+deleted file mode 100644
+index ff59faa..0000000
+Binary files a/videos/UR10eReachFixed-v2/2024_06_24_01_01_18front_mask_video.mp4 and /dev/null differ
+diff --git a/videos/UR10eReachFixed-v2/2024_06_24_01_01_18front_video.mp4 b/videos/UR10eReachFixed-v2/2024_06_24_01_01_18front_video.mp4
+deleted file mode 100644
+index 6e9fc9d..0000000
+Binary files a/videos/UR10eReachFixed-v2/2024_06_24_01_01_18front_video.mp4 and /dev/null differ
+diff --git a/videos/UR10eReachFixed-v2/2024_06_24_11_10_04front_mask_video.mp4 b/videos/UR10eReachFixed-v2/2024_06_24_11_10_04front_mask_video.mp4
+deleted file mode 100644
+index eabba29..0000000
+Binary files a/videos/UR10eReachFixed-v2/2024_06_24_11_10_04front_mask_video.mp4 and /dev/null differ
+diff --git a/videos/UR10eReachFixed-v2/2024_06_24_11_10_04front_video.mp4 b/videos/UR10eReachFixed-v2/2024_06_24_11_10_04front_video.mp4
+deleted file mode 100644
+index ecde798..0000000
+Binary files a/videos/UR10eReachFixed-v2/2024_06_24_11_10_04front_video.mp4 and /dev/null differ
+diff --git a/videos/UR10eReachFixed-v2/2024_06_25_00_46_36front_mask_video.mp4 b/videos/UR10eReachFixed-v2/2024_06_25_00_46_36front_mask_video.mp4
+deleted file mode 100644
+index 714965b..0000000
+Binary files a/videos/UR10eReachFixed-v2/2024_06_25_00_46_36front_mask_video.mp4 and /dev/null differ
+diff --git a/videos/UR10eReachFixed-v2/2024_06_25_00_46_36front_video.mp4 b/videos/UR10eReachFixed-v2/2024_06_25_00_46_36front_video.mp4
+deleted file mode 100644
+index bc13ddf..0000000
+Binary files a/videos/UR10eReachFixed-v2/2024_06_25_00_46_36front_video.mp4 and /dev/null differ
+diff --git a/videos1/UR10eMask3C-v1/2024_09_13_15_26_302front_mask_video.mp4 b/videos1/UR10eMask3C-v1/2024_09_13_15_26_302front_mask_video.mp4
+deleted file mode 100644
+index 39327bb..0000000
+Binary files a/videos1/UR10eMask3C-v1/2024_09_13_15_26_302front_mask_video.mp4 and /dev/null differ
+diff --git a/videos1/UR10eMask3C-v1/2024_09_13_15_26_302front_video.mp4 b/videos1/UR10eMask3C-v1/2024_09_13_15_26_302front_video.mp4
+deleted file mode 100644
+index 8e661ea..0000000
+Binary files a/videos1/UR10eMask3C-v1/2024_09_13_15_26_302front_video.mp4 and /dev/null differ

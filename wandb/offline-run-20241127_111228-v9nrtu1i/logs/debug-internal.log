@@ -1,0 +1,16 @@
+{"time":"2024-11-27T11:12:28.51125365-05:00","level":"INFO","msg":"using version","core version":"0.18.7"}
+{"time":"2024-11-27T11:12:28.511303849-05:00","level":"INFO","msg":"created symlink","path":"/home/cheryl/Documents/RL-Chemist/wandb/offline-run-20241127_111228-v9nrtu1i/logs/debug-core.log"}
+{"time":"2024-11-27T11:12:28.73006729-05:00","level":"INFO","msg":"created new stream","id":"v9nrtu1i"}
+{"time":"2024-11-27T11:12:28.730146541-05:00","level":"INFO","msg":"stream: started","id":"v9nrtu1i"}
+{"time":"2024-11-27T11:12:28.730212686-05:00","level":"INFO","msg":"writer: Do: started","stream_id":"v9nrtu1i"}
+{"time":"2024-11-27T11:12:28.730264094-05:00","level":"INFO","msg":"sender: started","stream_id":"v9nrtu1i"}
+{"time":"2024-11-27T11:12:28.730354521-05:00","level":"INFO","msg":"handler: started","stream_id":"v9nrtu1i"}
+{"time":"2024-11-27T11:12:28.751960588-05:00","level":"INFO","msg":"Starting system monitor"}
+{"time":"2024-11-27T11:12:39.501484589-05:00","level":"INFO","msg":"stream: closing","id":"v9nrtu1i"}
+{"time":"2024-11-27T11:12:39.501567451-05:00","level":"INFO","msg":"Stopping system monitor"}
+{"time":"2024-11-27T11:12:39.502399068-05:00","level":"INFO","msg":"Stopped system monitor"}
+{"time":"2024-11-27T11:12:45.108958225-05:00","level":"INFO","msg":"tensorboard: no root directory after 10 seconds, using working directory"}
+{"time":"2024-11-27T11:12:45.110011728-05:00","level":"INFO","msg":"handler: closed","stream_id":"v9nrtu1i"}
+{"time":"2024-11-27T11:12:45.110040999-05:00","level":"INFO","msg":"writer: Close: closed","stream_id":"v9nrtu1i"}
+{"time":"2024-11-27T11:12:45.110073931-05:00","level":"INFO","msg":"sender: closed","stream_id":"v9nrtu1i"}
+{"time":"2024-11-27T11:12:45.110174102-05:00","level":"INFO","msg":"stream: closed","id":"v9nrtu1i"}

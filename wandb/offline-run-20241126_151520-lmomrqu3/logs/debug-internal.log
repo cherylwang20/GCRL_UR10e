@@ -1,0 +1,16 @@
+{"time":"2024-11-26T15:15:20.098218169-05:00","level":"INFO","msg":"using version","core version":"0.18.7"}
+{"time":"2024-11-26T15:15:20.098272778-05:00","level":"INFO","msg":"created symlink","path":"/home/cheryl/Documents/RL-Chemist/wandb/offline-run-20241126_151520-lmomrqu3/logs/debug-core.log"}
+{"time":"2024-11-26T15:15:20.317832593-05:00","level":"INFO","msg":"created new stream","id":"lmomrqu3"}
+{"time":"2024-11-26T15:15:20.317880606-05:00","level":"INFO","msg":"stream: started","id":"lmomrqu3"}
+{"time":"2024-11-26T15:15:20.317983632-05:00","level":"INFO","msg":"writer: Do: started","stream_id":"lmomrqu3"}
+{"time":"2024-11-26T15:15:20.318048139-05:00","level":"INFO","msg":"sender: started","stream_id":"lmomrqu3"}
+{"time":"2024-11-26T15:15:20.318039781-05:00","level":"INFO","msg":"handler: started","stream_id":"lmomrqu3"}
+{"time":"2024-11-26T15:15:20.34003082-05:00","level":"INFO","msg":"Starting system monitor"}
+{"time":"2024-11-26T15:15:36.274330956-05:00","level":"INFO","msg":"tensorboard: no root directory after 10 seconds, using working directory"}
+{"time":"2024-11-26T15:16:24.567425947-05:00","level":"INFO","msg":"stream: closing","id":"lmomrqu3"}
+{"time":"2024-11-26T15:16:24.567492734-05:00","level":"INFO","msg":"Stopping system monitor"}
+{"time":"2024-11-26T15:16:24.568557609-05:00","level":"INFO","msg":"Stopped system monitor"}
+{"time":"2024-11-26T15:16:24.569081268-05:00","level":"INFO","msg":"handler: closed","stream_id":"lmomrqu3"}
+{"time":"2024-11-26T15:16:24.569106847-05:00","level":"INFO","msg":"writer: Close: closed","stream_id":"lmomrqu3"}
+{"time":"2024-11-26T15:16:24.569157207-05:00","level":"INFO","msg":"sender: closed","stream_id":"lmomrqu3"}
+{"time":"2024-11-26T15:16:24.56923062-05:00","level":"INFO","msg":"stream: closed","id":"lmomrqu3"}

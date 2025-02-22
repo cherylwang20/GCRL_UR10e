@@ -1,0 +1,16 @@
+{"time":"2024-11-26T15:36:45.33881715-05:00","level":"INFO","msg":"using version","core version":"0.18.7"}
+{"time":"2024-11-26T15:36:45.338876149-05:00","level":"INFO","msg":"created symlink","path":"/home/cheryl/Documents/RL-Chemist/wandb/offline-run-20241126_153645-xaug70af/logs/debug-core.log"}
+{"time":"2024-11-26T15:36:45.559392463-05:00","level":"INFO","msg":"created new stream","id":"xaug70af"}
+{"time":"2024-11-26T15:36:45.559456158-05:00","level":"INFO","msg":"stream: started","id":"xaug70af"}
+{"time":"2024-11-26T15:36:45.559495656-05:00","level":"INFO","msg":"writer: Do: started","stream_id":"xaug70af"}
+{"time":"2024-11-26T15:36:45.55954823-05:00","level":"INFO","msg":"handler: started","stream_id":"xaug70af"}
+{"time":"2024-11-26T15:36:45.559561846-05:00","level":"INFO","msg":"sender: started","stream_id":"xaug70af"}
+{"time":"2024-11-26T15:36:45.578753681-05:00","level":"INFO","msg":"Starting system monitor"}
+{"time":"2024-11-26T15:37:02.040371288-05:00","level":"INFO","msg":"tensorboard: no root directory after 10 seconds, using working directory"}
+{"time":"2024-11-26T15:37:30.45302393-05:00","level":"INFO","msg":"stream: closing","id":"xaug70af"}
+{"time":"2024-11-26T15:37:30.453087317-05:00","level":"INFO","msg":"Stopping system monitor"}
+{"time":"2024-11-26T15:37:30.455100978-05:00","level":"INFO","msg":"Stopped system monitor"}
+{"time":"2024-11-26T15:37:30.456574789-05:00","level":"INFO","msg":"handler: closed","stream_id":"xaug70af"}
+{"time":"2024-11-26T15:37:30.456620134-05:00","level":"INFO","msg":"writer: Close: closed","stream_id":"xaug70af"}
+{"time":"2024-11-26T15:37:30.456662044-05:00","level":"INFO","msg":"sender: closed","stream_id":"xaug70af"}
+{"time":"2024-11-26T15:37:30.456767963-05:00","level":"INFO","msg":"stream: closed","id":"xaug70af"}

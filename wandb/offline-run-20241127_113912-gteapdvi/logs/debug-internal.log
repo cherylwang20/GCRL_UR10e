@@ -1,0 +1,16 @@
+{"time":"2024-11-27T11:39:12.042221501-05:00","level":"INFO","msg":"using version","core version":"0.18.7"}
+{"time":"2024-11-27T11:39:12.04226603-05:00","level":"INFO","msg":"created symlink","path":"/home/cheryl/Documents/RL-Chemist/wandb/offline-run-20241127_113912-gteapdvi/logs/debug-core.log"}
+{"time":"2024-11-27T11:39:12.26302177-05:00","level":"INFO","msg":"created new stream","id":"gteapdvi"}
+{"time":"2024-11-27T11:39:12.263093281-05:00","level":"INFO","msg":"stream: started","id":"gteapdvi"}
+{"time":"2024-11-27T11:39:12.263196866-05:00","level":"INFO","msg":"writer: Do: started","stream_id":"gteapdvi"}
+{"time":"2024-11-27T11:39:12.263255264-05:00","level":"INFO","msg":"sender: started","stream_id":"gteapdvi"}
+{"time":"2024-11-27T11:39:12.263303453-05:00","level":"INFO","msg":"handler: started","stream_id":"gteapdvi"}
+{"time":"2024-11-27T11:39:12.284265834-05:00","level":"INFO","msg":"Starting system monitor"}
+{"time":"2024-11-27T11:39:28.567736594-05:00","level":"INFO","msg":"tensorboard: no root directory after 10 seconds, using working directory"}
+{"time":"2024-11-27T11:39:47.488346024-05:00","level":"INFO","msg":"stream: closing","id":"gteapdvi"}
+{"time":"2024-11-27T11:39:47.48839949-05:00","level":"INFO","msg":"Stopping system monitor"}
+{"time":"2024-11-27T11:39:47.489158028-05:00","level":"INFO","msg":"Stopped system monitor"}
+{"time":"2024-11-27T11:39:47.493322981-05:00","level":"INFO","msg":"handler: closed","stream_id":"gteapdvi"}
+{"time":"2024-11-27T11:39:47.493364806-05:00","level":"INFO","msg":"writer: Close: closed","stream_id":"gteapdvi"}
+{"time":"2024-11-27T11:39:47.493393193-05:00","level":"INFO","msg":"sender: closed","stream_id":"gteapdvi"}
+{"time":"2024-11-27T11:39:47.493520944-05:00","level":"INFO","msg":"stream: closed","id":"gteapdvi"}

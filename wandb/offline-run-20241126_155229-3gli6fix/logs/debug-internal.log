@@ -1,0 +1,16 @@
+{"time":"2024-11-26T15:52:29.509697979-05:00","level":"INFO","msg":"using version","core version":"0.18.7"}
+{"time":"2024-11-26T15:52:29.509743894-05:00","level":"INFO","msg":"created symlink","path":"/home/cheryl/Documents/RL-Chemist/wandb/offline-run-20241126_155229-3gli6fix/logs/debug-core.log"}
+{"time":"2024-11-26T15:52:29.729669568-05:00","level":"INFO","msg":"created new stream","id":"3gli6fix"}
+{"time":"2024-11-26T15:52:29.72976561-05:00","level":"INFO","msg":"stream: started","id":"3gli6fix"}
+{"time":"2024-11-26T15:52:29.729749817-05:00","level":"INFO","msg":"handler: started","stream_id":"3gli6fix"}
+{"time":"2024-11-26T15:52:29.729840526-05:00","level":"INFO","msg":"sender: started","stream_id":"3gli6fix"}
+{"time":"2024-11-26T15:52:29.729849846-05:00","level":"INFO","msg":"writer: Do: started","stream_id":"3gli6fix"}
+{"time":"2024-11-26T15:52:29.750930634-05:00","level":"INFO","msg":"Starting system monitor"}
+{"time":"2024-11-26T15:52:45.610673861-05:00","level":"INFO","msg":"tensorboard: no root directory after 10 seconds, using working directory"}
+{"time":"2024-11-26T15:54:52.438809858-05:00","level":"INFO","msg":"stream: closing","id":"3gli6fix"}
+{"time":"2024-11-26T15:54:52.43887976-05:00","level":"INFO","msg":"Stopping system monitor"}
+{"time":"2024-11-26T15:54:52.440074605-05:00","level":"INFO","msg":"Stopped system monitor"}
+{"time":"2024-11-26T15:54:52.440805144-05:00","level":"INFO","msg":"handler: closed","stream_id":"3gli6fix"}
+{"time":"2024-11-26T15:54:52.440843642-05:00","level":"INFO","msg":"writer: Close: closed","stream_id":"3gli6fix"}
+{"time":"2024-11-26T15:54:52.440853007-05:00","level":"INFO","msg":"sender: closed","stream_id":"3gli6fix"}
+{"time":"2024-11-26T15:54:52.441020615-05:00","level":"INFO","msg":"stream: closed","id":"3gli6fix"}

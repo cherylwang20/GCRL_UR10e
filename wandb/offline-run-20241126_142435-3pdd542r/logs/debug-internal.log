@@ -1,0 +1,15 @@
+{"time":"2024-11-26T14:24:35.239594294-05:00","level":"INFO","msg":"using version","core version":"0.18.7"}
+{"time":"2024-11-26T14:24:35.240195244-05:00","level":"INFO","msg":"created symlink","path":"/home/cheryl/Documents/RL-Chemist/wandb/offline-run-20241126_142435-3pdd542r/logs/debug-core.log"}
+{"time":"2024-11-26T14:24:35.460275076-05:00","level":"INFO","msg":"created new stream","id":"3pdd542r"}
+{"time":"2024-11-26T14:24:35.460362532-05:00","level":"INFO","msg":"stream: started","id":"3pdd542r"}
+{"time":"2024-11-26T14:24:35.460432848-05:00","level":"INFO","msg":"writer: Do: started","stream_id":"3pdd542r"}
+{"time":"2024-11-26T14:24:35.460486515-05:00","level":"INFO","msg":"sender: started","stream_id":"3pdd542r"}
+{"time":"2024-11-26T14:24:35.460574522-05:00","level":"INFO","msg":"handler: started","stream_id":"3pdd542r"}
+{"time":"2024-11-26T14:24:35.483552323-05:00","level":"INFO","msg":"Starting system monitor"}
+{"time":"2024-11-26T14:24:38.140635516-05:00","level":"INFO","msg":"stream: closing","id":"3pdd542r"}
+{"time":"2024-11-26T14:24:38.140705386-05:00","level":"INFO","msg":"Stopping system monitor"}
+{"time":"2024-11-26T14:24:38.141631341-05:00","level":"INFO","msg":"Stopped system monitor"}
+{"time":"2024-11-26T14:24:38.142019826-05:00","level":"INFO","msg":"handler: closed","stream_id":"3pdd542r"}
+{"time":"2024-11-26T14:24:38.142056473-05:00","level":"INFO","msg":"writer: Close: closed","stream_id":"3pdd542r"}
+{"time":"2024-11-26T14:24:38.142077715-05:00","level":"INFO","msg":"sender: closed","stream_id":"3pdd542r"}
+{"time":"2024-11-26T14:24:38.142144807-05:00","level":"INFO","msg":"stream: closed","id":"3pdd542r"}

@@ -1,0 +1,15 @@
+{"time":"2024-11-26T14:28:51.832124297-05:00","level":"INFO","msg":"using version","core version":"0.18.7"}
+{"time":"2024-11-26T14:28:51.832170216-05:00","level":"INFO","msg":"created symlink","path":"/home/cheryl/Documents/RL-Chemist/wandb/offline-run-20241126_142851-wcgacpx4/logs/debug-core.log"}
+{"time":"2024-11-26T14:28:52.051517319-05:00","level":"INFO","msg":"created new stream","id":"wcgacpx4"}
+{"time":"2024-11-26T14:28:52.051582714-05:00","level":"INFO","msg":"stream: started","id":"wcgacpx4"}
+{"time":"2024-11-26T14:28:52.05159896-05:00","level":"INFO","msg":"handler: started","stream_id":"wcgacpx4"}
+{"time":"2024-11-26T14:28:52.051696639-05:00","level":"INFO","msg":"sender: started","stream_id":"wcgacpx4"}
+{"time":"2024-11-26T14:28:52.051797296-05:00","level":"INFO","msg":"writer: Do: started","stream_id":"wcgacpx4"}
+{"time":"2024-11-26T14:28:52.076111312-05:00","level":"INFO","msg":"Starting system monitor"}
+{"time":"2024-11-26T14:28:56.079914662-05:00","level":"INFO","msg":"stream: closing","id":"wcgacpx4"}
+{"time":"2024-11-26T14:28:56.07993884-05:00","level":"INFO","msg":"Stopping system monitor"}
+{"time":"2024-11-26T14:28:56.080706411-05:00","level":"INFO","msg":"Stopped system monitor"}
+{"time":"2024-11-26T14:28:56.081032799-05:00","level":"INFO","msg":"handler: closed","stream_id":"wcgacpx4"}
+{"time":"2024-11-26T14:28:56.081051849-05:00","level":"INFO","msg":"writer: Close: closed","stream_id":"wcgacpx4"}
+{"time":"2024-11-26T14:28:56.081061212-05:00","level":"INFO","msg":"sender: closed","stream_id":"wcgacpx4"}
+{"time":"2024-11-26T14:28:56.081183033-05:00","level":"INFO","msg":"stream: closed","id":"wcgacpx4"}

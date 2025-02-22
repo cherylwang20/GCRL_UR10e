@@ -1,0 +1,16 @@
+{"time":"2024-11-26T15:03:24.785683784-05:00","level":"INFO","msg":"using version","core version":"0.18.7"}
+{"time":"2024-11-26T15:03:24.785738313-05:00","level":"INFO","msg":"created symlink","path":"/home/cheryl/Documents/RL-Chemist/wandb/offline-run-20241126_150324-pyzy5eve/logs/debug-core.log"}
+{"time":"2024-11-26T15:03:24.912328756-05:00","level":"INFO","msg":"created new stream","id":"pyzy5eve"}
+{"time":"2024-11-26T15:03:24.912395931-05:00","level":"INFO","msg":"stream: started","id":"pyzy5eve"}
+{"time":"2024-11-26T15:03:24.912436968-05:00","level":"INFO","msg":"writer: Do: started","stream_id":"pyzy5eve"}
+{"time":"2024-11-26T15:03:24.91248374-05:00","level":"INFO","msg":"handler: started","stream_id":"pyzy5eve"}
+{"time":"2024-11-26T15:03:24.912506327-05:00","level":"INFO","msg":"sender: started","stream_id":"pyzy5eve"}
+{"time":"2024-11-26T15:03:24.933753161-05:00","level":"INFO","msg":"Starting system monitor"}
+{"time":"2024-11-26T15:03:31.529107467-05:00","level":"INFO","msg":"stream: closing","id":"pyzy5eve"}
+{"time":"2024-11-26T15:03:31.529175712-05:00","level":"INFO","msg":"Stopping system monitor"}
+{"time":"2024-11-26T15:03:31.530871099-05:00","level":"INFO","msg":"Stopped system monitor"}
+{"time":"2024-11-26T15:03:41.117014203-05:00","level":"INFO","msg":"tensorboard: no root directory after 10 seconds, using working directory"}
+{"time":"2024-11-26T15:03:41.118227071-05:00","level":"INFO","msg":"handler: closed","stream_id":"pyzy5eve"}
+{"time":"2024-11-26T15:03:41.118258903-05:00","level":"INFO","msg":"writer: Close: closed","stream_id":"pyzy5eve"}
+{"time":"2024-11-26T15:03:41.118305262-05:00","level":"INFO","msg":"sender: closed","stream_id":"pyzy5eve"}
+{"time":"2024-11-26T15:03:41.118358087-05:00","level":"INFO","msg":"stream: closed","id":"pyzy5eve"}

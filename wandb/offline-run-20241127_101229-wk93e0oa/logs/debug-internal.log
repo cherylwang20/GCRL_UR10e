@@ -1,0 +1,16 @@
+{"time":"2024-11-27T10:12:29.107549965-05:00","level":"INFO","msg":"using version","core version":"0.18.7"}
+{"time":"2024-11-27T10:12:29.107595271-05:00","level":"INFO","msg":"created symlink","path":"/home/cheryl/Documents/RL-Chemist/wandb/offline-run-20241127_101229-wk93e0oa/logs/debug-core.log"}
+{"time":"2024-11-27T10:12:29.225208339-05:00","level":"INFO","msg":"created new stream","id":"wk93e0oa"}
+{"time":"2024-11-27T10:12:29.225244863-05:00","level":"INFO","msg":"stream: started","id":"wk93e0oa"}
+{"time":"2024-11-27T10:12:29.225347408-05:00","level":"INFO","msg":"writer: Do: started","stream_id":"wk93e0oa"}
+{"time":"2024-11-27T10:12:29.225394256-05:00","level":"INFO","msg":"sender: started","stream_id":"wk93e0oa"}
+{"time":"2024-11-27T10:12:29.22542046-05:00","level":"INFO","msg":"handler: started","stream_id":"wk93e0oa"}
+{"time":"2024-11-27T10:12:29.245415492-05:00","level":"INFO","msg":"Starting system monitor"}
+{"time":"2024-11-27T10:12:40.70499976-05:00","level":"INFO","msg":"stream: closing","id":"wk93e0oa"}
+{"time":"2024-11-27T10:12:40.705074765-05:00","level":"INFO","msg":"Stopping system monitor"}
+{"time":"2024-11-27T10:12:40.706118821-05:00","level":"INFO","msg":"Stopped system monitor"}
+{"time":"2024-11-27T10:12:45.802114187-05:00","level":"INFO","msg":"tensorboard: no root directory after 10 seconds, using working directory"}
+{"time":"2024-11-27T10:12:45.805145792-05:00","level":"INFO","msg":"handler: closed","stream_id":"wk93e0oa"}
+{"time":"2024-11-27T10:12:45.805217404-05:00","level":"INFO","msg":"writer: Close: closed","stream_id":"wk93e0oa"}
+{"time":"2024-11-27T10:12:45.805230084-05:00","level":"INFO","msg":"sender: closed","stream_id":"wk93e0oa"}
+{"time":"2024-11-27T10:12:45.805376234-05:00","level":"INFO","msg":"stream: closed","id":"wk93e0oa"}

@@ -1,0 +1,15 @@
+{"time":"2024-11-26T14:27:30.269657835-05:00","level":"INFO","msg":"using version","core version":"0.18.7"}
+{"time":"2024-11-26T14:27:30.269702941-05:00","level":"INFO","msg":"created symlink","path":"/home/cheryl/Documents/RL-Chemist/wandb/offline-run-20241126_142730-kncqqwlm/logs/debug-core.log"}
+{"time":"2024-11-26T14:27:30.389636297-05:00","level":"INFO","msg":"created new stream","id":"kncqqwlm"}
+{"time":"2024-11-26T14:27:30.390189519-05:00","level":"INFO","msg":"stream: started","id":"kncqqwlm"}
+{"time":"2024-11-26T14:27:30.390275137-05:00","level":"INFO","msg":"writer: Do: started","stream_id":"kncqqwlm"}
+{"time":"2024-11-26T14:27:30.390342028-05:00","level":"INFO","msg":"sender: started","stream_id":"kncqqwlm"}
+{"time":"2024-11-26T14:27:30.390407994-05:00","level":"INFO","msg":"handler: started","stream_id":"kncqqwlm"}
+{"time":"2024-11-26T14:27:30.411484351-05:00","level":"INFO","msg":"Starting system monitor"}
+{"time":"2024-11-26T14:27:32.944899175-05:00","level":"INFO","msg":"stream: closing","id":"kncqqwlm"}
+{"time":"2024-11-26T14:27:32.944931874-05:00","level":"INFO","msg":"Stopping system monitor"}
+{"time":"2024-11-26T14:27:32.945809698-05:00","level":"INFO","msg":"Stopped system monitor"}
+{"time":"2024-11-26T14:27:32.945964689-05:00","level":"INFO","msg":"handler: closed","stream_id":"kncqqwlm"}
+{"time":"2024-11-26T14:27:32.945973677-05:00","level":"INFO","msg":"writer: Close: closed","stream_id":"kncqqwlm"}
+{"time":"2024-11-26T14:27:32.946025958-05:00","level":"INFO","msg":"sender: closed","stream_id":"kncqqwlm"}
+{"time":"2024-11-26T14:27:32.946063043-05:00","level":"INFO","msg":"stream: closed","id":"kncqqwlm"}

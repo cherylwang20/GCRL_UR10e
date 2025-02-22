@@ -1,0 +1,16 @@
+{"time":"2024-11-26T15:54:59.784845551-05:00","level":"INFO","msg":"using version","core version":"0.18.7"}
+{"time":"2024-11-26T15:54:59.784890013-05:00","level":"INFO","msg":"created symlink","path":"/home/cheryl/Documents/RL-Chemist/wandb/offline-run-20241126_155459-blfi5dir/logs/debug-core.log"}
+{"time":"2024-11-26T15:55:00.006006857-05:00","level":"INFO","msg":"created new stream","id":"blfi5dir"}
+{"time":"2024-11-26T15:55:00.006074875-05:00","level":"INFO","msg":"stream: started","id":"blfi5dir"}
+{"time":"2024-11-26T15:55:00.006178746-05:00","level":"INFO","msg":"writer: Do: started","stream_id":"blfi5dir"}
+{"time":"2024-11-26T15:55:00.006226888-05:00","level":"INFO","msg":"handler: started","stream_id":"blfi5dir"}
+{"time":"2024-11-26T15:55:00.006300231-05:00","level":"INFO","msg":"sender: started","stream_id":"blfi5dir"}
+{"time":"2024-11-26T15:55:00.027034719-05:00","level":"INFO","msg":"Starting system monitor"}
+{"time":"2024-11-26T15:55:15.928226912-05:00","level":"INFO","msg":"tensorboard: no root directory after 10 seconds, using working directory"}
+{"time":"2024-11-26T15:56:04.256552228-05:00","level":"INFO","msg":"stream: closing","id":"blfi5dir"}
+{"time":"2024-11-26T15:56:04.256614961-05:00","level":"INFO","msg":"Stopping system monitor"}
+{"time":"2024-11-26T15:56:04.257938962-05:00","level":"INFO","msg":"Stopped system monitor"}
+{"time":"2024-11-26T15:56:04.258532241-05:00","level":"INFO","msg":"handler: closed","stream_id":"blfi5dir"}
+{"time":"2024-11-26T15:56:04.258578838-05:00","level":"INFO","msg":"writer: Close: closed","stream_id":"blfi5dir"}
+{"time":"2024-11-26T15:56:04.258608797-05:00","level":"INFO","msg":"sender: closed","stream_id":"blfi5dir"}
+{"time":"2024-11-26T15:56:04.258696354-05:00","level":"INFO","msg":"stream: closed","id":"blfi5dir"}
