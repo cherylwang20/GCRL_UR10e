@@ -17,7 +17,7 @@ from PIL import Image
 import io
 import matplotlib.pyplot as plt
 import matplotlib
-matplotlib.use('TkAgg')
+#matplotlib.use('TkAgg')
 
 class CustomFrameStack(gym.Wrapper):
     def __init__(self, env, n_stack=3):
@@ -103,7 +103,6 @@ detect_color = 'green'
 
 env.reset()
 
-<<<<<<< HEAD
 def visualize_saliency(observation):
     device = next(policy.parameters()).device
     
@@ -176,9 +175,6 @@ def visualize_saliency(observation):
 
 
 trial = 2
-=======
-trial = 1
->>>>>>> fda122c4e911212246fbd498edd0b2262240a922
 success = 0
 
 frames_rgb = []
@@ -193,18 +189,11 @@ for i in tqdm(range(trial)):
     #obs = np.stack([obs, obs, obs])
     step = 0
     #ret, frame = cap.read()
-<<<<<<< HEAD
     while not done and step < 200:   
-=======
-    while step < 200 and not solved:
-          #obs = env.obsdict2obsvec(env.obs_dict, env.obs_keys)[1]
-          #obs = np.stack([obs, obs, obs])
-          #obs = env.get_obs_dict()        
->>>>>>> fda122c4e911212246fbd498edd0b2262240a922
           action, _ = model.predict(obs, deterministic=True)
           obs, reward, done, info = env.step(action)
-          frame_saliency = visualize_saliency(obs)
-          saliency_map.append(frame_saliency)
+          #frame_saliency = visualize_saliency(obs)
+          #saliency_map.append(frame_saliency)
           solved = info['solved']
           if i < trial:
               frame_n = env.rgb_out

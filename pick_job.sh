@@ -13,7 +13,7 @@ export PYTHONPATH="$PYTHONPATH:/home/cheryl16/projects/def-durandau/RL-Chemist"
 cd /home/cheryl16/projects/def-durandau/RL-Chemist
 
 module load StdEnv/2023
-module load gcc opencv cuda/12.2 python/3.10 mpi4py mujoco/3.1.6
+module load gcc opencv/4.9.0 cuda/12.2 python/3.10 mpi4py mujoco/3.1.6
 
 source /home/cheryl16/py310/bin/activate
 

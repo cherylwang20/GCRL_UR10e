@@ -1,0 +1,74 @@
+RoboHive:> Registering Arms Envs
+RoboHive:> Registering Myo Envs
+RoboHive:> Registering Hand Envs
+RoboHive:> Registering Claw Envs
+RoboHive:> Registering Appliances Envs
+RoboHive:> Registering Multi-Task (2 subtasks) Envs
+RoboHive:> Registering FrankaKitchen (FK1) Envs
+RoboHive:> Registering Multi-Task (9 subtasks) Envs
+RoboHive:> Registering Quadruped Envs
+[36m    RoboHive: A unified framework for robot learning | https://sites.google.com/view/robohive
+[36m        Code: https://github.com/vikashplus/robohive/stargazers (add a star to support the project)
+[36m    
+[30m[43mWarning: Unused kwargs found: {'obj_xyz_range': {'high': [0.235, 0.5, 0.86], 'low': [-0.235, 0.4, 0.86]}, 'eval_mode': False}
+{'time': array([0.04]), 'qp_robot': array([-1.7482e-05,  4.8937e-03,  8.6014e-04, -1.3950e-03,  3.6680e-04,
+        1.8343e-03,  8.3394e-04]), 'qv_robot': array([0., 0., 0., 0., 0., 0., 0.]), 'reach_err': array([1.1589, 1.5998, 0.1594]), 'goal_pos': array([-0.025 ,  0.653 ,  1.0372]), 'touching_body': array([0, 0, 0])}
+[30m[43mWarning: Unused kwargs found: {'obj_xyz_range': {'high': [0.235, 0.5, 0.86], 'low': [-0.235, 0.4, 0.86]}, 'eval_mode': False}
+{'time': array([0.04]), 'qp_robot': array([-1.7482e-05,  4.8937e-03,  8.6014e-04, -1.3950e-03,  3.6680e-04,
+        1.8343e-03,  8.3394e-04]), 'qv_robot': array([0., 0., 0., 0., 0., 0., 0.]), 'reach_err': array([1.1589, 1.5998, 0.1594]), 'goal_pos': array([-0.025 ,  0.653 ,  1.0372]), 'touching_body': array([0, 0, 0])}
+[30m[43mWarning: Unused kwargs found: {'obj_xyz_range': {'high': [0.235, 0.5, 0.86], 'low': [-0.235, 0.4, 0.86]}, 'eval_mode': False}
+{'time': array([0.04]), 'qp_robot': array([-1.7482e-05,  4.8937e-03,  8.6014e-04, -1.3950e-03,  3.6680e-04,
+        1.8343e-03,  8.3394e-04]), 'qv_robot': array([0., 0., 0., 0., 0., 0., 0.]), 'reach_err': array([1.1589, 1.5998, 0.1594]), 'goal_pos': array([-0.025 ,  0.653 ,  1.0372]), 'touching_body': array([0, 0, 0])}
+[30m[43mWarning: Unused kwargs found: {'obj_xyz_range': {'high': [0.235, 0.5, 0.86], 'low': [-0.235, 0.4, 0.86]}, 'eval_mode': False}
+{'time': array([0.04]), 'qp_robot': array([-1.7482e-05,  4.8937e-03,  8.6014e-04, -1.3950e-03,  3.6680e-04,
+        1.8343e-03,  8.3394e-04]), 'qv_robot': array([0., 0., 0., 0., 0., 0., 0.]), 'reach_err': array([1.1589, 1.5998, 0.1594]), 'goal_pos': array([-0.025 ,  0.653 ,  1.0372]), 'touching_body': array([0, 0, 0])}
+[30m[43mWarning: Unused kwargs found: {'obj_xyz_range': {'high': [0.235, 0.5, 0.86], 'low': [-0.235, 0.4, 0.86]}, 'eval_mode': False}
+{'time': array([0.04]), 'qp_robot': array([-1.7482e-05,  4.8937e-03,  8.6014e-04, -1.3950e-03,  3.6680e-04,
+        1.8343e-03,  8.3394e-04]), 'qv_robot': array([0., 0., 0., 0., 0., 0., 0.]), 'reach_err': array([1.1589, 1.5998, 0.1594]), 'goal_pos': array([-0.025 ,  0.653 ,  1.0372]), 'touching_body': array([0, 0, 0])}
+[30m[43mWarning: Unused kwargs found: {'obj_xyz_range': {'high': [0.235, 0.5, 0.86], 'low': [-0.235, 0.4, 0.86]}, 'eval_mode': False}
+{'time': array([0.04]), 'qp_robot': array([-1.7482e-05,  4.8937e-03,  8.6014e-04, -1.3950e-03,  3.6680e-04,
+        1.8343e-03,  8.3394e-04]), 'qv_robot': array([0., 0., 0., 0., 0., 0., 0.]), 'reach_err': array([1.1589, 1.5998, 0.1594]), 'goal_pos': array([-0.025 ,  0.653 ,  1.0372]), 'touching_body': array([0, 0, 0])}
+[30m[43mWarning: Unused kwargs found: {'obj_xyz_range': {'high': [0.235, 0.5, 0.86], 'low': [-0.235, 0.4, 0.86]}, 'eval_mode': False}
+{'time': array([0.04]), 'qp_robot': array([-1.7482e-05,  4.8937e-03,  8.6014e-04, -1.3950e-03,  3.6680e-04,
+        1.8343e-03,  8.3394e-04]), 'qv_robot': array([0., 0., 0., 0., 0., 0., 0.]), 'reach_err': array([1.1589, 1.5998, 0.1594]), 'goal_pos': array([-0.025 ,  0.653 ,  1.0372]), 'touching_body': array([0, 0, 0])}
+[30m[43mWarning: Unused kwargs found: {'obj_xyz_range': {'high': [0.235, 0.5, 0.86], 'low': [-0.235, 0.4, 0.86]}, 'eval_mode': False}
+{'time': array([0.04]), 'qp_robot': array([-1.7482e-05,  4.8937e-03,  8.6014e-04, -1.3950e-03,  3.6680e-04,
+        1.8343e-03,  8.3394e-04]), 'qv_robot': array([0., 0., 0., 0., 0., 0., 0.]), 'reach_err': array([1.1589, 1.5998, 0.1594]), 'goal_pos': array([-0.025 ,  0.653 ,  1.0372]), 'touching_body': array([0, 0, 0])}
+Begin training
+2024_12_11_10_10_44
+dict_keys(['image', 'vector'])
+Eval num_timesteps=16000, episode_reward=-196.88 +/- 11.54
+Episode length: 200.00 +/- 0.00
+New best mean reward!
+Eval num_timesteps=32000, episode_reward=-200.37 +/- 9.68
+Episode length: 200.00 +/- 0.00
+Eval num_timesteps=48000, episode_reward=-192.83 +/- 11.63
+Episode length: 200.00 +/- 0.00
+New best mean reward!
+Eval num_timesteps=64000, episode_reward=-185.24 +/- 8.55
+Episode length: 200.00 +/- 0.00
+New best mean reward!
+Eval num_timesteps=80000, episode_reward=-195.17 +/- 10.88
+Episode length: 200.00 +/- 0.00
+Eval num_timesteps=96000, episode_reward=-196.43 +/- 10.68
+Episode length: 200.00 +/- 0.00
+Eval num_timesteps=112000, episode_reward=-194.87 +/- 12.36
+Episode length: 200.00 +/- 0.00
+Eval num_timesteps=128000, episode_reward=-187.28 +/- 11.00
+Episode length: 200.00 +/- 0.00
+Eval num_timesteps=144000, episode_reward=-192.86 +/- 9.97
+Episode length: 200.00 +/- 0.00
+Eval num_timesteps=160000, episode_reward=-182.15 +/- 11.32
+Episode length: 200.00 +/- 0.00
+New best mean reward!
+Eval num_timesteps=176000, episode_reward=-186.43 +/- 11.00
+Episode length: 200.00 +/- 0.00
+INFO:absl:MUJOCO_GL is not set, so an OpenGL backend will be chosen automatically.
+INFO:absl:Successfully imported OpenGL backend: glfw
+INFO:absl:MuJoCo library version is: 3.2.5
+/home/cheryl/Documents/RL-Chemist/.venv/lib/python3.10/site-packages/stable_baselines3/common/vec_env/patch_gym.py:49: UserWarning: You provided an OpenAI Gym environment. We strongly recommend transitioning to Gymnasium environments. Stable-Baselines3 is automatically wrapping your environments in a compatibility layer, which could potentially cause issues.
+  warnings.warn(
+/home/cheryl/Documents/RL-Chemist/.venv/lib/python3.10/site-packages/stable_baselines3/common/policies.py:486: UserWarning: As shared layers in the mlp_extractor are removed since SB3 v1.8.0, you should now pass directly a dictionary and not a list (net_arch=dict(pi=..., vf=...) instead of net_arch=[dict(pi=..., vf=...)])
+  warnings.warn(
+/home/cheryl/Documents/RL-Chemist/.venv/lib/python3.10/site-packages/mujoco/renderer.py:203: RuntimeWarning: invalid value encountered in cast
+  out_64 = out.astype(np.float64)

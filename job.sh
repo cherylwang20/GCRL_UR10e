@@ -1,10 +1,10 @@
 #!/bin/bash 
-#SBATCH --account=def-cbelling
-#SBATCH --job-name=wrap_reach4_3
-#SBATCH --cpus-per-task=5
-#SBATCH --time=0-60:00
-#SBATCH --array=1
-#SBATCH --mem=108G
+#SBATCH --account=def-durandau
+#SBATCH --job-name=reach_4d_augment
+#SBATCH --cpus-per-task=32
+#SBATCH --time=0-40:00
+#SBATCH --array=0-5
+#SBATCH --mem=88G
 #SBATCH --gres=gpu:1
 #SBATCH --mail-user=huiyi.wang@mail.mcgill.ca
 #SBATCH --mail-type=ALL
@@ -33,10 +33,15 @@ wandb offline
 #parallel -j 5 python Train_reach_1h.py --env_name 'UR10eReach1H-v0' --group 'random_reach1_3' --num_envs 3 --learning_rate 0.0003 --clip_range 0.1 --seed ::: {6..10} 
 
 #parallel -j 5 python Train_reach_4.py --env_name 'UR10eReach4C-v1' --group 'wrap_reach4_1' --num_envs 3 --learning_rate 0.0003 --clip_range 0.1 --seed ::: {6..10} 
-parallel -j 3 python Train_reach_4.py --env_name 'UR10eReach4C-v1' --group 'wrap_reach4_3' --num_envs 4 --learning_rate 0.0003 --clip_range 0.1 --seed ::: {1..5} 
+#python Train_reach_4.py --env_name 'UR10eReach4C-v1' --group 'augment_nomix_reach4_3' --num_envs 2 --learning_rate 0.0002 --clip_range 0.1 --seed $SLURM_ARRAY_TASK_ID
 
+#python Train_reach_4.py --env_name 'UR10eReach4C-v1' --group 'augment_env_rgb' --num_envs 2 --learning_rate 0.0002 --clip_range 0.1 --seed $SLURM_ARRAY_TASK_ID
 #parallel -j 5 python Train_reach_7.py --env_name 'UR10eReach7C-v1' --group 'random_reach7_4' --num_envs 4 --learning_rate 0.0002 --clip_range 0.1 --seed ::: {6..10} 
 
+python Train_reach.py --env_name 'UR10eReach1C-v1' --group 'Reach_4C' --num_envs 4 --learning_rate 0.0003 --clip_range 0.1 --seed=$SLURM_ARRAY_TASK_ID --channel_num 4
+
+#parallel -j 5 python Train_simple_rgb.py --group 'simple_rgb_dt_img' --learning_rate 0.0001 --seed ::: {16..20}
+#parallel -j 5 python Train_simple_rgb2.py --group 'simple_rgb_nodis' --seed ::: {26..30}
 
 #python Train_reach_4.py --env_name 'UR10eReach4C-v1' --group 'ground_reach4_2' --num_envs 4 --learning_rate 0.0001 --clip_range 0.1 --seed $SLURM_ARRAY_TASK_ID
 

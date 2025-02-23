@@ -1,0 +1,90 @@
+RoboHive:> Registering Arms Envs
+RoboHive:> Registering Myo Envs
+RoboHive:> Registering Hand Envs
+RoboHive:> Registering Claw Envs
+RoboHive:> Registering Appliances Envs
+RoboHive:> Registering Multi-Task (2 subtasks) Envs
+RoboHive:> Registering FrankaKitchen (FK1) Envs
+RoboHive:> Registering Multi-Task (9 subtasks) Envs
+RoboHive:> Registering Quadruped Envs
+[36m    RoboHive: A unified framework for robot learning | https://sites.google.com/view/robohive
+[36m        Code: https://github.com/vikashplus/robohive/stargazers (add a star to support the project)
+[36m    
+[30m[43mWarning: Unused kwargs found: {'obj_xyz_range': {'high': [0.235, 0.5, 0.86], 'low': [-0.235, 0.4, 0.86]}, 'eval_mode': False}
+{'time': array([0.04]), 'qp_robot': array([-1.7482e-05,  4.8937e-03,  8.6014e-04, -1.3950e-03,  3.6680e-04,
+        1.8343e-03,  8.3394e-04]), 'qv_robot': array([0., 0., 0., 0., 0., 0., 0.]), 'reach_err': array([1.1589, 1.3998, 0.1594]), 'goal_pos': array([-0.025 ,  0.453 ,  1.0372]), 'touching_body': array([0, 0, 0])}
+[30m[43mWarning: Unused kwargs found: {'obj_xyz_range': {'high': [0.235, 0.5, 0.86], 'low': [-0.235, 0.4, 0.86]}, 'eval_mode': False}
+{'time': array([0.04]), 'qp_robot': array([-1.7482e-05,  4.8937e-03,  8.6014e-04, -1.3950e-03,  3.6680e-04,
+        1.8343e-03,  8.3394e-04]), 'qv_robot': array([0., 0., 0., 0., 0., 0., 0.]), 'reach_err': array([1.1589, 1.3998, 0.1594]), 'goal_pos': array([-0.025 ,  0.453 ,  1.0372]), 'touching_body': array([0, 0, 0])}
+[30m[43mWarning: Unused kwargs found: {'obj_xyz_range': {'high': [0.235, 0.5, 0.86], 'low': [-0.235, 0.4, 0.86]}, 'eval_mode': False}
+{'time': array([0.04]), 'qp_robot': array([-1.7482e-05,  4.8937e-03,  8.6014e-04, -1.3950e-03,  3.6680e-04,
+        1.8343e-03,  8.3394e-04]), 'qv_robot': array([0., 0., 0., 0., 0., 0., 0.]), 'reach_err': array([1.1589, 1.3998, 0.1594]), 'goal_pos': array([-0.025 ,  0.453 ,  1.0372]), 'touching_body': array([0, 0, 0])}
+[30m[43mWarning: Unused kwargs found: {'obj_xyz_range': {'high': [0.235, 0.5, 0.86], 'low': [-0.235, 0.4, 0.86]}, 'eval_mode': False}
+{'time': array([0.04]), 'qp_robot': array([-1.7482e-05,  4.8937e-03,  8.6014e-04, -1.3950e-03,  3.6680e-04,
+        1.8343e-03,  8.3394e-04]), 'qv_robot': array([0., 0., 0., 0., 0., 0., 0.]), 'reach_err': array([1.1589, 1.3998, 0.1594]), 'goal_pos': array([-0.025 ,  0.453 ,  1.0372]), 'touching_body': array([0, 0, 0])}
+[30m[43mWarning: Unused kwargs found: {'obj_xyz_range': {'high': [0.235, 0.5, 0.86], 'low': [-0.235, 0.4, 0.86]}, 'eval_mode': False}
+{'time': array([0.04]), 'qp_robot': array([-1.7482e-05,  4.8937e-03,  8.6014e-04, -1.3950e-03,  3.6680e-04,
+        1.8343e-03,  8.3394e-04]), 'qv_robot': array([0., 0., 0., 0., 0., 0., 0.]), 'reach_err': array([1.1589, 1.3998, 0.1594]), 'goal_pos': array([-0.025 ,  0.453 ,  1.0372]), 'touching_body': array([0, 0, 0])}
+[30m[43mWarning: Unused kwargs found: {'obj_xyz_range': {'high': [0.235, 0.5, 0.86], 'low': [-0.235, 0.4, 0.86]}, 'eval_mode': False}
+{'time': array([0.04]), 'qp_robot': array([-1.7482e-05,  4.8937e-03,  8.6014e-04, -1.3950e-03,  3.6680e-04,
+        1.8343e-03,  8.3394e-04]), 'qv_robot': array([0., 0., 0., 0., 0., 0., 0.]), 'reach_err': array([1.1589, 1.3998, 0.1594]), 'goal_pos': array([-0.025 ,  0.453 ,  1.0372]), 'touching_body': array([0, 0, 0])}
+[30m[43mWarning: Unused kwargs found: {'obj_xyz_range': {'high': [0.235, 0.5, 0.86], 'low': [-0.235, 0.4, 0.86]}, 'eval_mode': False}
+{'time': array([0.04]), 'qp_robot': array([-1.7482e-05,  4.8937e-03,  8.6014e-04, -1.3950e-03,  3.6680e-04,
+        1.8343e-03,  8.3394e-04]), 'qv_robot': array([0., 0., 0., 0., 0., 0., 0.]), 'reach_err': array([1.1589, 1.3998, 0.1594]), 'goal_pos': array([-0.025 ,  0.453 ,  1.0372]), 'touching_body': array([0, 0, 0])}
+[30m[43mWarning: Unused kwargs found: {'obj_xyz_range': {'high': [0.235, 0.5, 0.86], 'low': [-0.235, 0.4, 0.86]}, 'eval_mode': False}
+{'time': array([0.04]), 'qp_robot': array([-1.7482e-05,  4.8937e-03,  8.6014e-04, -1.3950e-03,  3.6680e-04,
+        1.8343e-03,  8.3394e-04]), 'qv_robot': array([0., 0., 0., 0., 0., 0., 0.]), 'reach_err': array([1.1589, 1.3998, 0.1594]), 'goal_pos': array([-0.025 ,  0.453 ,  1.0372]), 'touching_body': array([0, 0, 0])}
+Begin training
+2024_12_17_12_21_160
+dict_keys(['image', 'vector'])
+Eval num_timesteps=16000, episode_reward=-205.00 +/- 14.20
+Episode length: 250.00 +/- 0.00
+New best mean reward!
+Eval num_timesteps=32000, episode_reward=-195.00 +/- 13.59
+Episode length: 250.00 +/- 0.00
+New best mean reward!
+INFO:absl:MUJOCO_GL is not set, so an OpenGL backend will be chosen automatically.
+INFO:absl:Successfully imported OpenGL backend: glfw
+INFO:absl:MuJoCo library version is: 3.2.5
+/home/cheryl/Documents/RL-Chemist/.venv/lib/python3.10/site-packages/stable_baselines3/common/vec_env/patch_gym.py:49: UserWarning: You provided an OpenAI Gym environment. We strongly recommend transitioning to Gymnasium environments. Stable-Baselines3 is automatically wrapping your environments in a compatibility layer, which could potentially cause issues.
+  warnings.warn(
+/home/cheryl/Documents/RL-Chemist/.venv/lib/python3.10/site-packages/stable_baselines3/common/policies.py:486: UserWarning: As shared layers in the mlp_extractor are removed since SB3 v1.8.0, you should now pass directly a dictionary and not a list (net_arch=dict(pi=..., vf=...) instead of net_arch=[dict(pi=..., vf=...)])
+  warnings.warn(
+Traceback (most recent call last):
+  File "/home/cheryl/Documents/RL-Chemist/Train_simple_rgb.py", line 163, in <module>
+    model.learn(total_timesteps=training_steps, callback=callback)# , tb_log_name=env_name + "_" + time_now)
+  File "/home/cheryl/Documents/RL-Chemist/.venv/lib/python3.10/site-packages/stable_baselines3/ppo/ppo.py", line 311, in learn
+    return super().learn(
+  File "/home/cheryl/Documents/RL-Chemist/.venv/lib/python3.10/site-packages/stable_baselines3/common/on_policy_algorithm.py", line 323, in learn
+    continue_training = self.collect_rollouts(self.env, callback, self.rollout_buffer, n_rollout_steps=self.n_steps)
+  File "/home/cheryl/Documents/RL-Chemist/.venv/lib/python3.10/site-packages/stable_baselines3/common/on_policy_algorithm.py", line 218, in collect_rollouts
+    new_obs, rewards, dones, infos = env.step(clipped_actions)
+  File "/home/cheryl/Documents/RL-Chemist/.venv/lib/python3.10/site-packages/stable_baselines3/common/vec_env/base_vec_env.py", line 206, in step
+    return self.step_wait()
+  File "/home/cheryl/Documents/RL-Chemist/.venv/lib/python3.10/site-packages/stable_baselines3/common/vec_env/vec_frame_stack.py", line 38, in step_wait
+    observations, rewards, dones, infos = self.venv.step_wait()
+  File "/home/cheryl/Documents/RL-Chemist/.venv/lib/python3.10/site-packages/stable_baselines3/common/vec_env/vec_monitor.py", line 76, in step_wait
+    obs, rewards, dones, infos = self.venv.step_wait()
+  File "/home/cheryl/Documents/RL-Chemist/.venv/lib/python3.10/site-packages/stable_baselines3/common/vec_env/dummy_vec_env.py", line 58, in step_wait
+    obs, self.buf_rews[env_idx], terminated, truncated, self.buf_infos[env_idx] = self.envs[env_idx].step(
+  File "/home/cheryl/Documents/RL-Chemist/.venv/lib/python3.10/site-packages/shimmy/openai_gym_compatibility.py", line 250, in step
+    obs, reward, done, info = self.gym_env.step(action)
+  File "/home/cheryl/Documents/RL-Chemist/.venv/lib/python3.10/site-packages/gym/wrappers/time_limit.py", line 15, in step
+    observation, reward, done, info = self.env.step(action)
+  File "/home/cheryl/Documents/RL-Chemist/mj_envs/robohive/envs/arms/reach_base_v2.py", line 246, in step
+    return self.forward(**kwargs)
+  File "/home/cheryl/Documents/RL-Chemist/mj_envs/robohive/envs/arms/reach_base_v2.py", line 259, in forward
+    obs = self.get_obs(**kwargs)
+  File "/home/cheryl/Documents/RL-Chemist/mj_envs/robohive/envs/env_base_2.py", line 316, in get_obs
+    self.obs_dict = self.get_obs_dict(self.sim_obsd)
+  File "/home/cheryl/Documents/RL-Chemist/mj_envs/robohive/envs/arms/reach_base_v2.py", line 105, in get_obs_dict
+    self.get_image_data()
+  File "/home/cheryl/Documents/RL-Chemist/mj_envs/robohive/envs/arms/reach_base_v2.py", line 141, in get_image_data
+    real_images = self.load_images('background/212x120')
+  File "/home/cheryl/Documents/RL-Chemist/mj_envs/robohive/envs/arms/reach_base_v2.py", line 170, in load_images
+    image = Image.open(file).convert('RGB')
+  File "/home/cheryl/Documents/RL-Chemist/.venv/lib/python3.10/site-packages/PIL/Image.py", line 995, in convert
+    self.load()
+  File "/home/cheryl/Documents/RL-Chemist/.venv/lib/python3.10/site-packages/PIL/ImageFile.py", line 293, in load
+    n, err_code = decoder.decode(b)
+KeyboardInterrupt
