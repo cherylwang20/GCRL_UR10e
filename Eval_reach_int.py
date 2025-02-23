@@ -70,6 +70,9 @@ parser.add_argument("--policy_env", type=str, default='NA', help="environment na
 parser.add_argument("--model_num", type=str, default='testing', help="environment name")
 parser.add_argument("--movie", type=str, default='False', help="environment name")
 parser.add_argument("--channel_num", type=int, default=4, help="channel num")
+
+parser.add_argument("--merge", type= bool, default= False, help="merge with real world image")
+
 args = parser.parse_args()
 
 # Ignore specific warning
@@ -81,7 +84,7 @@ model_num = args.model_num
 env_name = args.env_name 
 print(env_name)
 policy_env = args.policy_env
-env = gym.make(f'mj_envs.robohive.envs:{env_name}', channel = args.channel_num)
+env = gym.make(f'mj_envs.robohive.envs:{env_name}', channel = args.channel_num, MERGE = args.merge)
 env = CustomFrameStack(env, n_stack=3)
 
 seed_value = 47004  # Seed value for reproducibility
@@ -215,5 +218,5 @@ print(f"Success rate: {success/trial}")
 if movie:
     os.makedirs('./videos' +'/' + env_name, exist_ok=True)
     skvideo.io.vwrite('./videos'  +'/' + env_name + '/' + model_num + f'{view}_video.mp4', np.asarray(frames_rgb), inputdict = {'-r':'50'} , outputdict={"-pix_fmt": "yuv420p"})
-    skvideo.io.vwrite('./videos'  +'/' + env_name + '/' + model_num + f'{view}_saliency_video.mp4', np.asarray(saliency_map), inputdict = {'-r':'50'} , outputdict={"-pix_fmt": "yuv420p"})
-    #skvideo.io.vwrite('./videos'  +'/' + env_name + '/' + model_num + f'{view}_mask_video.mp4', np.asarray(frames_mask), inputdict = {'-r':'50'} , outputdict={"-pix_fmt": "yuv420p"})
+    #skvideo.io.vwrite('./videos'  +'/' + env_name + '/' + model_num + f'{view}_saliency_video.mp4', np.asarray(saliency_map), inputdict = {'-r':'50'} , outputdict={"-pix_fmt": "yuv420p"})
+    skvideo.io.vwrite('./videos'  +'/' + env_name + '/' + model_num + f'{view}_mask_video.mp4', np.asarray(frames_mask), inputdict = {'-r':'50'} , outputdict={"-pix_fmt": "yuv420p"})

@@ -1,48 +1,3 @@
-RoboHive:> Registering Arms Envs
-RoboHive:> Registering Myo Envs
-RoboHive:> Registering Hand Envs
-RoboHive:> Registering Claw Envs
-RoboHive:> Registering Appliances Envs
-RoboHive:> Registering Multi-Task (2 subtasks) Envs
-RoboHive:> Registering FrankaKitchen (FK1) Envs
-RoboHive:> Registering Multi-Task (9 subtasks) Envs
-RoboHive:> Registering Quadruped Envs
-[36m    RoboHive: A unified framework for robot learning | https://sites.google.com/view/robohive
-[36m        Code: https://github.com/vikashplus/robohive/stargazers (add a star to support the project)
-[36m    
-[30m[43mWarning: Unused kwargs found: {'obj_xyz_range': {'high': [0.235, 0.5, 0.86], 'low': [-0.235, 0.4, 0.86]}, 'eval_mode': False}
-{'time': array([0.04]), 'qp_robot': array([-1.7482e-05,  4.8937e-03,  8.6014e-04, -1.3950e-03,  3.6680e-04,
-        1.8343e-03,  8.3394e-04]), 'qv_robot': array([0., 0., 0., 0., 0., 0., 0.]), 'reach_err': array([1.1589, 1.3998, 0.1594]), 'goal_pos': array([-0.025 ,  0.453 ,  1.0372]), 'touching_body': array([0, 0, 0])}
-[30m[43mWarning: Unused kwargs found: {'obj_xyz_range': {'high': [0.235, 0.5, 0.86], 'low': [-0.235, 0.4, 0.86]}, 'eval_mode': False}
-{'time': array([0.04]), 'qp_robot': array([-1.7482e-05,  4.8937e-03,  8.6014e-04, -1.3950e-03,  3.6680e-04,
-        1.8343e-03,  8.3394e-04]), 'qv_robot': array([0., 0., 0., 0., 0., 0., 0.]), 'reach_err': array([1.1589, 1.3998, 0.1594]), 'goal_pos': array([-0.025 ,  0.453 ,  1.0372]), 'touching_body': array([0, 0, 0])}
-[30m[43mWarning: Unused kwargs found: {'obj_xyz_range': {'high': [0.235, 0.5, 0.86], 'low': [-0.235, 0.4, 0.86]}, 'eval_mode': False}
-{'time': array([0.04]), 'qp_robot': array([-1.7482e-05,  4.8937e-03,  8.6014e-04, -1.3950e-03,  3.6680e-04,
-        1.8343e-03,  8.3394e-04]), 'qv_robot': array([0., 0., 0., 0., 0., 0., 0.]), 'reach_err': array([1.1589, 1.3998, 0.1594]), 'goal_pos': array([-0.025 ,  0.453 ,  1.0372]), 'touching_body': array([0, 0, 0])}
-[30m[43mWarning: Unused kwargs found: {'obj_xyz_range': {'high': [0.235, 0.5, 0.86], 'low': [-0.235, 0.4, 0.86]}, 'eval_mode': False}
-{'time': array([0.04]), 'qp_robot': array([-1.7482e-05,  4.8937e-03,  8.6014e-04, -1.3950e-03,  3.6680e-04,
-        1.8343e-03,  8.3394e-04]), 'qv_robot': array([0., 0., 0., 0., 0., 0., 0.]), 'reach_err': array([1.1589, 1.3998, 0.1594]), 'goal_pos': array([-0.025 ,  0.453 ,  1.0372]), 'touching_body': array([0, 0, 0])}
-[30m[43mWarning: Unused kwargs found: {'obj_xyz_range': {'high': [0.235, 0.5, 0.86], 'low': [-0.235, 0.4, 0.86]}, 'eval_mode': False}
-{'time': array([0.04]), 'qp_robot': array([-1.7482e-05,  4.8937e-03,  8.6014e-04, -1.3950e-03,  3.6680e-04,
-        1.8343e-03,  8.3394e-04]), 'qv_robot': array([0., 0., 0., 0., 0., 0., 0.]), 'reach_err': array([1.1589, 1.3998, 0.1594]), 'goal_pos': array([-0.025 ,  0.453 ,  1.0372]), 'touching_body': array([0, 0, 0])}
-[30m[43mWarning: Unused kwargs found: {'obj_xyz_range': {'high': [0.235, 0.5, 0.86], 'low': [-0.235, 0.4, 0.86]}, 'eval_mode': False}
-{'time': array([0.04]), 'qp_robot': array([-1.7482e-05,  4.8937e-03,  8.6014e-04, -1.3950e-03,  3.6680e-04,
-        1.8343e-03,  8.3394e-04]), 'qv_robot': array([0., 0., 0., 0., 0., 0., 0.]), 'reach_err': array([1.1589, 1.3998, 0.1594]), 'goal_pos': array([-0.025 ,  0.453 ,  1.0372]), 'touching_body': array([0, 0, 0])}
-[30m[43mWarning: Unused kwargs found: {'obj_xyz_range': {'high': [0.235, 0.5, 0.86], 'low': [-0.235, 0.4, 0.86]}, 'eval_mode': False}
-{'time': array([0.04]), 'qp_robot': array([-1.7482e-05,  4.8937e-03,  8.6014e-04, -1.3950e-03,  3.6680e-04,
-        1.8343e-03,  8.3394e-04]), 'qv_robot': array([0., 0., 0., 0., 0., 0., 0.]), 'reach_err': array([1.1589, 1.3998, 0.1594]), 'goal_pos': array([-0.025 ,  0.453 ,  1.0372]), 'touching_body': array([0, 0, 0])}
-[30m[43mWarning: Unused kwargs found: {'obj_xyz_range': {'high': [0.235, 0.5, 0.86], 'low': [-0.235, 0.4, 0.86]}, 'eval_mode': False}
-{'time': array([0.04]), 'qp_robot': array([-1.7482e-05,  4.8937e-03,  8.6014e-04, -1.3950e-03,  3.6680e-04,
-        1.8343e-03,  8.3394e-04]), 'qv_robot': array([0., 0., 0., 0., 0., 0., 0.]), 'reach_err': array([1.1589, 1.3998, 0.1594]), 'goal_pos': array([-0.025 ,  0.453 ,  1.0372]), 'touching_body': array([0, 0, 0])}
-Begin training
-2024_12_17_12_21_160
-dict_keys(['image', 'vector'])
-Eval num_timesteps=16000, episode_reward=-205.00 +/- 14.20
-Episode length: 250.00 +/- 0.00
-New best mean reward!
-Eval num_timesteps=32000, episode_reward=-195.00 +/- 13.59
-Episode length: 250.00 +/- 0.00
-New best mean reward!
 INFO:absl:MUJOCO_GL is not set, so an OpenGL backend will be chosen automatically.
 INFO:absl:Successfully imported OpenGL backend: glfw
 INFO:absl:MuJoCo library version is: 3.2.5
@@ -88,3 +43,48 @@ Traceback (most recent call last):
   File "/home/cheryl/Documents/RL-Chemist/.venv/lib/python3.10/site-packages/PIL/ImageFile.py", line 293, in load
     n, err_code = decoder.decode(b)
 KeyboardInterrupt
+RoboHive:> Registering Arms Envs
+RoboHive:> Registering Myo Envs
+RoboHive:> Registering Hand Envs
+RoboHive:> Registering Claw Envs
+RoboHive:> Registering Appliances Envs
+RoboHive:> Registering Multi-Task (2 subtasks) Envs
+RoboHive:> Registering FrankaKitchen (FK1) Envs
+RoboHive:> Registering Multi-Task (9 subtasks) Envs
+RoboHive:> Registering Quadruped Envs
+[36m    RoboHive: A unified framework for robot learning | https://sites.google.com/view/robohive
+[36m        Code: https://github.com/vikashplus/robohive/stargazers (add a star to support the project)
+[36m    
+[30m[43mWarning: Unused kwargs found: {'obj_xyz_range': {'high': [0.235, 0.5, 0.86], 'low': [-0.235, 0.4, 0.86]}, 'eval_mode': False}
+{'time': array([0.04]), 'qp_robot': array([-1.7482e-05,  4.8937e-03,  8.6014e-04, -1.3950e-03,  3.6680e-04,
+        1.8343e-03,  8.3394e-04]), 'qv_robot': array([0., 0., 0., 0., 0., 0., 0.]), 'reach_err': array([1.1589, 1.3998, 0.1594]), 'goal_pos': array([-0.025 ,  0.453 ,  1.0372]), 'touching_body': array([0, 0, 0])}
+[30m[43mWarning: Unused kwargs found: {'obj_xyz_range': {'high': [0.235, 0.5, 0.86], 'low': [-0.235, 0.4, 0.86]}, 'eval_mode': False}
+{'time': array([0.04]), 'qp_robot': array([-1.7482e-05,  4.8937e-03,  8.6014e-04, -1.3950e-03,  3.6680e-04,
+        1.8343e-03,  8.3394e-04]), 'qv_robot': array([0., 0., 0., 0., 0., 0., 0.]), 'reach_err': array([1.1589, 1.3998, 0.1594]), 'goal_pos': array([-0.025 ,  0.453 ,  1.0372]), 'touching_body': array([0, 0, 0])}
+[30m[43mWarning: Unused kwargs found: {'obj_xyz_range': {'high': [0.235, 0.5, 0.86], 'low': [-0.235, 0.4, 0.86]}, 'eval_mode': False}
+{'time': array([0.04]), 'qp_robot': array([-1.7482e-05,  4.8937e-03,  8.6014e-04, -1.3950e-03,  3.6680e-04,
+        1.8343e-03,  8.3394e-04]), 'qv_robot': array([0., 0., 0., 0., 0., 0., 0.]), 'reach_err': array([1.1589, 1.3998, 0.1594]), 'goal_pos': array([-0.025 ,  0.453 ,  1.0372]), 'touching_body': array([0, 0, 0])}
+[30m[43mWarning: Unused kwargs found: {'obj_xyz_range': {'high': [0.235, 0.5, 0.86], 'low': [-0.235, 0.4, 0.86]}, 'eval_mode': False}
+{'time': array([0.04]), 'qp_robot': array([-1.7482e-05,  4.8937e-03,  8.6014e-04, -1.3950e-03,  3.6680e-04,
+        1.8343e-03,  8.3394e-04]), 'qv_robot': array([0., 0., 0., 0., 0., 0., 0.]), 'reach_err': array([1.1589, 1.3998, 0.1594]), 'goal_pos': array([-0.025 ,  0.453 ,  1.0372]), 'touching_body': array([0, 0, 0])}
+[30m[43mWarning: Unused kwargs found: {'obj_xyz_range': {'high': [0.235, 0.5, 0.86], 'low': [-0.235, 0.4, 0.86]}, 'eval_mode': False}
+{'time': array([0.04]), 'qp_robot': array([-1.7482e-05,  4.8937e-03,  8.6014e-04, -1.3950e-03,  3.6680e-04,
+        1.8343e-03,  8.3394e-04]), 'qv_robot': array([0., 0., 0., 0., 0., 0., 0.]), 'reach_err': array([1.1589, 1.3998, 0.1594]), 'goal_pos': array([-0.025 ,  0.453 ,  1.0372]), 'touching_body': array([0, 0, 0])}
+[30m[43mWarning: Unused kwargs found: {'obj_xyz_range': {'high': [0.235, 0.5, 0.86], 'low': [-0.235, 0.4, 0.86]}, 'eval_mode': False}
+{'time': array([0.04]), 'qp_robot': array([-1.7482e-05,  4.8937e-03,  8.6014e-04, -1.3950e-03,  3.6680e-04,
+        1.8343e-03,  8.3394e-04]), 'qv_robot': array([0., 0., 0., 0., 0., 0., 0.]), 'reach_err': array([1.1589, 1.3998, 0.1594]), 'goal_pos': array([-0.025 ,  0.453 ,  1.0372]), 'touching_body': array([0, 0, 0])}
+[30m[43mWarning: Unused kwargs found: {'obj_xyz_range': {'high': [0.235, 0.5, 0.86], 'low': [-0.235, 0.4, 0.86]}, 'eval_mode': False}
+{'time': array([0.04]), 'qp_robot': array([-1.7482e-05,  4.8937e-03,  8.6014e-04, -1.3950e-03,  3.6680e-04,
+        1.8343e-03,  8.3394e-04]), 'qv_robot': array([0., 0., 0., 0., 0., 0., 0.]), 'reach_err': array([1.1589, 1.3998, 0.1594]), 'goal_pos': array([-0.025 ,  0.453 ,  1.0372]), 'touching_body': array([0, 0, 0])}
+[30m[43mWarning: Unused kwargs found: {'obj_xyz_range': {'high': [0.235, 0.5, 0.86], 'low': [-0.235, 0.4, 0.86]}, 'eval_mode': False}
+{'time': array([0.04]), 'qp_robot': array([-1.7482e-05,  4.8937e-03,  8.6014e-04, -1.3950e-03,  3.6680e-04,
+        1.8343e-03,  8.3394e-04]), 'qv_robot': array([0., 0., 0., 0., 0., 0., 0.]), 'reach_err': array([1.1589, 1.3998, 0.1594]), 'goal_pos': array([-0.025 ,  0.453 ,  1.0372]), 'touching_body': array([0, 0, 0])}
+Begin training
+2024_12_17_12_21_160
+dict_keys(['image', 'vector'])
+Eval num_timesteps=16000, episode_reward=-205.00 +/- 14.20
+Episode length: 250.00 +/- 0.00
+New best mean reward!
+Eval num_timesteps=32000, episode_reward=-195.00 +/- 13.59
+Episode length: 250.00 +/- 0.00
+New best mean reward!

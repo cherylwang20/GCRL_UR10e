@@ -1,5 +1,6 @@
 import gym
 import os
+import sys
 from gym import spaces
 from PIL import Image
 import cv2
@@ -27,6 +28,9 @@ from datetime import datetime
 import time
 from wandb.integration.sb3 import WandbCallback
 
+sys.path.append('/home/cheryl16/projects/def-durandau/RL-Chemist/mj_envs')
+sys.path.append('/home/cheryl16/projects/def-durandau/RL-Chemist/')
+
 import numpy as np
 import argparse
 parser = argparse.ArgumentParser(description="Main script to train an agent")
@@ -39,6 +43,8 @@ parser.add_argument("--learning_rate", type=float, default=0.0003, help="Learnin
 parser.add_argument("--clip_range", type=float, default=0.2, help="Clip range for the policy gradient update")
 
 parser.add_argument("--channel_num", type=int, default=4, help="channel num")
+parser.add_argument("--merge", type= bool, default= False, help="merge with real world image")
+
 args = parser.parse_args()
 
 class KorniaAugmentationCallback(BaseCallback):
@@ -206,9 +212,9 @@ def linear_schedule(initial_value: float) -> Callable[[float], float]:
 
     return func
 
-def make_env(env_name, idx,  channel, seed=0,eval_mode=False):
+def make_env(env_name, idx,  channel, MERGE, seed=0,eval_mode=False):
     def _init():
-        env = gym.make(f'mj_envs.robohive.envs:{env_name}', eval_mode=eval_mode, channel = channel)
+        env = gym.make(f'mj_envs.robohive.envs:{env_name}', eval_mode=eval_mode, channel = channel, MERGE = MERGE)
         env.seed(seed + idx)
         return env
     return _init
@@ -275,7 +281,7 @@ def main():
 
     num_cpu = args.num_envs
 
-    env = DummyVecEnv([make_env(env_name, i, seed=args.seed, channel = args.channel_num) for i in range(num_cpu)])
+    env = DummyVecEnv([make_env(env_name, i, seed=args.seed, channel = args.channel_num, MERGE = args.merge ) for i in range(num_cpu)])
     env.render_mode = 'rgb_array'
     envs = VecVideoRecorder(env, "videos/" + env_name + '/training_log' ,
         record_video_trigger=lambda x: x % 30000 == 0, video_length=250)
@@ -283,7 +289,7 @@ def main():
     envs = VecFrameStack(envs, n_stack = 3)
 
     ## EVAL
-    eval_env = DummyVecEnv([make_env(env_name, i, seed=args.seed,channel = args.channel_num, eval_mode=True) for i in range(1)])
+    eval_env = DummyVecEnv([make_env(env_name, i, seed=args.seed,channel = args.channel_num, eval_mode=True, MERGE = args.merge) for i in range(1)])
     eval_env.render_mode = 'rgb_array'
     eval_env = VecVideoRecorder(eval_env, "videos/" + env_name + '/training_log' ,
         record_video_trigger=lambda x: x % 30000 == 0, video_length=250)
