@@ -1,9 +1,9 @@
 #!/bin/bash 
-#SBATCH --account=def-durandau
-#SBATCH --job-name=reach_4d_merge
+#SBATCH --account=def-cbelling
+#SBATCH --job-name=reach_4d_resnet
 #SBATCH --cpus-per-task=32
-#SBATCH --time=0-60:00
-#SBATCH --array=0-5
+#SBATCH --time=0-00:10
+#SBATCH --array=0
 #SBATCH --mem=88G
 #SBATCH --gres=gpu:1
 #SBATCH --mail-user=huiyi.wang@mail.mcgill.ca
@@ -38,10 +38,15 @@ wandb offline
 #python Train_reach_4.py --env_name 'UR10eReach4C-v1' --group 'augment_env_rgb' --num_envs 2 --learning_rate 0.0002 --clip_range 0.1 --seed $SLURM_ARRAY_TASK_ID
 #parallel -j 5 python Train_reach_7.py --env_name 'UR10eReach7C-v1' --group 'random_reach7_4' --num_envs 4 --learning_rate 0.0002 --clip_range 0.1 --seed ::: {6..10} 
 
+
+######Sim2Real
 #python Train_reach.py --env_name 'UR10eReach1C-v1' --group 'Reach_4C' --num_envs 4 --learning_rate 0.0003 --clip_range 0.1 --seed=$SLURM_ARRAY_TASK_ID --channel_num 4
 
-python training/Train_reach.py --env_name 'UR10eReach1C-v1' --group 'Reach_4C_80k' --num_envs 4 --learning_rate 0.0003 --clip_range 0.1 --seed=$SLURM_ARRAY_TASK_ID --channel_num 4 --merge True
+#python training/Train_reach.py --env_name 'UR10eReach1C-v1' --group 'Reach_4C_80k' --num_envs 4 --learning_rate 0.0003 --clip_range 0.1 --seed=$SLURM_ARRAY_TASK_ID --channel_num 4 --merge True
 
+python training/Train_reach_resnet.py --env_name 'UR10eReach1C-v1' --group "ResNet test" --num_envs 4 --learning_rate 0.0003 --clip_range 0.1 --seed=$SLURM_ARRAY_TASK_ID --channel_num 4 --merge False
+
+#------------------------------------
 #parallel -j 5 python Train_simple_rgb.py --group 'simple_rgb_dt_img' --learning_rate 0.0001 --seed ::: {16..20}
 #parallel -j 5 python Train_simple_rgb2.py --group 'simple_rgb_nodis' --seed ::: {26..30}
 

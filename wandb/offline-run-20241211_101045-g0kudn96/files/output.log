@@ -1,3 +1,12 @@
+INFO:absl:MUJOCO_GL is not set, so an OpenGL backend will be chosen automatically.
+INFO:absl:Successfully imported OpenGL backend: glfw
+INFO:absl:MuJoCo library version is: 3.2.5
+/home/cheryl/Documents/RL-Chemist/.venv/lib/python3.10/site-packages/stable_baselines3/common/vec_env/patch_gym.py:49: UserWarning: You provided an OpenAI Gym environment. We strongly recommend transitioning to Gymnasium environments. Stable-Baselines3 is automatically wrapping your environments in a compatibility layer, which could potentially cause issues.
+  warnings.warn(
+/home/cheryl/Documents/RL-Chemist/.venv/lib/python3.10/site-packages/stable_baselines3/common/policies.py:486: UserWarning: As shared layers in the mlp_extractor are removed since SB3 v1.8.0, you should now pass directly a dictionary and not a list (net_arch=dict(pi=..., vf=...) instead of net_arch=[dict(pi=..., vf=...)])
+  warnings.warn(
+/home/cheryl/Documents/RL-Chemist/.venv/lib/python3.10/site-packages/mujoco/renderer.py:203: RuntimeWarning: invalid value encountered in cast
+  out_64 = out.astype(np.float64)
 RoboHive:> Registering Arms Envs
 RoboHive:> Registering Myo Envs
 RoboHive:> Registering Hand Envs
@@ -63,12 +72,3 @@ Episode length: 200.00 +/- 0.00
 New best mean reward!
 Eval num_timesteps=176000, episode_reward=-186.43 +/- 11.00
 Episode length: 200.00 +/- 0.00
-INFO:absl:MUJOCO_GL is not set, so an OpenGL backend will be chosen automatically.
-INFO:absl:Successfully imported OpenGL backend: glfw
-INFO:absl:MuJoCo library version is: 3.2.5
-/home/cheryl/Documents/RL-Chemist/.venv/lib/python3.10/site-packages/stable_baselines3/common/vec_env/patch_gym.py:49: UserWarning: You provided an OpenAI Gym environment. We strongly recommend transitioning to Gymnasium environments. Stable-Baselines3 is automatically wrapping your environments in a compatibility layer, which could potentially cause issues.
-  warnings.warn(
-/home/cheryl/Documents/RL-Chemist/.venv/lib/python3.10/site-packages/stable_baselines3/common/policies.py:486: UserWarning: As shared layers in the mlp_extractor are removed since SB3 v1.8.0, you should now pass directly a dictionary and not a list (net_arch=dict(pi=..., vf=...) instead of net_arch=[dict(pi=..., vf=...)])
-  warnings.warn(
-/home/cheryl/Documents/RL-Chemist/.venv/lib/python3.10/site-packages/mujoco/renderer.py:203: RuntimeWarning: invalid value encountered in cast
-  out_64 = out.astype(np.float64)

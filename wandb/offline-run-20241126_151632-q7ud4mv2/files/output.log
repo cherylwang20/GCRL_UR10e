@@ -1,3 +1,18 @@
+INFO:absl:MUJOCO_GL is not set, so an OpenGL backend will be chosen automatically.
+INFO:absl:Successfully imported OpenGL backend: glfw
+INFO:absl:MuJoCo library version is: 3.2.5
+/home/cheryl/Documents/RL-Chemist/.venv/lib/python3.10/site-packages/stable_baselines3/common/vec_env/patch_gym.py:49: UserWarning: You provided an OpenAI Gym environment. We strongly recommend transitioning to Gymnasium environments. Stable-Baselines3 is automatically wrapping your environments in a compatibility layer, which could potentially cause issues.
+  warnings.warn(
+/home/cheryl/Documents/RL-Chemist/.venv/lib/python3.10/site-packages/stable_baselines3/common/vec_env/patch_gym.py:49: UserWarning: You provided an OpenAI Gym environment. We strongly recommend transitioning to Gymnasium environments. Stable-Baselines3 is automatically wrapping your environments in a compatibility layer, which could potentially cause issues.
+  warnings.warn(
+/home/cheryl/Documents/RL-Chemist/.venv/lib/python3.10/site-packages/stable_baselines3/common/policies.py:486: UserWarning: As shared layers in the mlp_extractor are removed since SB3 v1.8.0, you should now pass directly a dictionary and not a list (net_arch=dict(pi=..., vf=...) instead of net_arch=[dict(pi=..., vf=...)])
+  warnings.warn(
+/home/cheryl/Documents/RL-Chemist/Train_reach_4.py:80: RuntimeWarning: invalid value encountered in divide
+  img = (img / img.max() * 255).astype(np.uint8)
+/home/cheryl/Documents/RL-Chemist/Train_reach_4.py:80: RuntimeWarning: invalid value encountered in cast
+  img = (img / img.max() * 255).astype(np.uint8)
+/home/cheryl/Documents/RL-Chemist/.venv/lib/python3.10/site-packages/stable_baselines3/common/evaluation.py:67: UserWarning: Evaluation environment is not wrapped with a ``Monitor`` wrapper. This may result in reporting modified episode lengths and rewards, if other wrappers happen to modify these. Consider wrapping environment first with ``Monitor`` wrapper.
+  warnings.warn(
 Using GPU: NVIDIA GeForce RTX 2080 Ti
 RoboHive:> Registering Arms Envs
 RoboHive:> Registering Myo Envs
@@ -890,18 +905,3 @@ New best mean reward!
   [0. 0. 0.]
   [0. 0. 0.]
   [0. 0. 0.]]]
-INFO:absl:MUJOCO_GL is not set, so an OpenGL backend will be chosen automatically.
-INFO:absl:Successfully imported OpenGL backend: glfw
-INFO:absl:MuJoCo library version is: 3.2.5
-/home/cheryl/Documents/RL-Chemist/.venv/lib/python3.10/site-packages/stable_baselines3/common/vec_env/patch_gym.py:49: UserWarning: You provided an OpenAI Gym environment. We strongly recommend transitioning to Gymnasium environments. Stable-Baselines3 is automatically wrapping your environments in a compatibility layer, which could potentially cause issues.
-  warnings.warn(
-/home/cheryl/Documents/RL-Chemist/.venv/lib/python3.10/site-packages/stable_baselines3/common/vec_env/patch_gym.py:49: UserWarning: You provided an OpenAI Gym environment. We strongly recommend transitioning to Gymnasium environments. Stable-Baselines3 is automatically wrapping your environments in a compatibility layer, which could potentially cause issues.
-  warnings.warn(
-/home/cheryl/Documents/RL-Chemist/.venv/lib/python3.10/site-packages/stable_baselines3/common/policies.py:486: UserWarning: As shared layers in the mlp_extractor are removed since SB3 v1.8.0, you should now pass directly a dictionary and not a list (net_arch=dict(pi=..., vf=...) instead of net_arch=[dict(pi=..., vf=...)])
-  warnings.warn(
-/home/cheryl/Documents/RL-Chemist/Train_reach_4.py:80: RuntimeWarning: invalid value encountered in divide
-  img = (img / img.max() * 255).astype(np.uint8)
-/home/cheryl/Documents/RL-Chemist/Train_reach_4.py:80: RuntimeWarning: invalid value encountered in cast
-  img = (img / img.max() * 255).astype(np.uint8)
-/home/cheryl/Documents/RL-Chemist/.venv/lib/python3.10/site-packages/stable_baselines3/common/evaluation.py:67: UserWarning: Evaluation environment is not wrapped with a ``Monitor`` wrapper. This may result in reporting modified episode lengths and rewards, if other wrappers happen to modify these. Consider wrapping environment first with ``Monitor`` wrapper.
-  warnings.warn(

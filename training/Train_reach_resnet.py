@@ -1,8 +1,10 @@
 import gym
 import os
+import sys
 from gym import spaces
 from PIL import Image
 import cv2
+import torchvision.models as models
 import torchvision.transforms as transforms
 import torch 
 import random
@@ -27,6 +29,12 @@ from datetime import datetime
 import time
 from wandb.integration.sb3 import WandbCallback
 
+sys.path.append('/home/cheryl16/projects/def-durandau/RL-Chemist/mj_envs')
+sys.path.append('/home/cheryl16/projects/def-durandau/RL-Chemist/')
+
+from torchvision.models.resnet import ResNet18_Weights
+#model_urls['resnet18'] = model_urls['resnet18'].replace('https://', 'http://')
+
 import numpy as np
 import argparse
 parser = argparse.ArgumentParser(description="Main script to train an agent")
@@ -38,102 +46,11 @@ parser.add_argument("--group", type=str, default='testing', help="environment na
 parser.add_argument("--learning_rate", type=float, default=0.0003, help="Learning rate for the optimizer")
 parser.add_argument("--clip_range", type=float, default=0.2, help="Clip range for the policy gradient update")
 
+parser.add_argument("--channel_num", type=int, default=4, help="channel num")
+parser.add_argument("--merge", type= bool, default= False, help="merge with real world image")
+
 args = parser.parse_args()
 
-class KorniaAugmentationCallback(BaseCallback):
-    def __init__(self, augment_images, low, high, verbose=0):
-        super().__init__(verbose)
-        self.low = low
-        self.high = high
-        self.augment_images = augment_images
-        self.display = False
-        self.transform = torch.nn.Sequential(
-            KAug.RandomContrast(contrast=(low, high), clip_output=True, p=0.8),
-            KAug.RandomBrightness((low, high)),
-            KAug.RandomSaturation((low, high)), 
-            KAug.RandomGaussianBlur(kernel_size=(5, 5), sigma=(low, high), p=0.5)
-        )
-    
-    def show_images(self, images, title='Image'):
-        #print(images)
-        images = images * 255
-        images = images.permute(0, 2, 3, 1).numpy().astype(np.uint8)
-        for index, img in enumerate(images):
-            cv2.imwrite(f'test' + title + f'_{index}.png', img)
-            if cv2.waitKey(0) & 0xFF == ord('q'):
-                break
-        cv2.destroyAllWindows()
-
-    def _on_rollout_end(self):
-        # Assume observations['image'] has the shape [batch_size, height, width, channels]
-        images = self.model.rollout_buffer.observations['image']
-
-        images = images.reshape(images.shape[0] * images.shape[1], 120, 212, 12)
-
-        # Reshape to separate frames and channels
-        # New shape: [batch_size, height, width, num_frames, channels_per_frame]
-        images = np.split(images, 3, axis = 3)
-
-        final_tensors = []
-
-        for image in images:
-            image = torch.from_numpy(image)
-            image = image.permute(0, 3, 1, 2)
-            rgb_channel = image[:, :3, :, :]
-            mask_channel = image[:, 3:4, :, :]
-            
-            if self.display:
-                # Display original first half
-                self.show_images(rgb_channel, title='Original First Half')
-
-            rgb_transform = self.transform(rgb_channel)
-
-            if self.display:
-                # Display original first half
-                self.show_images(rgb_transform, title='After')
-
-            enhanced_transform = torch.empty_like(rgb_transform)
-            idx = np.random.choice(len(self.augment_images), size=rgb_channel.size(0), replace=True)
-            alpha = np.random.uniform(self.low, 1, size=rgb_channel.size(0))
-            beta, gamma = 1 - alpha, np.zeros(rgb_channel.size(0))
-
-            self.augment_images = np.array(self.augment_images)
-
-            #enhanced_transform = KEnhance.add_weighted(rgb_transform, alpha[:, None, None, None], torch.from_numpy(self.augment_images[idx]), beta[:, None, None, None], gamma[:, None, None, None])
-
-            #augmented_tensor = torch.cat((enhanced_transform, mask_channel), dim=1)
-            augmented_tensor = torch.cat((rgb_transform, mask_channel), dim=1)
-
-            final_tensors.append(augmented_tensor)
-        
-        concatenated = torch.cat(final_tensors, dim=1)
-        final_output = concatenated.unsqueeze(1) 
-        final_output = final_output.permute(0, 1, 3, 4, 2)
-
-        #print("Final output shape:", final_output.numpy().shape)
-
-        # Update the observations in the rollout buffer
-        self.model.rollout_buffer.observations['image'] = final_output.numpy()
-
-        return True
-    
-    def _on_step(self):
-        return True
-
-def load_images(folder_path):
-    image_files = [os.path.join(folder_path, file) for file in os.listdir(folder_path) if file.endswith(('.png', '.jpg', '.jpeg'))]
-    images = []
-    for file in image_files:
-        image = Image.open(file).convert('RGB')
-
-        transform = transforms.Compose([
-            transforms.Resize((120, 212)),
-            transforms.ToTensor()
-        ])
-        image = transform(image)
-        image = image[[2, 1, 0], :, :]
-        images.append(image)
-    return images
 
 class TensorboardCallback(BaseCallback):
     """
@@ -149,35 +66,107 @@ class TensorboardCallback(BaseCallback):
         self.logger.record("average_obs", average_obs)
         return True
 
+'''
 class CustomDictFeaturesExtractor(BaseFeaturesExtractor):
     def __init__(self, observation_space, features_dim=1024):  # Adjust features_dim if needed
         super(CustomDictFeaturesExtractor, self).__init__(observation_space, features_dim)
 
-        num_input_channels = observation_space.spaces['image'].shape[2]
-        self.cnn = nn.Sequential(
-            nn.Conv2d(num_input_channels, 32, kernel_size=8, stride=4, padding=2),  # Adjust padding to fit your needs
-            nn.ReLU(),
-            nn.Conv2d(32, 64, kernel_size=4, stride=2, padding=1),
-            nn.ReLU(),
-            nn.Conv2d(64, 64, kernel_size=3, stride=1, padding=1),
-            nn.ReLU(),
-            nn.Flatten()  # Flatten the output for feature concatenation
+        # Load a pretrained ResNet18 and prepare it as a feature extractor
+        resnet18 = models.resnet18(pretrained=True)
+        #resnet18.load_state_dict(torch.load('/home/cheryl16/projects/def-durandau/RL-Chemist/PVE/resnet18-5c106cde.pth'))
+
+        self.resnet_cnn = nn.Sequential(
+            *list(resnet18.children())[:-2]  # Remove the fully connected layer & the last downsample layer
         )
+
+        self.flatten = nn.Flatten()
 
         # Vector processing network
         self.mlp = nn.Linear(observation_space.spaces['vector'].shape[0], 512)
-        
-        print(observation_space.spaces.keys())
 
         # Calculate the total concatenated feature dimension
-        self._features_dim = observation_space.spaces['image'].shape[0]* observation_space.spaces['image'].shape[1]+ 512 # Adjust based on actual output dimensions of cnn and mlp
+        # Assuming the output of the modified ResNet18 and the MLP
+        self._features_dim = self.calculate_feature_dim(observation_space) + 512
+
+    def calculate_feature_dim(self, observation_space):
+        with torch.no_grad():
+            sample_input = torch.randn(1, 3, observation_space.spaces['image'].shape[0], observation_space.spaces['image'].shape[1])
+            output = self.flatten(self.resnet_cnn(sample_input))
+            return output.shape[1]
 
     def forward(self, observations):
-        image = observations['image'].permute(0, 3, 1, 2)
-        image_features = self.cnn(image)
+        # Reshape and normalize image input to fit ResNet's expected input
+        image = observations['image'].permute(0, 3, 1, 2)  # Adjust dimension order
+        image = image.float() / 255.0  # Normalize to [0, 1]
+        image_features = self.flatten(self.resnet_cnn(image))
+        
         vector_features = self.mlp(observations['vector'])
+
         concatenated_features = torch.cat([image_features, vector_features], dim=1)
         return concatenated_features
+'''
+
+
+class CustomDictFeaturesExtractor(BaseFeaturesExtractor):
+    def __init__(self, observation_space, features_dim=1024):
+        super(CustomDictFeaturesExtractor, self).__init__(observation_space, features_dim)
+
+        resnet18 = models.resnet18(pretrained=True)
+        self.rgb_cnn = nn.Sequential(
+            *list(resnet18.children())[:-2]  # Remove the fully connected layer and the last downsampling layer
+        )
+        
+        self.binary_cnn = nn.Sequential(
+            nn.Conv2d(1, 16, kernel_size=3, stride=1, padding=1),
+            nn.ReLU(),
+            nn.MaxPool2d(2, 2),
+            nn.Conv2d(16, 32, kernel_size=3, stride=1, padding=1),
+            nn.ReLU(),
+            nn.MaxPool2d(2, 2),
+            nn.Conv2d(32, 64, kernel_size=3, stride=1, padding=1),
+            nn.ReLU(),
+            nn.AdaptiveAvgPool2d((1,1))  # Output is 1x1x64
+        )
+
+        self.flatten = nn.Flatten()
+
+        # Vector processing network
+        self.mlp = nn.Linear(observation_space.spaces['vector'].shape[0], 512)
+
+        # Calculate the feature dimensions separately for each network and vector features
+        self.rgb_feature_dim = self.calculate_feature_dim(self.rgb_cnn, 3, observation_space.spaces['image'].shape[1], observation_space.spaces['image'].shape[2])
+        self.binary_feature_dim = self.calculate_feature_dim(self.binary_cnn, 1, observation_space.spaces['image'].shape[1], observation_space.spaces['image'].shape[2])
+
+        # The total feature dimension is three times the sum of RGB and binary features for each frame, plus vector features
+        self._features_dim = 3 * (self.rgb_feature_dim + self.binary_feature_dim) + 512
+
+    def calculate_feature_dim(self, cnn, channels, height, width):
+        with torch.no_grad():
+            sample_input = torch.randn(1, channels, height, width)
+            output = self.flatten(cnn(sample_input))
+            return output.shape[1]
+
+    def forward(self, observations):
+        stacked_features = []
+        for i in range(3):  # Assuming 3 stacked frames
+            # Process RGB channels with the ResNet
+            print(observations['image'].shape)
+            rgb = observations['image'][:, i*3:(i+1)*3, :, :].permute(0, 3, 1, 2).float() / 255.0
+            rgb_features = self.flatten(self.rgb_cnn(rgb))
+            
+            # Process binary channel with the custom CNN
+            binary = observations['image'][:, i*3+3, :, :].unsqueeze(1).float()
+            binary_features = self.flatten(self.binary_cnn(binary))
+            
+            # Concatenate features of the current frame
+            frame_features = torch.cat([rgb_features, binary_features], dim=1)
+            stacked_features.append(frame_features)
+
+        # Concatenate features of all frames
+        concatenated_features = torch.cat(stacked_features, dim=1) + self.mlp(observations['vector'])
+
+        return concatenated_features
+    
 
 class CustomMultiInputPolicy(ActorCriticPolicy):
     def __init__(self, *args, **kwargs):
@@ -205,9 +194,9 @@ def linear_schedule(initial_value: float) -> Callable[[float], float]:
 
     return func
 
-def make_env(env_name, idx, seed=0, eval_mode=False):
+def make_env(env_name, idx,  channel, MERGE, seed=0,eval_mode=False):
     def _init():
-        env = gym.make(f'mj_envs.robohive.envs:{env_name}', eval_mode=eval_mode)
+        env = gym.make(f'mj_envs.robohive.envs:{env_name}', eval_mode=eval_mode, channel = channel, MERGE = MERGE)
         env.seed(seed + idx)
         return env
     return _init
@@ -227,7 +216,7 @@ def main():
 
     IS_WnB_enabled = True
 
-    loaded_model = '2024_09_25_13_42_113'
+    loaded_model = 'N/A' #'2024_09_25_13_42_113'
     try:
         import wandb
         from wandb.integration.sb3 import WandbCallback
@@ -258,13 +247,6 @@ def main():
     except ImportError as e:
         pass 
 
-    augment_images = load_images('background/212x120')
-    augment_callback = KorniaAugmentationCallback(
-                    augment_images=augment_images,
-                    low = 1, 
-                    high = 1
-                    )
-
     if torch.cuda.is_available():
         device = torch.device("cuda")
         print("Using GPU:", torch.cuda.get_device_name(0))
@@ -274,7 +256,7 @@ def main():
 
     num_cpu = args.num_envs
 
-    env = DummyVecEnv([make_env(env_name, i, seed=args.seed) for i in range(num_cpu)])
+    env = DummyVecEnv([make_env(env_name, i, seed=args.seed, channel = args.channel_num, MERGE = args.merge ) for i in range(num_cpu)])
     env.render_mode = 'rgb_array'
     envs = VecVideoRecorder(env, "videos/" + env_name + '/training_log' ,
         record_video_trigger=lambda x: x % 30000 == 0, video_length=250)
@@ -282,7 +264,7 @@ def main():
     envs = VecFrameStack(envs, n_stack = 3)
 
     ## EVAL
-    eval_env = DummyVecEnv([make_env(env_name, i, seed=args.seed, eval_mode=True) for i in range(1)])
+    eval_env = DummyVecEnv([make_env(env_name, i, seed=args.seed,channel = args.channel_num, eval_mode=True, MERGE = args.merge) for i in range(1)])
     eval_env.render_mode = 'rgb_array'
     eval_env = VecVideoRecorder(eval_env, "videos/" + env_name + '/training_log' ,
         record_video_trigger=lambda x: x % 30000 == 0, video_length=250)
