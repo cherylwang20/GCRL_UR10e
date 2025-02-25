@@ -29,8 +29,8 @@ from datetime import datetime
 import time
 from wandb.integration.sb3 import WandbCallback
 
-sys.path.append('/home/cheryl16/projects/def-durandau/RL-Chemist/mj_envs')
-sys.path.append('/home/cheryl16/projects/def-durandau/RL-Chemist/')
+sys.path.append(r'C:\Users\chery\Documents\RL-Chemist\mj_envs')
+sys.path.append(r'C:\Users\chery\Documents\RL-Chemist')
 
 from torchvision.models.resnet import ResNet18_Weights
 #model_urls['resnet18'] = model_urls['resnet18'].replace('https://', 'http://')
@@ -134,11 +134,11 @@ class CustomDictFeaturesExtractor(BaseFeaturesExtractor):
         self.mlp = nn.Linear(observation_space.spaces['vector'].shape[0], 512)
 
         # Calculate the feature dimensions separately for each network and vector features
-        self.rgb_feature_dim = self.calculate_feature_dim(self.rgb_cnn, 3, observation_space.spaces['image'].shape[1], observation_space.spaces['image'].shape[2])
-        self.binary_feature_dim = self.calculate_feature_dim(self.binary_cnn, 1, observation_space.spaces['image'].shape[1], observation_space.spaces['image'].shape[2])
-
+        self.rgb_feature_dim = self.calculate_feature_dim(self.rgb_cnn, 3, observation_space.spaces['image'].shape[0], observation_space.spaces['image'].shape[1])
+        self.binary_feature_dim = self.calculate_feature_dim(self.binary_cnn, 1, observation_space.spaces['image'].shape[0], observation_space.spaces['image'].shape[1])
         # The total feature dimension is three times the sum of RGB and binary features for each frame, plus vector features
         self._features_dim = 3 * (self.rgb_feature_dim + self.binary_feature_dim) + 512
+
 
     def calculate_feature_dim(self, cnn, channels, height, width):
         with torch.no_grad():
@@ -150,20 +150,27 @@ class CustomDictFeaturesExtractor(BaseFeaturesExtractor):
         stacked_features = []
         for i in range(3):  # Assuming 3 stacked frames
             # Process RGB channels with the ResNet
-            print(observations['image'].shape)
-            rgb = observations['image'][:, i*3:(i+1)*3, :, :].permute(0, 3, 1, 2).float() / 255.0
+            rgb = observations['image'][:, :, :, i*3:(i+1)*3].permute(0, 3, 1, 2).float() #/ 255.0
             rgb_features = self.flatten(self.rgb_cnn(rgb))
             
             # Process binary channel with the custom CNN
-            binary = observations['image'][:, i*3+3, :, :].unsqueeze(1).float()
+            binary = observations['image'][:, :, :, i*3+3].unsqueeze(1).float()
             binary_features = self.flatten(self.binary_cnn(binary))
             
             # Concatenate features of the current frame
             frame_features = torch.cat([rgb_features, binary_features], dim=1)
             stacked_features.append(frame_features)
 
-        # Concatenate features of all frames
-        concatenated_features = torch.cat(stacked_features, dim=1) + self.mlp(observations['vector'])
+        # Convert list of tensors to a single tensor for all frames
+        stacked_features_tensor = torch.cat(stacked_features, dim=1)
+
+        # Prepare MLP output for concatenation
+        mlp_output = self.mlp(observations['vector'])
+        if mlp_output.dim() == 1:
+            mlp_output = mlp_output.unsqueeze(0)  # Unsqueezing if it's a flat vector without batch dimension
+
+        # Concatenate stacked frame features with MLP output
+        concatenated_features = torch.cat((stacked_features_tensor, mlp_output), dim=1)
 
         return concatenated_features
     
@@ -238,7 +245,7 @@ def main():
         #config = {**config, **envs.rwd_keys_wt}
         run = wandb.init(project="RL-Chemist_Reach",
                         group=args.group,
-                        settings=wandb.Settings(start_method="fork"),
+                        settings=wandb.Settings(start_method="thread"),
                         config=config,
                         sync_tensorboard=True,  # auto-upload sb3's tensorboard metrics
                         monitor_gym=True,  # auto-upload the videos of agents playing the game
