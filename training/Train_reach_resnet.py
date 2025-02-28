@@ -111,13 +111,23 @@ class CustomDictFeaturesExtractor(BaseFeaturesExtractor):
     def __init__(self, observation_space, features_dim=1024):
         super(CustomDictFeaturesExtractor, self).__init__(observation_space, features_dim)
 
-        resnet18 = models.resnet18(pretrained=True)
-        self.rgb_cnn = nn.Sequential(
-            *list(resnet18.children())[:-2]  # Remove the fully connected layer and the last downsampling layer
-        )
+        self.model = models.resnet18(pretrained=True)
+        for param in self.model.parameters():
+            param.requires_grad = False
+        
+        self.repr_dim = 1024
+        self.image_channel = 3
+        x = torch.randn([1] + [9, 120, 212])
+
+        with torch.no_grad():
+            out_shape = self.forward_conv(x)
+        self.out_dim = out_shape.shape[1]
+        self.fc = nn.Linear(self.out_dim, self.repr_dim)
+        self.ln = nn.LayerNorm(self.repr_dim)
+        self.rgb_feature = self.ln(self.fc(out_shape)).shape[1]
         
         self.binary_cnn = nn.Sequential(
-            nn.Conv2d(1, 16, kernel_size=3, stride=1, padding=1),
+            nn.Conv2d(3, 16, kernel_size=3, stride=1, padding=1),
             nn.ReLU(),
             nn.MaxPool2d(2, 2),
             nn.Conv2d(16, 32, kernel_size=3, stride=1, padding=1),
@@ -134,10 +144,30 @@ class CustomDictFeaturesExtractor(BaseFeaturesExtractor):
         self.mlp = nn.Linear(observation_space.spaces['vector'].shape[0], 512)
 
         # Calculate the feature dimensions separately for each network and vector features
-        self.rgb_feature_dim = self.calculate_feature_dim(self.rgb_cnn, 3, observation_space.spaces['image'].shape[0], observation_space.spaces['image'].shape[1])
-        self.binary_feature_dim = self.calculate_feature_dim(self.binary_cnn, 1, observation_space.spaces['image'].shape[0], observation_space.spaces['image'].shape[1])
+        #self.rgb_feature_dim = self.calculate_feature_dim(self.rgb_cnn, 3, observation_space.spaces['image'].shape[0], observation_space.spaces['image'].shape[1])
+        self.binary_feature_dim = self.calculate_feature_dim(self.binary_cnn, 3, observation_space.spaces['image'].shape[0], observation_space.spaces['image'].shape[1])
         # The total feature dimension is three times the sum of RGB and binary features for each frame, plus vector features
-        self._features_dim = 3 * (self.rgb_feature_dim + self.binary_feature_dim) + 512
+        self._features_dim = self.rgb_feature + self.binary_feature_dim + 512
+
+    @torch.no_grad()
+    def forward_conv(self, obs, flatten = True):
+        time_step = obs.shape[1] // self.image_channel
+        obs = obs.view(obs.shape[0], time_step, self.image_channel, obs.shape[-2], obs.shape[-1])
+        obs = obs.view(obs.shape[0] * time_step, self.image_channel, obs.shape[-2], obs.shape[-1])
+        for name, module in self.model._modules.items():
+            obs = module(obs)
+            if name == 'layer2':
+                break
+        
+        conv = obs.view(obs.size(0) // time_step, time_step, obs.size(1), obs.size(2), obs.size(3))
+        conv_current = conv[:, 1:, :, :, :]
+        conv_prev = conv_current - conv[:, :time_step - 1, :, :, :].detach()
+        conv = torch.cat([conv_current, conv_prev], axis=1)
+        conv = conv.view(conv.size(0), conv.size(1) * conv.size(2), conv.size(3), conv.size(4))
+        if flatten:
+            conv = conv.view(conv.size(0), -1)
+
+        return conv
 
 
     def calculate_feature_dim(self, cnn, channels, height, width):
@@ -147,22 +177,21 @@ class CustomDictFeaturesExtractor(BaseFeaturesExtractor):
             return output.shape[1]
 
     def forward(self, observations):
-        stacked_features = []
-        for i in range(3):  # Assuming 3 stacked frames
-            # Process RGB channels with the ResNet
-            rgb = observations['image'][:, :, :, i*3:(i+1)*3].permute(0, 3, 1, 2).float() #/ 255.0
-            rgb_features = self.flatten(self.rgb_cnn(rgb))
-            
-            # Process binary channel with the custom CNN
-            binary = observations['image'][:, :, :, i*3+3].unsqueeze(1).float()
-            binary_features = self.flatten(self.binary_cnn(binary))
-            
-            # Concatenate features of the current frame
-            frame_features = torch.cat([rgb_features, binary_features], dim=1)
-            stacked_features.append(frame_features)
+        images = observations['image']
+        rgb1 = images[:, :, :, 0:3]   # Channels 1-3
+        rgb2 = images[:, :, :, 4:7]   # Channels 5-7 (0-indexed, so 4:7 slices channels 5, 6, and 7)
+        rgb3 = images[:, :, :, 8:11]  # Channels 9-11
 
-        # Convert list of tensors to a single tensor for all frames
-        stacked_features_tensor = torch.cat(stacked_features, dim=1)
+        # Concatenate the RGB frames into one tensor along a new dimension
+        combined_rgb = torch.cat([rgb1, rgb2, rgb3], dim=3).permute(0, 3, 1, 2).float()
+        rgb_conv = self.forward_conv(combined_rgb)
+        rgb_features = self.fc(rgb_conv)
+        rgb_features = self.ln(rgb_features)
+
+        binary_channels = images[:, :, :, [3, 7, 11]].permute(0, 3, 1, 2).float()
+        binary_features = self.flatten(self.binary_cnn(binary_channels))
+
+        stacked_features_tensor = torch.cat([rgb_features, binary_features], dim=1)
 
         # Prepare MLP output for concatenation
         mlp_output = self.mlp(observations['vector'])
