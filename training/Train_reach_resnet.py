@@ -45,6 +45,7 @@ parser.add_argument("--env_name", type=str, default='N/A', help="environment nam
 parser.add_argument("--group", type=str, default='testing', help="environment name")
 parser.add_argument("--learning_rate", type=float, default=0.0003, help="Learning rate for the optimizer")
 parser.add_argument("--clip_range", type=float, default=0.2, help="Clip range for the policy gradient update")
+parser.add_argument("--algo", type=str, default='PPO', help="Algorithm to train")
 
 parser.add_argument("--channel_num", type=int, default=4, help="channel num")
 parser.add_argument("--merge", type= bool, default= False, help="merge with real world image")
@@ -65,46 +66,6 @@ class TensorboardCallback(BaseCallback):
         average_obs = np.mean([np.mean(obs) for obs in obs_vecs], axis=0)  # Compute the average observation
         self.logger.record("average_obs", average_obs)
         return True
-
-'''
-class CustomDictFeaturesExtractor(BaseFeaturesExtractor):
-    def __init__(self, observation_space, features_dim=1024):  # Adjust features_dim if needed
-        super(CustomDictFeaturesExtractor, self).__init__(observation_space, features_dim)
-
-        # Load a pretrained ResNet18 and prepare it as a feature extractor
-        resnet18 = models.resnet18(pretrained=True)
-        #resnet18.load_state_dict(torch.load('/home/cheryl16/projects/def-durandau/RL-Chemist/PVE/resnet18-5c106cde.pth'))
-
-        self.resnet_cnn = nn.Sequential(
-            *list(resnet18.children())[:-2]  # Remove the fully connected layer & the last downsample layer
-        )
-
-        self.flatten = nn.Flatten()
-
-        # Vector processing network
-        self.mlp = nn.Linear(observation_space.spaces['vector'].shape[0], 512)
-
-        # Calculate the total concatenated feature dimension
-        # Assuming the output of the modified ResNet18 and the MLP
-        self._features_dim = self.calculate_feature_dim(observation_space) + 512
-
-    def calculate_feature_dim(self, observation_space):
-        with torch.no_grad():
-            sample_input = torch.randn(1, 3, observation_space.spaces['image'].shape[0], observation_space.spaces['image'].shape[1])
-            output = self.flatten(self.resnet_cnn(sample_input))
-            return output.shape[1]
-
-    def forward(self, observations):
-        # Reshape and normalize image input to fit ResNet's expected input
-        image = observations['image'].permute(0, 3, 1, 2)  # Adjust dimension order
-        image = image.float() / 255.0  # Normalize to [0, 1]
-        image_features = self.flatten(self.resnet_cnn(image))
-        
-        vector_features = self.mlp(observations['vector'])
-
-        concatenated_features = torch.cat([image_features, vector_features], dim=1)
-        return concatenated_features
-'''
 
 
 class CustomDictFeaturesExtractor(BaseFeaturesExtractor):
@@ -153,7 +114,7 @@ class CustomDictFeaturesExtractor(BaseFeaturesExtractor):
     def forward_conv(self, obs, flatten = True):
         time_step = obs.shape[1] // self.image_channel
         obs = obs.view(obs.shape[0], time_step, self.image_channel, obs.shape[-2], obs.shape[-1])
-        obs = obs.view(obs.shape[0] * time_step, self.image_channel, obs.shape[-2], obs.shape[-1])
+        obs = obs.reshape(obs.shape[0] * time_step, self.image_channel, obs.shape[-2], obs.shape[-1])
         for name, module in self.model._modules.items():
             obs = module(obs)
             if name == 'layer2':
@@ -211,6 +172,51 @@ class CustomMultiInputPolicy(ActorCriticPolicy):
                                                      features_extractor_kwargs={},
                                                      net_arch=[{'vf': [512, 512], 'pi': [512, 512]}])  # Adjust architecture if needed
 
+
+class CustomMultiInputPolicySAC(ActorCriticPolicy):
+    def __init__(self, observation_space, action_space, lr_schedule, **kwargs):
+        super().__init__(observation_space, action_space, lr_schedule, **kwargs,
+                         features_extractor_class=CustomDictFeaturesExtractor,
+                         features_extractor_kwargs={"features_dim": 1600})
+
+        # Define the actor network
+        self.actor = nn.Sequential(
+            nn.Linear(1600, 512),
+            nn.ReLU(),
+            nn.Linear(512, action_space.shape[0])
+        )
+
+        # Define the critic network (two critic networks for SAC)
+        self.critic = nn.Sequential(
+            nn.Linear(1600, 512),
+            nn.ReLU(),
+            nn.Linear(512, 1)
+        )
+
+        self.critic_target = nn.Sequential(
+            nn.Linear(1600, 512),
+            nn.ReLU(),
+            nn.Linear(512, 1)
+        )
+        
+        # Make sure the critic_target is a copy of the critic with the same weights
+        self.critic_target.load_state_dict(self.critic.state_dict())
+
+    def _predict(self, observation, deterministic=False):
+        features = self.extract_features(observation)
+        action = self.actor(features)
+        if deterministic:
+            action = torch.tanh(action)
+        else:
+            action = torch.normal(action, 1.0)  # Add randomness or noise appropriate for your environment
+        return action
+
+    def forward(self, obs, deterministic=False):
+        features = self.extract_features(obs)
+        action = self._predict(features, deterministic)
+        value = self.critic(features)
+        return action, value
+    
 def linear_schedule(initial_value: float) -> Callable[[float], float]:
     """
     Linear learning rate schedule.
@@ -238,7 +244,7 @@ def make_env(env_name, idx,  channel, MERGE, seed=0,eval_mode=False):
     return _init
 
 def main():
-
+    print('merge',args.merge)
 
     training_steps = 3500000
     env_name = args.env_name
@@ -248,7 +254,7 @@ def main():
     LR = linear_schedule(args.learning_rate)
     CR = linear_schedule(args.clip_range)
 
-    time_now = time_now + str(args.seed)
+    time_now = time_now + str(args.seed) + args.algo
 
     IS_WnB_enabled = True
 
@@ -315,11 +321,14 @@ def main():
 
     # Create a model using the vectorized environment
     #model = SAC("MultiInputPolicy", envs, buffer_size=1000, verbose=0)
-    model = PPO(CustomMultiInputPolicy, envs, ent_coef=ENTROPY, learning_rate=LR, clip_range=CR, n_steps = 2048, batch_size = 64, verbose=0, tensorboard_log=f"runs/{time_now}")
+    if args.algo == 'PPO':
+        model = PPO(CustomMultiInputPolicy, envs, ent_coef=ENTROPY, learning_rate=LR, clip_range=CR, n_steps = 2048, batch_size = 64, verbose=0, tensorboard_log=f"runs/{time_now}")
+    elif args.algo == 'SAC':
+        model = SAC(CustomMultiInputPolicySAC, envs, buffer_size = 100000, learning_rate=LR, verbose=0)
     #model = PPO.load(r"./Reach_Target_vel/policy_best_model/" + env_name + '/' + loaded_model + '/best_model', envs, verbose=1, tensorboard_log=f"runs/{time_now}")
 
     #callback = CallbackList([augment_callback, eval_callback, WandbCallback(gradient_save_freq=100)])
-    callback = CallbackList([eval_callback, WandbCallback(gradient_save_freq=100)])
+    callback = CallbackList([eval_callback, WandbCallback(gradient_save_freq=1000)])
     
 
     model.learn(total_timesteps=training_steps, callback=callback)# , tb_log_name=env_name + "_" + time_now)
