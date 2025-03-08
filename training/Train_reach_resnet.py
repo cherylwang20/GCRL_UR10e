@@ -1,12 +1,17 @@
 import gym
 import os
 import sys
+sys.path.append(r'C:\Users\chery\Documents\RL-Chemist\mj_envs')
+sys.path.append(r'C:\Users\chery\Documents\RL-Chemist')
+sys.path.append(r'C:\Users\chery\Documents\RL-Chemist\utils')
+
 from gym import spaces
 from PIL import Image
 import cv2
 import torchvision.models as models
 import torchvision.transforms as transforms
 import torch 
+from utils.sac import MultiInputPolicySAC
 import random
 import kornia.augmentation as KAug
 import kornia.enhance as KEnhance
@@ -29,8 +34,6 @@ from datetime import datetime
 import time
 from wandb.integration.sb3 import WandbCallback
 
-sys.path.append(r'C:\Users\chery\Documents\RL-Chemist\mj_envs')
-sys.path.append(r'C:\Users\chery\Documents\RL-Chemist')
 
 from torchvision.models.resnet import ResNet18_Weights
 #model_urls['resnet18'] = model_urls['resnet18'].replace('https://', 'http://')
@@ -172,51 +175,7 @@ class CustomMultiInputPolicy(ActorCriticPolicy):
                                                      features_extractor_kwargs={},
                                                      net_arch=[{'vf': [512, 512], 'pi': [512, 512]}])  # Adjust architecture if needed
 
-
-class CustomMultiInputPolicySAC(ActorCriticPolicy):
-    def __init__(self, observation_space, action_space, lr_schedule, **kwargs):
-        super().__init__(observation_space, action_space, lr_schedule, **kwargs,
-                         features_extractor_class=CustomDictFeaturesExtractor,
-                         features_extractor_kwargs={"features_dim": 1600})
-
-        # Define the actor network
-        self.actor = nn.Sequential(
-            nn.Linear(1600, 512),
-            nn.ReLU(),
-            nn.Linear(512, action_space.shape[0])
-        )
-
-        # Define the critic network (two critic networks for SAC)
-        self.critic = nn.Sequential(
-            nn.Linear(1600, 512),
-            nn.ReLU(),
-            nn.Linear(512, 1)
-        )
-
-        self.critic_target = nn.Sequential(
-            nn.Linear(1600, 512),
-            nn.ReLU(),
-            nn.Linear(512, 1)
-        )
-        
-        # Make sure the critic_target is a copy of the critic with the same weights
-        self.critic_target.load_state_dict(self.critic.state_dict())
-
-    def _predict(self, observation, deterministic=False):
-        features = self.extract_features(observation)
-        action = self.actor(features)
-        if deterministic:
-            action = torch.tanh(action)
-        else:
-            action = torch.normal(action, 1.0)  # Add randomness or noise appropriate for your environment
-        return action
-
-    def forward(self, obs, deterministic=False):
-        features = self.extract_features(obs)
-        action = self._predict(features, deterministic)
-        value = self.critic(features)
-        return action, value
-    
+ 
 def linear_schedule(initial_value: float) -> Callable[[float], float]:
     """
     Linear learning rate schedule.
@@ -324,7 +283,7 @@ def main():
     if args.algo == 'PPO':
         model = PPO(CustomMultiInputPolicy, envs, ent_coef=ENTROPY, learning_rate=LR, clip_range=CR, n_steps = 2048, batch_size = 64, verbose=0, tensorboard_log=f"runs/{time_now}")
     elif args.algo == 'SAC':
-        model = SAC(CustomMultiInputPolicySAC, envs, buffer_size = 100000, learning_rate=LR, verbose=0)
+        model = SAC(MultiInputPolicySAC, envs, batch_size=32, buffer_size = 300, learning_rate=LR, verbose=0)
     #model = PPO.load(r"./Reach_Target_vel/policy_best_model/" + env_name + '/' + loaded_model + '/best_model', envs, verbose=1, tensorboard_log=f"runs/{time_now}")
 
     #callback = CallbackList([augment_callback, eval_callback, WandbCallback(gradient_save_freq=100)])
