@@ -1,0 +1,27 @@
+Metadata-Version: 2.2
+Name: jsac
+Version: 1.0.0
+Summary: Jax based real-time Reinforcement Learning for Vision-Based Robotics Utilizing Local and Remote Computers
+Home-page: https://github.com/fahimfss/JSAC
+Author: Fahim Shahriar
+Author-email: fshahri1@ualberta.ca
+Requires-Dist: gymnasium==0.29.0
+Requires-Dist: seaborn==0.13.2
+Requires-Dist: termcolor==2.4.0
+Requires-Dist: tensorboardX==2.6.2.2
+Requires-Dist: flax==0.8.5
+Requires-Dist: pyopengl==3.1.7
+Requires-Dist: wandb==0.16.0
+Requires-Dist: tensorflow_probability==0.21.0
+Requires-Dist: imageio==2.34.1
+Requires-Dist: mujoco==3.2.3
+Requires-Dist: dm_control==1.0.22
+Requires-Dist: opencv_python==4.9.0.80
+Requires-Dist: numpy==1.25.2
+Requires-Dist: orbax-checkpoint==0.4.3
+Requires-Dist: moviepy==1.0.3
+Dynamic: author
+Dynamic: author-email
+Dynamic: home-page
+Dynamic: requires-dist
+Dynamic: summary

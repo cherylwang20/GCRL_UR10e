@@ -5,51 +5,95 @@ import gymnasium as gym
 from collections import deque
 from gymnasium.spaces import Box
 import mujoco
+import sys
+sys.path.append(r'C:\Users\chery\Documents\RL-Chemist\mj_envs\robohive')
+sys.path.append(r'C:\Users\chery\Documents\RL-Chemist')
+sys.path.append(r'C:\Users\chery\Documents\RL-Chemist\utils')
+
 
 from jsac.helpers.utils import render_interactive
+
+GOALTYPE_MASK = "G1_Mask"
+GOALTYPE_ONE_HOT = "G2_OH"
+GOALTYPE_3D = "G3_3d"
+GOALTYPE_CLIP = "G4_Clip"
+GOALTYPE_TARGET_STATE = "G5_TS"
 
 class RLC_Env(gym.Wrapper):
     def __init__(self, 
                  env_name,  
-                 image_history=2, 
-                 image_width=128, 
-                 image_height=128, 
-                 env_mode="train",
-                 mask_type="ground_truth",
+                 image_history=3, 
+                 image_width=212, 
+                 image_height=120, 
+                 eval_mode = False,
+                 MERGE = False,
+                 channel = 4,
                  target_obj_num=-1,
                  mask_delay_type="none",
                  mask_delay_steps=2,
-                 step_time=None,
                  video_path=".",
-                 render_interactive=False):
+                 reward_mode="distance",
+                 goal_type="none",
+                 classifier="none",
+                 inference_type="none",
+                 render_interactive=False,
+                 step_time=0,
+                 ofd_index=0):
 
-        if target_obj_num >= 0:
-            super().__init__(gym.make(f'robohive.envs:{env_name}', 
-                                      env_mode=env_mode, 
-                                      target_obj_num=target_obj_num))
+        #if target_obj_num >= 0:
+        super().__init__(gym.make(f'mj_envs.robohive.envs:{env_name}', 
+                                      eval_mode=eval_mode, 
+                                      channel = channel, MERGE = MERGE))
+        
+        '''
         else:
-            if step_time:
+            if inference_type is not "none":
                 super().__init__(gym.make(f'robohive.envs:{env_name}', 
                                         env_mode=env_mode,
+                                        env_mode=env_mode,
                                         mask_type=mask_type,
-                                        mask_delay_type=mask_delay_type,
-                                        mask_delay_steps=mask_delay_steps,
-                                        step_time=step_time))
+                                            env_mode=env_mode, 
+                                        mask_type=mask_type,
+                                            mask_delay_type=mask_delay_type, 
+                                            mask_delay_steps=mask_delay_steps, 
+                                            ofd_index=ofd_index,
+                                            reward_mode=reward_mode,
+                                            step_time=step_time,
+                                            classifier=classifier,
+                                            inference_type=inference_type))
             else:
                 super().__init__(gym.make(f'robohive.envs:{env_name}', 
                                         env_mode=env_mode,
+                                        env_mode=env_mode,
                                         mask_type=mask_type,
-                                        mask_delay_type=mask_delay_type,
-                                        mask_delay_steps=mask_delay_steps))
+                                            env_mode=env_mode, 
+                                        mask_type=mask_type,
+                                            mask_delay_type=mask_delay_type, 
+                                            mask_delay_steps=mask_delay_steps, 
+                                            ofd_index=ofd_index,
+                                            reward_mode=reward_mode,
+                                            goal_type=goal_type))
+        '''
 
         self._env_name = env_name
         self._image_history = image_history
         self._video_path = video_path
+        self.classifier=classifier
         
         state = self.env.reset() 
         channels = state['image'].shape[-1]
-        self._single_image_shape = (image_height, image_width, channels)
-        self._image_shape = (image_height, image_width, channels * self._image_history)
+        
+        self.goal_type = goal_type
+        if goal_type == GOALTYPE_TARGET_STATE:
+            channel1 = 3
+            channel2 = (self._image_history + 1) * 3
+            self._image_history -= 1
+        else:
+            channel1 = channels
+            channel2 = channels * self._image_history
+        
+        self._single_image_shape = (image_height, image_width, channel1)
+        self._image_shape = (image_height, image_width, channel2)
         self._image_buffer = deque([], maxlen=self._image_history)
         self._obs_dim = state['vector'].shape[0] 
         self._action_dim = self.env.action_space.shape[0]
@@ -58,7 +102,7 @@ class RLC_Env(gym.Wrapper):
         self._reset = False
         self._create_video = False
         if render_interactive:
-            self.viewer = mujoco.viewer.launch_passive(self.model, self.data)
+            self.viewer = mujoco.viewer.launch_passive(self.env.sim.model, self.env.sim.data)
     @property
     def image_space(self):
         return Box(low=0, high=255, shape=self._image_shape, dtype=np.uint8)
@@ -81,20 +125,25 @@ class RLC_Env(gym.Wrapper):
         ob, reward, terminated, truncated, info = self.env.step(a)
         
         new_img = ob['image']
+
         prop = ob['vector']
         done = terminated 
         
-        msk = (new_img[:, :, 3:4].squeeze(-1),)*3
+        extra = None
+        if self.goal_type == GOALTYPE_MASK or self.classifier != "none":
+            extra = np.repeat(new_img[:, :, 3:4], 3, axis=-1)
+        elif self.goal_type == GOALTYPE_TARGET_STATE:
+            extra = new_img[:, :, 3:6]
 
         # path = '/home/fahim/project/imgs_dump/'
         # ln = len([f for f in os.listdir(path) if os.path.isfile(os.path.join(path, f))])
         # img_name = f'{path}{ln}.png'
-        # cv2.imshow("w1", np.concatenate((new_img[:, :, 0:3], np.stack(msk, axis=-1)), axis=1))
+        # cv2.imshow("w1", np.concatenate((new_img[:, :, 0:3], extra), axis=1)) 
         # cv2.waitKey(1)
         # print(info['prompt'])
         
         if self._create_video: 
-            self.add_frame_to_video_buffer(self.env.target_name.title(), new_img, msk)
+            self.add_frame_to_video_buffer(self.env.target_name.title(), new_img[:,:,0:3], extra)
         
         if truncated:
             info['truncated'] = True
@@ -106,9 +155,21 @@ class RLC_Env(gym.Wrapper):
                 self._create_video = False
                 self._video_buffer = []
                 
-        new_img = cv2.resize(new_img, self._single_image_shape[0:2][::-1], interpolation=cv2.INTER_AREA)
-        self._image_buffer.append(new_img)
-        self._latest_image = np.concatenate(self._image_buffer, axis=-1)
+        if self.goal_type == GOALTYPE_TARGET_STATE:
+            new_img = cv2.resize(new_img[:, :, 0:3], self._single_image_shape[0:2][::-1], interpolation=cv2.INTER_AREA)
+            temp = cv2.resize(extra, self._single_image_shape[0:2][::-1], interpolation=cv2.INTER_AREA)
+        else:
+            new_img = cv2.resize(new_img, self._single_image_shape[0:2][::-1], interpolation=cv2.INTER_AREA)
+            
+        if self.goal_type == GOALTYPE_TARGET_STATE:
+            buffer = list(self._image_buffer.copy())
+            buffer.append(new_img)
+            buffer.append(temp)
+            self._latest_image = np.concatenate(buffer, axis=-1)
+            self._image_buffer.append(new_img)
+        else:
+            self._image_buffer.append(new_img)
+            self._latest_image = np.concatenate(self._image_buffer, axis=-1)
  
         return (self._latest_image, prop), reward, done, info 
 
@@ -123,32 +184,52 @@ class RLC_Env(gym.Wrapper):
         new_img = ob['image']
         prop = ob['vector']
         
-        msk = (new_img[:, :, 3:4].squeeze(-1),)*3
+        extra = None
+        if self.goal_type == GOALTYPE_MASK or self.classifier != "none":
+            extra = np.repeat(new_img[:, :, 3:4], 3, axis=-1)
+        elif self.goal_type == GOALTYPE_TARGET_STATE:
+            extra = new_img[:, :, 3:6]
         
         # path = '/home/fahim/project/imgs_dump/'
         # ln = len([f for f in os.listdir(path) if os.path.isfile(os.path.join(path, f))])
         # img_name = f'{path}{ln}.png'
-        # cv2.imshow("w1", np.concatenate((new_img[:, :, 0:3], np.stack(msk, axis=-1)), axis=1)) 
+        # cv2.imshow("w1", np.concatenate((new_img[:, :, 0:3], extra), axis=1)) 
         # cv2.waitKey(1)
         
         if create_vid: 
             print("Video will be created. ")
             self._create_video = True
             self._video_buffer = []
-            self.add_frame_to_video_buffer(self.env.target_name.title(), new_img, msk)
+            self.add_frame_to_video_buffer(self.env.target_name.title(), new_img[:, :, 0:3], extra)
         
-        new_img = cv2.resize(new_img, self._single_image_shape[0:2][::-1], interpolation=cv2.INTER_AREA)
+        if self.goal_type == GOALTYPE_TARGET_STATE:
+            new_img = cv2.resize(new_img[:, :, 0:3], self._single_image_shape[0:2][::-1], interpolation=cv2.INTER_AREA)
+            temp = cv2.resize(extra, self._single_image_shape[0:2][::-1], interpolation=cv2.INTER_AREA)
+        else:
+            new_img = cv2.resize(new_img, self._single_image_shape[0:2][::-1], interpolation=cv2.INTER_AREA)
+            
         for _ in range(self._image_buffer.maxlen):
             self._image_buffer.append(new_img)
-        self._latest_image = np.concatenate(self._image_buffer, axis=-1)
+        
+        if self.goal_type == GOALTYPE_TARGET_STATE:
+            buffer = list(self._image_buffer.copy())
+            buffer.append(new_img)
+            buffer.append(temp)
+            self._latest_image = np.concatenate(buffer, axis=-1)
+            self._image_buffer.append(new_img)
+        else:
+            self._latest_image = np.concatenate(self._image_buffer, axis=-1)
         
         self._reset = True
         
         return (self._latest_image, prop)
     
-    def add_frame_to_video_buffer(self, text, new_img, msk): 
-        new_img = cv2.cvtColor(new_img, cv2.COLOR_RGB2BGR)
-        frame = np.concatenate((new_img[:, :, 0:3][..., ::-1], np.stack(msk, axis=-1)), axis=1).copy()
+    def add_frame_to_video_buffer(self, text, new_img, extra): 
+        
+        if extra is not None:
+            frame = np.concatenate((new_img[:, :, 0:3], extra), axis=1)
+        else:
+            frame = new_img
         
         font = cv2.FONT_HERSHEY_SIMPLEX
         font_scale = 1
@@ -157,15 +238,16 @@ class RLC_Env(gym.Wrapper):
         
         (text_width, text_height), baseline = cv2.getTextSize(text, font, font_scale, thickness)
 
-        # Create a black image for the text
-        banner_height = text_height + baseline + 20  # Adjust height for padding
+        banner_height = text_height + baseline + 20
         banner = np.zeros((banner_height, frame.shape[1], 3), dtype=np.uint8)
 
+
+        # Calculate the center position for the text
+        
         # Calculate the center position for the text
         center_x = (banner.shape[1] - text_width) // 2
-        center_y = (banner.shape[0] + text_height) // 2  # Adjust for baseline
+        center_y = (banner.shape[0] + text_height) // 2
 
-        # Add text to the black image
         cv2.putText(banner, text, (center_x, center_y), font, font_scale, font_color, thickness)
         
         combined_image = np.vstack((frame, banner))
@@ -245,11 +327,3 @@ class RLC_Env(gym.Wrapper):
 
 ### TEST ENVIRONMENT ###
 
-
-if __name__=="__main__":
-    import argparse
-    parser = argparse.ArgumentParser()
-    parser.add_argument('--env_name', default='FrankaEnv-v0', type=str, help="Two envs: FrankaEnv-v0, UR10eEnv-v0")
-    args = parser.parse_args()
-    env = RLC_Env(env_name=args.env_name, render_interactive=True) # replace model path accordingly
-    render_interactive(env)

@@ -44,7 +44,7 @@ def eval(args, log_dir, eval_queue, num_eval_episodes, rlc_eval):
                            args['num_cameras'], 
                            args['action_repeat'])
         env = WrappedEnv(env)
-    elif args['env_type'] == 'RLC':
+    elif args['env_type'] == 'RLC' or args['env_type'] == 'RLC_ic':
         if rlc_eval:
             env_mode = "eval"
         else:
@@ -52,15 +52,32 @@ def eval(args, log_dir, eval_queue, num_eval_episodes, rlc_eval):
         step_time = None
         if args['step_time'] > 0:
             step_time = args['step_time']
-        env = RLC_Env(args['env_name'], 
-                          args['image_history'], 
-                          args['image_width'], 
-                          args['image_height'],  
-                          mask_type=args['mask_type'],
-                          env_mode=env_mode,
-                          video_path=args['video_dir'],
-                          step_time=step_time)
-        env = WrappedEnv(env, 200)
+        if args['env_type'] == 'RLC':
+            env = RLC_Env(args['env_name'], 
+                            args['image_history'], 
+                            args['image_width'], 
+                            args['image_height'],  
+                            mask_delay_type=args['mask_delay_type'],
+                            mask_delay_steps=args['mask_delay_steps'],
+                            goal_type=args['goal_type'],
+                            reward_mode=args['reward_mode'],
+                            video_path=args['video_dir'],
+                            step_time=step_time,
+                            env_mode=env_mode,
+                            ofd_index=args['ofd_index'])
+        else:
+            env = RLC_Env(args['env_name'], 
+                            args['image_history'], 
+                            args['image_width'], 
+                            args['image_height'],  
+                            classifier=args['classifier'],
+                            inference_type=args['inference_type'],
+                            step_time=step_time,
+                            reward_mode='mask_size',
+                            ofd_index=args['ofd_index'])
+        
+        
+        env = WrappedEnv(env, args['episode_steps'])
         
     env_steps = int(args['env_steps'])
     
