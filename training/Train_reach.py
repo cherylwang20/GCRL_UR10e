@@ -1,4 +1,4 @@
-import gym
+import gymnasium as gym
 import os
 import sys
 from gym import spaces
@@ -45,6 +45,7 @@ parser.add_argument("--clip_range", type=float, default=0.2, help="Clip range fo
 parser.add_argument("--channel_num", type=int, default=4, help="channel num")
 parser.add_argument("--merge", type= bool, default= False, help="merge with real world image")
 parser.add_argument("--cont", type= bool, default= False, help="whether do continuing training from a previous policy")
+parser.add_argument("--fs", type=int, default= 20, help="frameskip")
 
 args = parser.parse_args()
 
@@ -119,10 +120,10 @@ def linear_schedule(initial_value: float) -> Callable[[float], float]:
 
     return func
 
-def make_env(env_name, idx,  channel, MERGE, seed=0,eval_mode=False):
+def make_env(env_name, idx,  channel, MERGE, seed=0, fs = 20, eval_mode=False):
     def _init():
-        env = gym.make(f'mj_envs.robohive.envs:{env_name}', eval_mode=eval_mode, channel = channel, MERGE = MERGE)
-        env.seed(seed + idx)
+        env = gym.make(f'mj_envs.robohive.envs:{env_name}', eval_mode=eval_mode, channel = channel, MERGE = MERGE,  fs = fs)
+        env.reset(seed = seed+idx)
         return env
     return _init
 
@@ -141,7 +142,7 @@ def main():
 
     IS_WnB_enabled = True
 
-    loaded_model = '2025_02_21_23_44_053' #'2024_09_25_13_42_113'
+    loaded_model =  "2025_04_04_22_58_444" #for dt30: '2025_03_29_19_39_280' #for dt20: '2025_02_21_23_44_053' #'2024_09_25_13_42_113'
     try:
         import wandb
         from wandb.integration.sb3 import WandbCallback
@@ -181,7 +182,7 @@ def main():
 
     num_cpu = args.num_envs
 
-    env = DummyVecEnv([make_env(env_name, i, seed=args.seed, channel = args.channel_num, MERGE = args.merge ) for i in range(num_cpu)])
+    env = DummyVecEnv([make_env(env_name, i, seed=args.seed, channel = args.channel_num, MERGE = args.merge, fs = args.fs ) for i in range(num_cpu)])
     env.render_mode = 'rgb_array'
     envs = VecVideoRecorder(env, "videos/" + env_name + '/training_log' ,
         record_video_trigger=lambda x: x % 30000 == 0, video_length=250)
@@ -200,7 +201,6 @@ def main():
     
     print('Begin training')
     print(time_now)
-
 
 
     if args.cont:
