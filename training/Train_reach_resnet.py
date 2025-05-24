@@ -1,9 +1,9 @@
 import gym
 import os
 import sys
-sys.path.append(r'C:\Users\chery\Documents\RL-Chemist\mj_envs')
-sys.path.append(r'C:\Users\chery\Documents\RL-Chemist')
-sys.path.append(r'C:\Users\chery\Documents\RL-Chemist\utils')
+sys.path.append('/home/cheryl16/projects/def-durandau/RL-Chemist/mj_envs')
+sys.path.append('/home/cheryl16/projects/def-durandau/RL-Chemist/')
+sys.path.append('/home/cheryl16/projects/def-durandau/RL-Chemist/algo_utils')
 
 from gym import spaces
 from PIL import Image
@@ -11,7 +11,7 @@ import cv2
 import torchvision.models as models
 import torchvision.transforms as transforms
 import torch 
-from utils.sac import MultiInputPolicySAC
+from algo_utils.sac import MultiInputPolicySAC
 import random
 import kornia.augmentation as KAug
 import kornia.enhance as KEnhance
@@ -283,7 +283,7 @@ def main():
     if args.algo == 'PPO':
         model = PPO(CustomMultiInputPolicy, envs, ent_coef=ENTROPY, learning_rate=LR, clip_range=CR, n_steps = 2048, batch_size = 64, verbose=0, tensorboard_log=f"runs/{time_now}")
     elif args.algo == 'SAC':
-        model = SAC(MultiInputPolicySAC, envs, batch_size=32, buffer_size = 300, learning_rate=LR, verbose=0)
+        model = SAC(MultiInputPolicySAC, envs, batch_size=128, buffer_size = 100000, learning_rate=LR, verbose=0, tensorboard_log=f"runs/{time_now}")
     #model = PPO.load(r"./Reach_Target_vel/policy_best_model/" + env_name + '/' + loaded_model + '/best_model', envs, verbose=1, tensorboard_log=f"runs/{time_now}")
 
     #callback = CallbackList([augment_callback, eval_callback, WandbCallback(gradient_save_freq=100)])
