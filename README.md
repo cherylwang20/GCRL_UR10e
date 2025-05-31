@@ -60,7 +60,7 @@ gdown 'https://drive.google.com/uc?id=1wKpIUVp2kXvf_Lq1VV7aKIoERLOS6QtW' -O poli
 
 To train a new policy, run:
 ```bash
-training/Train_reach.py --env_name 'UR10eReach1C-v1' --group 'Reach_4C_dt20' --num_envs 4 --learning_rate 0.0003 --clip_range 0.1 --seed=$SLURM_ARRAY_TASK_ID --channel_num 4 --fs 20
+python training/Train_reach.py --env_name 'UR10eReach1C-v1' --group 'Reach_4C_dt20' --num_envs 4 --learning_rate 0.0003 --clip_range 0.1 --seed=$SLURM_ARRAY_TASK_ID --channel_num 4 --fs 20
 ```
 Training Script Arguments
 
