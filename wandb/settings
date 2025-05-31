@@ -1,7 +1,0 @@
-[default]
-entity = huiyi-wang-mcgill-university
-project = test
-base_url = https://api.wandb.ai
-disabled = true
-mode = offline
-
