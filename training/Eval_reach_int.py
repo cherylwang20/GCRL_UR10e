@@ -43,7 +43,7 @@ class CustomFrameStack(gym.Wrapper):
         })
 
     def reset(self, **kwargs):
-        obs, info = self.env.reset(**kwargs)
+        obs = self.env.reset(**kwargs)
         for _ in range(self.n_stack):
             self.image_frames.append(obs['image'])
             self.vector_frames.append(obs['vector'])
@@ -80,8 +80,6 @@ args = parser.parse_args()
 # Ignore specific warning
 warnings.filterwarnings("ignore", message=".*tostring.*is deprecated.*")
 
-#obj2mjcf --obj-dir . --obj-filter beaker --save-mjcf --compile-model --decompose --overwrite --coacd-args.max-convex-hull 15
-
 model_num = args.model_num  
 env_name = args.env_name 
 print(env_name)
@@ -94,10 +92,8 @@ seed_value = 47004  # Seed value for reproducibility
 movie = True
 frame_width = 212
 frame_height = 120
-#cap = cv.VideoCapture(0)
 
-model = PPO.load('./policy/' + '/' + model_num + r'/best_model')
-#model = PPO.load('./models/'+ model_num + r'/model')
+model = PPO.load(os.getcwd() + '/policy/' + '/' + model_num)
 policy = model.policy
 
 print("Action Space Lower Bounds:", env.action_space.low)
@@ -117,14 +113,10 @@ for i in tqdm(range(trial)):
     ep_rewards = 0
     solved, done = False, False
     obs = env.reset()
-    #obs = np.stack([obs, obs, obs])
     step = 0
-    #ret, frame = cap.read()
     while not done and step < 200:   
           action, _ = model.predict(obs, deterministic=True)
           obs, reward, done, info  = env.step(action)
-          #frame_saliency = visualize_saliency(obs)
-          #saliency_map.append(frame_saliency)
           solved = info['solved']
           if i < trial:
               frame_n = env.unwrapped.rgb_out
@@ -146,5 +138,4 @@ print(f"Success rate: {success/trial}")
 if movie:
     os.makedirs('./videos' +'/' + env_name, exist_ok=True)
     skvideo.io.vwrite('./videos'  +'/' + env_name + '/' + model_num + f'{view}_video.mp4', np.asarray(frames_rgb), inputdict = {'-r':'50'} , outputdict={"-pix_fmt": "yuv420p"})
-    #skvideo.io.vwrite('./videos'  +'/' + env_name + '/' + model_num + f'{view}_saliency_video.mp4', np.asarray(saliency_map), inputdict = {'-r':'50'} , outputdict={"-pix_fmt": "yuv420p"})
     skvideo.io.vwrite('./videos'  +'/' + env_name + '/' + model_num + f'{view}_mask_video.mp4', np.asarray(frames_mask), inputdict = {'-r':'50'} , outputdict={"-pix_fmt": "yuv420p"})
