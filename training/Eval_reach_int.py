@@ -17,8 +17,8 @@ import io
 import matplotlib.pyplot as plt
 import sys
 
-sys.path.append('/home/cheryl16/projects/def-durandau/RL-Chemist/mj_envs')
-sys.path.append('/home/cheryl16/projects/def-durandau/RL-Chemist/')
+sys.path.append('/Users/cherylwang/Documents/GitHub/GCRL_UR10e/mj_envs')
+sys.path.append('/Users/cherylwang/Documents/GitHub/GCRL_UR10e')
 
 class CustomFrameStack(gym.Wrapper):
     def __init__(self, env, n_stack=3):
@@ -67,7 +67,6 @@ import argparse
 parser = argparse.ArgumentParser(description="Main script to train an agent")
 
 parser.add_argument("--env_name", type=str, default='NA', help="environment name")
-parser.add_argument("--policy_env", type=str, default='NA', help="environment name")
 parser.add_argument("--model_num", type=str, default='testing', help="environment name")
 parser.add_argument("--movie", type=str, default='False', help="environment name")
 parser.add_argument("--channel_num", type=int, default=4, help="channel num")
@@ -86,7 +85,6 @@ warnings.filterwarnings("ignore", message=".*tostring.*is deprecated.*")
 model_num = args.model_num  
 env_name = args.env_name 
 print(env_name)
-policy_env = args.policy_env
 env = gym.make(f'mj_envs.robohive.envs:{env_name}', channel = args.channel_num, MERGE = args.merge, fs = args.fs)
 env = CustomFrameStack(env, n_stack=3)
 
@@ -98,7 +96,7 @@ frame_width = 212
 frame_height = 120
 #cap = cv.VideoCapture(0)
 
-model = PPO.load('./Reach_Target_vel/policy_best_model/' + policy_env +'/' + model_num + r'/best_model')
+model = PPO.load('./policy/' + '/' + model_num + r'/best_model')
 #model = PPO.load('./models/'+ model_num + r'/model')
 policy = model.policy
 

@@ -1,7 +1,7 @@
 [submodule "mj_envs"]
 	path = mj_envs
 	url = https://github.com/cherylwang20/mj_envs.git
-	branch = rl-chemist
+	branch = cleanup
 
 [submodule "GroundingDINO"]
 	path = GroundingDINO
