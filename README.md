@@ -5,6 +5,12 @@ git clone https://github.com/cherylwang20/GCRL_UR10e.git
 git submodule update --init --recursive
 ```
 
+## Creating a new venv
+```
+python3 -m venv .venv
+source .venv/bin/activate
+```
+
 # Loading the submodules
 
 The UR10e gym environment can be used via the mj_envs package. 
