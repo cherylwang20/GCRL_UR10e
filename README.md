@@ -39,6 +39,11 @@ wget --no-check-certificate "https://drive.google.com/uc?export=download&id=1wKp
 
 ```
 
+## To train with image augmentation, please download the resized external image from (OpenX)[https://robotics-transformer-x.github.io/] here:
+
+
+
+
 ## Training on Alliance Canada
 
 
