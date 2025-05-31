@@ -193,7 +193,7 @@ def main():
     eval_env = DummyVecEnv([make_env(env_name, i, seed=args.seed,channel = args.channel_num, eval_mode=True, MERGE = args.merge) for i in range(1)])
     eval_env.render_mode = 'rgb_array'
     eval_env = VecVideoRecorder(eval_env, "videos/" + env_name + '/training_log' ,
-        record_video_trigger=lambda x: x % 300000 == 0, video_length=250)
+        record_video_trigger=lambda x: x % 30000 == 0, video_length=250)
     eval_envs = VecFrameStack(eval_env, n_stack = 3)
     
     log_path = './Reach_Target_vel/policy_best_model/' + env_name + '/' + time_now + '/'

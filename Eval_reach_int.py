@@ -43,7 +43,7 @@ class CustomFrameStack(gym.Wrapper):
         })
 
     def reset(self, **kwargs):
-        obs = self.env.reset(**kwargs)
+        obs, info = self.env.reset(**kwargs)
         for _ in range(self.n_stack):
             self.image_frames.append(obs['image'])
             self.vector_frames.append(obs['vector'])
