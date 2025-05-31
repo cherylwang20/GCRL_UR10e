@@ -1,6 +1,0 @@
-0
-
-Set RF to 0 to continue the task (deafult)
-Set RF to 1 to end the task without saving models/replay buffer
-Set RF to 2 to end the task and save models/replay buffer. Note, the args for 
-    saving the models and the replay buffer needs to be set True
