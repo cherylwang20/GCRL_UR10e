@@ -35,9 +35,13 @@ Use `wget` to download the pre-trained policy for the UR10e robotic arm:
 
 ```bash
 mkdir -p policy
-wget --no-check-certificate "https://drive.google.com/uc?export=download&id=1wKpIUVp2kXvf_Lq1VV7aKIoERLOS6QtW" -O policy/baseline.zip
-
+gdown 'https://drive.google.com/uc?id=1wKpIUVp2kXvf_Lq1VV7aKIoERLOS6QtW' -O policy/baseline.zip
 ```
+
+## To train with image augmentation, please download the resized external image from (OpenX)[https://robotics-transformer-x.github.io/] here:
+
+
+
 
 ## Training on Alliance Canada
 
