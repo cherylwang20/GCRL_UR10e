@@ -83,10 +83,8 @@ Training Script Arguments
 
 ## Training with Image Augmentation
 
-To train with image augmentation, download the resized external images originally from [OpenX](https://robotics-transformer-x.github.io/):
-```
-gdown 'https://drive.google.com/uc?id=16RqXa5849LtLVHdYmyjwPvH08kkhkzHu' -O background/resized_images.npy
-```
+To train with image augmentation, download the resized external images originally from [OpenX](https://robotics-transformer-x.github.io/) into `background` from https://mcgill-my.sharepoint.com/:u:/g/personal/huiyi_wang_mail_mcgill_ca/EZM8oZL_PPVIiOtrbl8Gy0sBLTBYWjd18TOdrS43WULVdA?e=ZBfhfY. 
+
 
 Modify the training script:
 ```bash
