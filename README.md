@@ -60,7 +60,7 @@ gdown 'https://drive.google.com/uc?id=1wKpIUVp2kXvf_Lq1VV7aKIoERLOS6QtW' -O poli
 
 To train a new policy, run:
 ```bash
---env_name 'UR10eReach1C-v1' --group 'Reach_4C_dt20' --num_envs 4 --learning_rate 0.0003 --clip_range 0.1 --seed=$SLURM_ARRAY_TASK_ID --channel_num 4 --fs 20
+python training/Train_reach.py --env_name 'UR10eReach1C-v1' --group 'Reach_4C_dt20' --num_envs 4 --learning_rate 0.0003 --clip_range 0.1 --seed=$SLURM_ARRAY_TASK_ID --channel_num 4 --fs 20
 ```
 Training Script Arguments
 
@@ -83,14 +83,12 @@ Training Script Arguments
 
 ## Training with Image Augmentation
 
-To train with image augmentation, download the resized external images originally from [OpenX](https://robotics-transformer-x.github.io/):
-```
-gdown 'https://drive.google.com/uc?id=16RqXa5849LtLVHdYmyjwPvH08kkhkzHu' -O background/resized_images.npy
-```
+To train with image augmentation, download the resized external images originally from [OpenX](https://robotics-transformer-x.github.io/) into `background` from https://mcgill-my.sharepoint.com/:u:/g/personal/huiyi_wang_mail_mcgill_ca/EZM8oZL_PPVIiOtrbl8Gy0sBLTBYWjd18TOdrS43WULVdA?e=ZBfhfY. 
+
 
 Modify the training script:
 ```bash
-python training/Train_reach_int.py --env_name "UR10eReach1C-v1" --merge True
+python training/Train_reach.py --env_name "UR10eReach1C-v1" --merge True
 ```
 
 ## Evaluate an Existing Policy
