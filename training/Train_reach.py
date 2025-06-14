@@ -28,8 +28,8 @@ from datetime import datetime
 import time
 from wandb.integration.sb3 import WandbCallback
 
-sys.path.append('/home/cheryl16/projects/def-durandau/RL-Chemist/mj_envs')
-sys.path.append('/home/cheryl16/projects/def-durandau/RL-Chemist/')
+sys.path.append(r'/Users/cherylwang/Documents/GitHub/GCRL_UR10e/mj_envs')
+sys.path.append(r'/Users/cherylwang/Documents/GitHub/GCRL_UR10e/')
 
 import numpy as np
 import argparse
@@ -40,7 +40,7 @@ parser.add_argument("--num_envs", type=int, default=1, help="Number of parallel 
 parser.add_argument("--env_name", type=str, default='N/A', help="environment name")
 parser.add_argument("--group", type=str, default='testing', help="environment name")
 parser.add_argument("--learning_rate", type=float, default=0.0003, help="Learning rate for the optimizer")
-parser.add_argument("--clip_range", type=float, default=0.2, help="Clip range for the policy gradient update")
+parser.add_argument("--clip_range", type=float, default=0.1, help="Clip range for the policy gradient update")
 
 parser.add_argument("--channel_num", type=int, default=4, help="channel num")
 parser.add_argument("--merge", type= bool, default= False, help="merge with real world image")
