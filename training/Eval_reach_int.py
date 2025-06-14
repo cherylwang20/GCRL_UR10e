@@ -67,7 +67,7 @@ import argparse
 parser = argparse.ArgumentParser(description="Main script to train an agent")
 
 parser.add_argument("--env_name", type=str, default='NA', help="environment name")
-parser.add_argument("--model_num", type=str, default='testing', help="environment name")
+parser.add_argument("--model_num", type=str, default='baseline', help="environment name")
 parser.add_argument("--movie", type=str, default='False', help="environment name")
 parser.add_argument("--channel_num", type=int, default=4, help="channel num")
 
