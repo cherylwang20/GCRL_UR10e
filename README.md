@@ -35,14 +35,6 @@ cd mj_envs
 pip install -e .
 ```
 
-### GroundingDINO
-
-```bash
-git clone https://github.com/IDEA-Research/GroundingDINO.git
-cd GroundingDINO
-pip install -e .
-```
-
 **Note on PyTorch 2.0 Compatibility:**  
 If you encounter an error with `value.type()` in `ms_deform_attn_cuda.cu`, replace it with `value.scalar_type()` in:
 ```
@@ -141,7 +133,9 @@ sbatch job.sh
 
 # Sim2Real Transfer for UR10e Robotic Arm Using Mask-Based Goal-Conditioning
 
-After the policy is trained, one could perform sim2real on an actual UR10e robot and a D435. This allows you to perform a mask-based GC PPO policy and environment to perform reach target objects placed on a table in front of a UR10e robot. 
+After the policy is trained, one could perform sim2real on an actual UR10e robot and a D435. This allows you to perform a mask-based GC PPO policy and environment to reach target objects placed on a table in front of a UR10e robot. 
+cd into the folder sim2real to start the process. ```cd sim2real```
+
 <img src="https://github.com/user-attachments/assets/40cceab5-dcca-40f2-a410-7acc832d7569" alt="UR10e" width="400"/>
 
 
