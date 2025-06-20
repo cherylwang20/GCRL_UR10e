@@ -83,9 +83,127 @@ The authors and contributors **assume no liability** for any damage, failure, or
 
 ## Code and Usage
 
-Coming soon.
+## Clone the Repository
+
+```bash
+git clone https://github.com/cherylwang20/GCRL_UR10e.git
+cd GCRL_UR10e
+git submodule update --init --recursive
+```
+
+### Installation
+
+You would also need to use an external pre-trained object recognition model for object inference. We use GDINO here, the model should be cloned already through submodule. Please allow the instruction link in the GDINO repo to make sure that CUDA with torch and GPU is compatible. 
+
+```bash
+cd GroundingDINO
+pip install -e .
+```
+
+**Note on PyTorch 2.0 Compatibility:**  
+If you encounter an error with `value.type()` in `ms_deform_attn_cuda.cu`, replace it with `value.scalar_type()` in:
+```
+groundingdino/models/GroundingDINO/csrc/MsDeformAttn/ms_deform_attn_cuda.cu
+```
+
+## Set Up the Virtual Environment
+
+Use **Python 3.9** (later versions may cause issues with loading the baseline):
+
+```bash
+python3.9 -m venv .venv
+source .venv/bin/activate
+pip install -r requirements.txt
+```
+
+## Load Submodules
+
+### UR10e Gym Environment (mj_envs)
+
+```bash
+cd mj_envs
+pip install -e .
+```
+
+## Download the Pre-trained Policy
+
+```bash
+mkdir -p policy
+gdown 'https://drive.google.com/uc?id=1wKpIUVp2kXvf_Lq1VV7aKIoERLOS6QtW' -O policy/baseline.zip
+```
+
+## Use the pretrained policy in Sim
+
+
+#TODO add script to load policy and run an episode in the ur10e simulation environment with rendering on 
+---
+
+## Training a New Policy
+
+To train a new policy, run:
+```bash
+python training/Train_reach.py --env_name 'UR10eReach1C-v1' --group 'Reach_4C_dt20' --num_envs 4 --learning_rate 0.0003 --clip_range 0.1 --seed=0 --channel_num 4 --fs 20
+```
+Training Script Arguments
+
+```--env_name 'UR10eReach1C-v1'``` : Specifies the UR10e environment for training.
+
+```--group 'Reach_4C_dt20'``` : Name of the experiment group for logging.
+
+```--num_envs 4``` : Number of parallel environments.
+
+```--learning_rate 0.0003``` : Learning rate for PPO.
+
+```--clip_range 0.1``` : PPO clip range for stable policy updates.
+
+```--seed 0``` : Random seed, often set via SLURM for batch runs.
+
+```--channel_num 4``` : Number of input image channels.
+
+```--fs 20``` : Frame skip (simulation step interval).
+
+
+## Evaluate an Existing Policy
+
+```bash
+python training/Eval_reach_int.py --env_name "UR10eReach1C-v1" --model_num "baseline"
+```
+
+## Sim2Real
+
+For achieve effective sim2real transfer, we finetune the policy trained above with observation image augmentation. To train with image augmentation, download the resized external images originally from [OpenX](https://robotics-transformer-x.github.io/) into `background` from https://mcgill-my.sharepoint.com/:u:/g/personal/huiyi_wang_mail_mcgill_ca/EZM8oZL_PPVIiOtrbl8Gy0sBLTBYWjd18TOdrS43WULVdA?e=ZBfhfY. 
+
+#TODO add figure of image mixing
+
+Use the following command:
+```bash
+python training/Train_reach.py --env_name "UR10eReach1C-v1" --merge True --cont True
+```
 
 ---
+
+## Details on the Robotic Setup
+
+
+### Getting Started
+
+- The robot's initial joint configuration is:  
+  `[4.7799, -2.0740, 2.6200, 3.0542, -1.5800, 1.4305e-05]` (in radians), with the gripper fully open.
+- Place target objects **30–50 cm in front of the camera**, making sure they are **visible at the start**.
+- The camera is mounted on the Robotiq gripper using a custom 3D-printed bracket.  
+  It is essential that the **gripper is visible** in the camera view around 17 degrees downwards.
+
+<img src="https://github.com/user-attachments/assets/d3fa1dee-6506-40b1-86d9-40dfb7742a22" alt="Camera Mounting" width="500"/>
+
+- Set the correct IP address for your UR10e robot in:  
+  [`GdinoReachGraspEnv_servoJ.py#L86`](https://github.com/cherylwang20/Sim2Real_GCRL_UR10e/blob/3f6d3c6f44f698b062e058aac546f5c7d1629576/src/reachGrasp_env/GdinoReachGraspEnv_servoJ.py#L86)
+
+- Both `servoJ` and `moveJ` motion commands are supported.  
+  **`servoJ` offers better performance for sim-to-real transfer.**
+- We use a camera resolution of 848 * 480 for best inferenece results and later rescaled to 212 * 120 for policy training.
+- Due to exceeding performance, we hardcorded a pick up after approaching close to the table and performing a pick up and drop up: https://github.com/cherylwang20/Sim2Real_GCRL_UR10e/blob/3f6d3c6f44f698b062e058aac546f5c7d1629576/src/reachGrasp_env/GdinoReachGraspEnv_servoJ.py#L326. Uncomment if you don't require this behavior. 
+
+
 
 ## 📝 Citation
 
