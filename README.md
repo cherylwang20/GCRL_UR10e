@@ -21,11 +21,6 @@ source .venv/bin/activate
 pip install -r requirements.txt
 ```
 
-For Compute Canada, use:
-```bash
-pip install -r requirements_CC.txt
-```
-
 ## Load Submodules
 
 ### UR10e Gym Environment (mj_envs)
@@ -87,48 +82,6 @@ python training/Train_reach.py --env_name "UR10eReach1C-v1" --merge True
 
 ```bash
 python training/Eval_reach_int.py --env_name "UR10eReach1C-v1" --model_num "baseline"
-```
-
-## Training on Compute Canada
-
-Modify `job.sh` to set the desired environment and training script, fill in your own account information and path.
-
-```bash
-#!/bin/bash 
-#SBATCH --account=your-account
-#SBATCH --job-name=your-job-name
-#SBATCH --cpus-per-task=32
-#SBATCH --time=0-50:50
-#SBATCH --array=5-9
-#SBATCH --mem=128G
-#SBATCH --gres=gpu:1
-#SBATCH --mail-user=your-email
-#SBATCH --mail-type=ALL
-
-export PYTHONPATH="$PYTHONPATH:/yourpath/"
-
-cd /yourpath/
-
-module load StdEnv/2023
-module load gcc opencv/4.9.0 cuda/12.2 python/3.10 mpi4py mujoco/3.1.6
-
-source /your_env/
-
-export MUJOCO_GL="egl"
-export PYOPENGL_PLATFORM="egl"
-export OMP_NUM_THREADS=1
-export MKL_NUM_THREADS=1
-
-wandb offline
-
-python training/Train_reach.py --env_name 'UR10eReach1C-v1' --group 'Reach_4C_dt20' --num_envs 4 --learning_rate 0.0003 --clip_range 0.1 --seed=$SLURM_ARRAY_TASK_ID --channel_num 4 --fs 20
-######Sim2Real
-python training/Train_reach.py --env_name 'UR10eReach1C-v1' --group 'Reach_4C_dt20' --num_envs 4 --learning_rate 0.0003 --clip_range 0.1 --seed=$SLURM_ARRAY_TASK_ID --channel_num 4 --fs 20 --cont True
-```
-
-Submit with:
-```bash
-sbatch job.sh
 ```
 
 # Sim2Real Transfer for UR10e Robotic Arm Using Mask-Based Goal-Conditioning
