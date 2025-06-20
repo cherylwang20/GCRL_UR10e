@@ -1,7 +1,7 @@
 # GCRL_UR10e Setup Instructions
 GCRL_UR10e is a research codebase for Goal-Conditioned Reinforcement Learning applied to the UR10e robotic arm. It implements methods from the paper [Versatile and Generalizable Manipulation via Goal-Conditioned Reinforcement Learning with Grounded Object Detection](https://openreview.net/forum?id=TgXIkK8WPQ&referrer=%5Bthe%20profile%20of%20Cheryl%20Wang%5D(%2Fprofile%3Fid%3D~Cheryl_Wang1)), presented at the CoRL 2024 Workshop. The repository provides training, evaluation, and pre-trained models for learning reaching tasks on the UR10e arm, supporting both standard and image-augmented training. It integrates GroundingDINO for visual goal representation and uses PPO for policy optimization.
 
-A sim2real repository is also provided: [Sim2Real_GCRL_UR10e](https://github.com/cherylwang20/Sim2Real_GCRL_UR10e)
+A trained PPO policy and RL environment for the real UR10e robot are provided here: [Sim2Real_GCRL_UR10e](https://github.com/cherylwang20/Sim2Real_GCRL_UR10e). The policy can be used zero-shot or fine-tuned.
 
 ## Clone the Repository
 
