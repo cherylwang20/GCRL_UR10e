@@ -13,12 +13,18 @@ git submodule update --init --recursive
 
 ### Installation
 
-You would also need to use an external pre-trained object recognition model for object inference. We use GDINO here, which you can follow the link below to clone the repository and install:
+You would also need to use an external pre-trained object recognition model for object inference. We use GDINO here, the model should be cloned already through submodule. Please allow the instruction link in the GDINO repo to make sure that CUDA with torch and GPU is compatible. 
 
 ```bash
-git clone https://github.com/IDEA-Research/GroundingDINO.git
 cd GroundingDINO
 pip install -e .
+```
+
+**Note on PyTorch 2.0 Compatibility:**  
+If you encounter an error with `value.type()` in `ms_deform_attn_cuda.cu`, replace it with `value.scalar_type()` in:
+```
+groundingdino/models/GroundingDINO/csrc/MsDeformAttn/ms_deform_attn_cuda.cu
+```
 
 ## Set Up the Virtual Environment
 
@@ -37,12 +43,6 @@ pip install -r requirements.txt
 ```bash
 cd mj_envs
 pip install -e .
-```
-
-**Note on PyTorch 2.0 Compatibility:**  
-If you encounter an error with `value.type()` in `ms_deform_attn_cuda.cu`, replace it with `value.scalar_type()` in:
-```
-groundingdino/models/GroundingDINO/csrc/MsDeformAttn/ms_deform_attn_cuda.cu
 ```
 
 ## Download the Pre-trained Policy
