@@ -140,6 +140,58 @@ Submit with:
 sbatch job.sh
 ```
 
+# Sim2Real Transfer for UR10e Robotic Arm Using Mask-Based Goal-Conditioning
+
+Welcome to the Sim2Real Transfer project for the UR10e robotic arm. This repository provides tools and guidelines to allow zero-shot transfer of goal-conditioned reinforement learning policies from simulation environments to real-world applications specifically for the UR10e robotic arm.
+
+## Features
+
+- **UR10e Simulation Environment:** Customized simulation settings for the UR10e robotic arm.
+- **External Policy Support:** Ability to download and integrate pre-trained policies for reaching tasks.
+- **Action Type Flexibility:** Support for servoJ and moveJ position based control.
+- **Real-world Adaptation:** Techniques and tools to adapt the simulation data for real-world application.
+
+## Getting Started
+
+These instructions will get you set up to run simulations with the UR10e robotic arm, including how to download external policies, load the environment, and apply different actions.
+
+### Prerequisites
+
+Ensure the following tools and libraries are installed:
+- Python 3.8+
+- CUDA 12.4
+
+### Installation
+
+Clone the repository and install the required Python packages:
+
+```bash
+git clone https://github.com/cherylwang20/Sim2Real_GCRL_UR10e.git
+pip install -r requirements.txt
+```
+
+You would also need to use an external pre-trained object recognition model for object inference. We use GDINO here, which you can follow the link below to clone the repository and install:
+
+```bash
+git clone https://github.com/IDEA-Research/GroundingDINO.git
+cd GroundingDINO
+pip install -e .
+```
+### PyTorch 2.0 Fix
+
+If you see an error from `value.type()` in `ms_deform_attn_cuda.cu`, replace it with `value.scalar_type()` to fix compatibility with PyTorch 2.0+ at `groundingdino/models/GroundingDINO/csrc/MsDeformAttn/ms_deform_attn_cuda.cu`
+
+
+### Downloading the External Policy
+
+Use `wget` to download the pre-trained policy for the UR10e robotic arm:
+
+```bash
+mkdir -p policy
+gdown 'https://drive.google.com/uc?id=1wKpIUVp2kXvf_Lq1VV7aKIoERLOS6QtW' -O policy/baseline.zip
+```
+
+
 # Citation
 If you use this repository or any of its code in your work, please cite:
 
