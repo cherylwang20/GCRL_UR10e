@@ -17,8 +17,8 @@ import io
 import matplotlib.pyplot as plt
 import sys
 
-sys.path.append('/Users/cherylwang/Documents/GitHub/GCRL_UR10e/mj_envs')
-sys.path.append('/Users/cherylwang/Documents/GitHub/GCRL_UR10e')
+sys.path.append('/yourpath/GCRL_UR10e/mj_envs')
+sys.path.append('/yourpath/GCRL_UR10e')
 
 class CustomFrameStack(gym.Wrapper):
     def __init__(self, env, n_stack=3):
@@ -73,8 +73,6 @@ parser.add_argument("--channel_num", type=int, default=4, help="channel num")
 
 parser.add_argument("--merge", type= bool, default= False, help="merge with real world image")
 parser.add_argument("--fs", type=int, default= 20, help="frameskip")
-
-
 args = parser.parse_args()
 
 # Ignore specific warning
@@ -87,7 +85,6 @@ env = gym.make(f'mj_envs.robohive.envs:{env_name}', channel = args.channel_num, 
 env = CustomFrameStack(env, n_stack=3)
 
 seed_value = 47004  # Seed value for reproducibility
-#env.seed(seed_value)
 
 movie = True
 frame_width = 212
@@ -101,14 +98,14 @@ print("Action Space Upper Bounds:", env.action_space.high)
 
 env.reset(seed = seed_value)
 
-trial = 2
+trial = 10
 success = 0
 
 frames_rgb = []
 frames_mask = []
 view = 'front'
 all_rewards = []
-saliency_map = []
+
 for i in tqdm(range(trial)):
     ep_rewards = 0
     solved, done = False, False
@@ -125,7 +122,6 @@ for i in tqdm(range(trial)):
               frames_mask.append(mask)
           step += 1
           ep_rewards += reward
-    print(step)
     if solved:
         success += 1
     all_rewards.append(ep_rewards)
