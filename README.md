@@ -129,10 +129,9 @@ export MKL_NUM_THREADS=1
 
 wandb offline
 
+python training/Train_reach.py --env_name 'UR10eReach1C-v1' --group 'Reach_4C_dt20' --num_envs 4 --learning_rate 0.0003 --clip_range 0.1 --seed=$SLURM_ARRAY_TASK_ID --channel_num 4 --fs 20
 ######Sim2Real
-#python training/Train_reach.py --env_name 'UR10eReach1C-v1' --group 'Reach_4C_dt20' --num_envs 4 --learning_rate 0.0003 --clip_range 0.1 --seed=$SLURM_ARRAY_TASK_ID --channel_num 4 --fs 20
-
-python training/Train_reach.py --env_name 'UR10ePickPlace-v0' --group 'Pick_dis_cher' --num_envs 4 --learning_rate 0.0003 --clip_range 0.1 --seed=$SLURM_ARRAY_TASK_ID --channel_num 4 --fs 20
+python training/Train_reach.py --env_name 'UR10eReach1C-v1' --group 'Reach_4C_dt20' --num_envs 4 --learning_rate 0.0003 --clip_range 0.1 --seed=$SLURM_ARRAY_TASK_ID --channel_num 4 --fs 20 --cont True
 ```
 
 Submit with:
@@ -142,7 +141,9 @@ sbatch job.sh
 
 # Sim2Real Transfer for UR10e Robotic Arm Using Mask-Based Goal-Conditioning
 
-Welcome to the Sim2Real Transfer project for the UR10e robotic arm. This repository provides tools and guidelines to allow zero-shot transfer of goal-conditioned reinforement learning policies from simulation environments to real-world applications specifically for the UR10e robotic arm.
+After the policy is trained, one could perform sim2real on an actual UR10e robot and a D435. This allows you to perform a mask-based GC PPO policy and environment to perform reach target objects placed on a table in front of a UR10e robot. 
+<img src="https://github.com/user-attachments/assets/40cceab5-dcca-40f2-a410-7acc832d7569" alt="UR10e" width="400"/>
+
 
 ## Features
 
@@ -190,8 +191,25 @@ Use `wget` to download the pre-trained policy for the UR10e robotic arm:
 mkdir -p policy
 gdown 'https://drive.google.com/uc?id=1wKpIUVp2kXvf_Lq1VV7aKIoERLOS6QtW' -O policy/baseline.zip
 ```
+### Getting Started
 
+- The robot's initial joint configuration is:  
+  `[4.7799, -2.0740, 2.6200, 3.0542, -1.5800, 1.4305e-05]` (in radians), with the gripper fully open.
+- Place target objects **30–50 cm in front of the camera**, making sure they are **visible at the start**.
+- The camera is mounted on the Robotiq gripper using a custom 3D-printed bracket.  
+  It is essential that the **gripper is visible** in the camera view around 17 degrees downwards.
 
+<img src="https://github.com/user-attachments/assets/d3fa1dee-6506-40b1-86d9-40dfb7742a22" alt="Camera Mounting" width="500"/>
+
+- Set the correct IP address for your UR10e robot in:  
+  [`GdinoReachGraspEnv_servoJ.py#L86`](https://github.com/cherylwang20/Sim2Real_GCRL_UR10e/blob/3f6d3c6f44f698b062e058aac546f5c7d1629576/src/reachGrasp_env/GdinoReachGraspEnv_servoJ.py#L86)
+
+- Both `servoJ` and `moveJ` motion commands are supported.  
+  **`servoJ` offers better performance for sim-to-real transfer.**
+- We use a camera resolution of 848 * 480 for best inferenece results and later rescaled to 212 * 120 for policy training.
+- Due to exceeding performance, we hardcorded a pick up after approaching close to the table and performing a pick up and drop up: https://github.com/cherylwang20/Sim2Real_GCRL_UR10e/blob/3f6d3c6f44f698b062e058aac546f5c7d1629576/src/reachGrasp_env/GdinoReachGraspEnv_servoJ.py#L326. Uncomment if you don't require this behavior. 
+
+  
 # Citation
 If you use this repository or any of its code in your work, please cite:
 
