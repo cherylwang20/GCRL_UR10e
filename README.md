@@ -11,6 +11,15 @@ cd GCRL_UR10e
 git submodule update --init --recursive
 ```
 
+### Installation
+
+You would also need to use an external pre-trained object recognition model for object inference. We use GDINO here, which you can follow the link below to clone the repository and install:
+
+```bash
+git clone https://github.com/IDEA-Research/GroundingDINO.git
+cd GroundingDINO
+pip install -e .
+
 ## Set Up the Virtual Environment
 
 Use **Python 3.9** (later versions may cause issues with loading the baseline):
@@ -109,21 +118,6 @@ Ensure the following tools and libraries are installed:
 - Python 3.8+
 - CUDA 12.4
 
-### Installation
-
-Clone the repository and install the required Python packages:
-
-```bash
-git clone https://github.com/cherylwang20/Sim2Real_GCRL_UR10e.git
-pip install -r requirements.txt
-```
-
-You would also need to use an external pre-trained object recognition model for object inference. We use GDINO here, which you can follow the link below to clone the repository and install:
-
-```bash
-git clone https://github.com/IDEA-Research/GroundingDINO.git
-cd GroundingDINO
-pip install -e .
 ```
 ### PyTorch 2.0 Fix
 
