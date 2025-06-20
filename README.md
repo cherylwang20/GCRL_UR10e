@@ -122,7 +122,7 @@ Ensure the following tools and libraries are installed:
 ### PyTorch 2.0 Fix
 
 If you see an error from `value.type()` in `ms_deform_attn_cuda.cu`, replace it with `value.scalar_type()` to fix compatibility with PyTorch 2.0+ at `groundingdino/models/GroundingDINO/csrc/MsDeformAttn/ms_deform_attn_cuda.cu`
-
+```
 
 ### Downloading the External Policy
 
@@ -132,6 +132,7 @@ Use `wget` to download the pre-trained policy for the UR10e robotic arm:
 mkdir -p policy
 gdown 'https://drive.google.com/uc?id=1wKpIUVp2kXvf_Lq1VV7aKIoERLOS6QtW' -O policy/baseline.zip
 ```
+
 ### Getting Started
 
 - The robot's initial joint configuration is:  
