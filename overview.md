@@ -83,7 +83,7 @@ The authors and contributors **assume no liability** for any damage, failure, or
 
 ## Code and Usage
 
-## Clone the Repository
+### Clone the Repository
 
 ```bash
 git clone https://github.com/cherylwang20/GCRL_UR10e.git
