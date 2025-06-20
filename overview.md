@@ -65,15 +65,6 @@ The RL policy is conditioned on:
 
 ---
 
-## Key Features
-
--  **Object grounding** with GroundingDINO + SAM
--  **Mask-based goal representation** for object-level generalization
--  **Single RL policy** conditioned on dynamic, interpretable goal cues
--  Supports **simulation and real-world deployment** with a UR10e robot
-
----
-
 ## Disclaimer
 
 This codebase is provided for research purposes. Users are **fully responsible** for validating and testing any part of the code—both in simulation and on real robotic systems.  
