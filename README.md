@@ -82,7 +82,7 @@ Training Script Arguments
 To train with image augmentation, download the resized external images originally from [OpenX](https://robotics-transformer-x.github.io/) into `background` from https://mcgill-my.sharepoint.com/:u:/g/personal/huiyi_wang_mail_mcgill_ca/EZM8oZL_PPVIiOtrbl8Gy0sBLTBYWjd18TOdrS43WULVdA?e=ZBfhfY. 
 
 
-Modify the training script:
+Use the following command:
 ```bash
 python training/Train_reach.py --env_name "UR10eReach1C-v1" --merge True --cont True
 ```
