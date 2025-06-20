@@ -84,7 +84,7 @@ To train with image augmentation, download the resized external images originall
 
 Modify the training script:
 ```bash
-python training/Train_reach.py --env_name "UR10eReach1C-v1" --merge True
+python training/Train_reach.py --env_name "UR10eReach1C-v1" --merge True --cont True
 ```
 
 ## Evaluate an Existing Policy
