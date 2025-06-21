@@ -44,7 +44,7 @@ parser.add_argument("--clip_range", type=float, default=0.1, help="Clip range fo
 
 parser.add_argument("--channel_num", type=int, default=4, help="channel num")
 parser.add_argument("--merge", type= bool, default= False, help="merge with real world image")
-parser.add_argument("--cont", type= bool, default= False, help="whether do continuing training from a previous policy")
+parser.add_argument("--cont", type=str, default=None, help="whether to continue training from a previous policy")
 parser.add_argument("--fs", type=int, default= 20, help="frameskip")
 
 args = parser.parse_args()
@@ -128,9 +128,7 @@ def make_env(env_name, idx,  channel, MERGE, seed=0, fs = 20, eval_mode=False):
     return _init
 
 def main():
-    print(args.cont)
-
-    training_steps = 2500000
+    training_steps = 1500000
     env_name = args.env_name
     start_time = time.time()
     time_now = datetime.now().strftime("%Y_%m_%d_%H_%M_%S")
@@ -142,7 +140,7 @@ def main():
 
     IS_WnB_enabled = True
 
-    loaded_model =  "2025_04_04_22_58_444" #for dt30: '2025_03_29_19_39_280' #for dt20: '2025_02_21_23_44_053' #'2024_09_25_13_42_113'
+    loaded_model =  args.cont
     try:
         import wandb
         from wandb.integration.sb3 import WandbCallback
