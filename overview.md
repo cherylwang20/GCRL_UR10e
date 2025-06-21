@@ -124,9 +124,32 @@ gdown 'https://drive.google.com/uc?id=1wKpIUVp2kXvf_Lq1VV7aKIoERLOS6QtW' -O poli
 ```
 
 ## Use the pretrained policy in Sim
+```bash
+import gymnasium as gym
+from stable_baselines3 import PPO
+import mujoco
+import mujoco.viewer
+import numpy as np
+
+model = PPO.load("policy/baseline")
+
+env = gym.make('mj_envs.robohive.envs:'UR10eReach1C-v1')
+obs = env.reset(seed=42)
+
+mj_model = env.unwrapped.model
+mj_data = env.unwrapped.data
+
+with mujoco.viewer.launch_passive(mj_model, mj_data) as viewer:
+    for ep in range(5):
+        obs = env.reset()
+        done = False
+        while not done:
+            action, _ = model.predict(obs, deterministic=True)
+            obs, reward, done, info = env.step(action)
+
+```
 
 
-#TODO add script to load policy and run an episode in the ur10e simulation environment with rendering on 
 ---
 
 ## Training a New Policy
@@ -169,7 +192,7 @@ To achieve effective sim2real transfer, we fine-tune the policy trained above wi
 
 Use the following command:
 ```bash
-python training/Train_reach.py --env_name "UR10eReach1C-v1" --merge True --cont "Your Previous Policy"
+python training/Train_reach.py --env_name "UR10eReach1C-v1" --group 'Reach_4C_dt20_cont' --num_envs 4 --learning_rate 0.0003 --clip_range 0.1 --seed=0 --channel_num 4 --fs 20 --merge True --cont "Your Previous Policy"
 ```
 No change in the hyperparameter or reward shaping is required. We trained an additional 1 Million Steps until full convergence. Sim2Real shows a lack of transferability without this augmentation. 
 
@@ -193,7 +216,7 @@ No change in the hyperparameter or reward shaping is required. We trained an add
 
 - Both `servoJ` and `moveJ` motion commands are supported.  
   **`servoJ` offers better performance for sim-to-real transfer.**
-- We use a camera resolution of 848 * 480 for best inferenece results and later rescaled to 212 * 120 for policy training.
+- We use a camera resolution of 848 * 480 for best inference results and later rescaled to 212 * 120 for policy training.
 - Due to exceeding performance, we hardcorded a pick up after approaching close to the table and performing a pick up and drop up: https://github.com/cherylwang20/Sim2Real_GCRL_UR10e/blob/3f6d3c6f44f698b062e058aac546f5c7d1629576/src/reachGrasp_env/GdinoReachGraspEnv_servoJ.py#L326. Uncomment if you don't require this behavior. 
 
 
