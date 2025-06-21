@@ -34,6 +34,8 @@ The RL policy is conditioned on:
 - Proprioceptive state
 - Binary goal mask (updated at each timestep)
 
+![image](https://github.com/user-attachments/assets/143cb0c0-f81a-4cbe-be84-0ac9460f6765)
+
 ---
 
 ##  Method Summary
@@ -123,33 +125,6 @@ mkdir -p policy
 gdown 'https://drive.google.com/uc?id=1wKpIUVp2kXvf_Lq1VV7aKIoERLOS6QtW' -O policy/baseline.zip
 ```
 
-## Use the pretrained policy in Sim
-```bash
-import gymnasium as gym
-from stable_baselines3 import PPO
-import mujoco
-import mujoco.viewer
-import numpy as np
-
-model = PPO.load("policy/baseline")
-
-env = gym.make('mj_envs.robohive.envs:'UR10eReach1C-v1')
-obs = env.reset(seed=42)
-
-mj_model = env.unwrapped.model
-mj_data = env.unwrapped.data
-
-with mujoco.viewer.launch_passive(mj_model, mj_data) as viewer:
-    for ep in range(5):
-        obs = env.reset()
-        done = False
-        while not done:
-            action, _ = model.predict(obs, deterministic=True)
-            obs, reward, done, info = env.step(action)
-
-```
-
-
 ---
 
 ## Training a New Policy
@@ -206,10 +181,16 @@ No change in the hyperparameter or reward shaping is required. We trained an add
 - The robot's initial joint configuration is:  
   `[4.7799, -2.0740, 2.6200, 3.0542, -1.5800, 1.4305e-05]` (in radians), with the gripper fully open.
 - Place target objects **30–50 cm in front of the camera**, making sure they are **visible at the start**.
+
+<p align="center">
+  <img src="https://github.com/user-attachments/assets/b04fdf7e-1f52-4c69-bcde-03405df7e358" width="500"/>
+</p>
+
 - The camera is mounted on the Robotiq gripper using a custom 3D-printed bracket.  
   It is essential that the **gripper is visible** in the camera view around 17 degrees downwards.
-
-<img src="https://github.com/user-attachments/assets/d3fa1dee-6506-40b1-86d9-40dfb7742a22" alt="Camera Mounting" width="500"/>
+<p align="center">
+  <img src="https://github.com/user-attachments/assets/d3fa1dee-6506-40b1-86d9-40dfb7742a22" width="500"/>
+</p>
 
 - Set the correct IP address for your UR10e robot in:  
   [`GdinoReachGraspEnv_servoJ.py#L86`](https://github.com/cherylwang20/Sim2Real_GCRL_UR10e/blob/3f6d3c6f44f698b062e058aac546f5c7d1629576/src/reachGrasp_env/GdinoReachGraspEnv_servoJ.py#L86)
@@ -219,6 +200,12 @@ No change in the hyperparameter or reward shaping is required. We trained an add
 - We use a camera resolution of 848 * 480 for best inference results and later rescaled to 212 * 120 for policy training.
 - Due to exceeding performance, we hardcorded a pick up after approaching close to the table and performing a pick up and drop up: https://github.com/cherylwang20/Sim2Real_GCRL_UR10e/blob/3f6d3c6f44f698b062e058aac546f5c7d1629576/src/reachGrasp_env/GdinoReachGraspEnv_servoJ.py#L326. Uncomment if you don't require this behavior. 
 
+## Sample Video Demonstration for UR10e Reaching
+- G.DINO Prompt: Green Apple
+- Control: ServoJ
+<p align="center">
+  <img src="https://github.com/user-attachments/assets/c0108591-ac24-40cf-9839-8dd98b53c533" width="300"/>
+</p>
 
 
 ## 📝 Citation
