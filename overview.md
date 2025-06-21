@@ -157,19 +157,21 @@ Training Script Arguments
 ## Evaluate an Existing Policy
 
 ```bash
-python training/Eval_reach_int.py --env_name "UR10eReach1C-v1" --model_num "baseline"
+python training/Eval_Baseline.py --env_name "UR10eReach1C-v1" --model_num "baseline"
 ```
 
 ## Sim2Real
 
-For achieve effective sim2real transfer, we finetune the policy trained above with observation image augmentation. To train with image augmentation, download the resized external images originally from [OpenX](https://robotics-transformer-x.github.io/) into `background` from https://mcgill-my.sharepoint.com/:u:/g/personal/huiyi_wang_mail_mcgill_ca/EZM8oZL_PPVIiOtrbl8Gy0sBLTBYWjd18TOdrS43WULVdA?e=ZBfhfY. 
+To achieve effective sim2real transfer, we fine-tune the policy trained above with observation image augmentation using continuous training. To train with image augmentation, download the resized external images originally from [OpenX](https://robotics-transformer-x.github.io/) into `background` from https://mcgill-my.sharepoint.com/:u:/g/personal/huiyi_wang_mail_mcgill_ca/EZM8oZL_PPVIiOtrbl8Gy0sBLTBYWjd18TOdrS43WULVdA?e=ZBfhfY. 
 
-#TODO add figure of image mixing
+![image](https://github.com/user-attachments/assets/1519c8ed-2f64-4b9c-9281-425fd117f8e2)
+
 
 Use the following command:
 ```bash
-python training/Train_reach.py --env_name "UR10eReach1C-v1" --merge True --cont True
+python training/Train_reach.py --env_name "UR10eReach1C-v1" --merge True --cont "Your Previous Policy"
 ```
+No change in the hyperparameter or reward shaping is required. We trained an additional 1 Million Steps until full convergence. Sim2Real shows a lack of transferability without this augmentation. 
 
 ---
 
